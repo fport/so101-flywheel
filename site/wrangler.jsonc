@@ -1,0 +1,9 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "flywheel",
+  "compatibility_date": "2026-10-22",
+  "workers_dev": true,
+  "observability": { "enabled": true },
+  "routes": [{ "pattern": "flywheel.getporti.com", "custom_domain": true }],
+  "assets": { "directory": "public", "not_found_handling": "404-page", "html_handling": "auto-trailing-slash" }
+}

@@ -1,0 +1,165 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 930" width="1280" height="930" font-family="-apple-system, Helvetica, Arial, sans-serif" font-size="12">
+<rect width="1280" height="930" fill="#fbfbfa"/>
+<text x="28" y="36" font-size="20" font-weight="700" fill="#1f2328">SO-101 quality control cell</text>
+<text x="28" y="56" fill="#667085">Scaled diagram, generated from hardware/params.yaml. Dimensions in mm.</text>
+<text x="28" y="92" font-size="14" font-weight="600" fill="#1f2328">Top view</text>
+<rect x="52.2" y="100.9" width="148.7" height="247.8" fill="#3b3d42" stroke="#fbfbfa" stroke-width="2"/>
+<line x1="52.2" y1="150.4" x2="200.9" y2="150.4" stroke="#4a4d53" stroke-width="0.6"/>
+<line x1="52.2" y1="200.0" x2="200.9" y2="200.0" stroke="#4a4d53" stroke-width="0.6"/>
+<line x1="52.2" y1="249.6" x2="200.9" y2="249.6" stroke="#4a4d53" stroke-width="0.6"/>
+<line x1="52.2" y1="299.1" x2="200.9" y2="299.1" stroke="#4a4d53" stroke-width="0.6"/>
+<line x1="101.8" y1="100.9" x2="101.8" y2="348.7" stroke="#4a4d53" stroke-width="0.6"/>
+<line x1="151.3" y1="100.9" x2="151.3" y2="348.7" stroke="#4a4d53" stroke-width="0.6"/>
+<text x="68.7" y="115.0" text-anchor="start" fill="#9aa0a9" font-size="11">A1</text>
+<rect x="200.9" y="100.9" width="198.2" height="247.8" fill="#3b3d42" stroke="#fbfbfa" stroke-width="2"/>
+<line x1="200.9" y1="150.4" x2="399.1" y2="150.4" stroke="#4a4d53" stroke-width="0.6"/>
+<line x1="200.9" y1="200.0" x2="399.1" y2="200.0" stroke="#4a4d53" stroke-width="0.6"/>
+<line x1="200.9" y1="249.6" x2="399.1" y2="249.6" stroke="#4a4d53" stroke-width="0.6"/>
+<line x1="200.9" y1="299.1" x2="399.1" y2="299.1" stroke="#4a4d53" stroke-width="0.6"/>
+<line x1="250.4" y1="100.9" x2="250.4" y2="348.7" stroke="#4a4d53" stroke-width="0.6"/>
+<line x1="300.0" y1="100.9" x2="300.0" y2="348.7" stroke="#4a4d53" stroke-width="0.6"/>
+<line x1="349.6" y1="100.9" x2="349.6" y2="348.7" stroke="#4a4d53" stroke-width="0.6"/>
+<text x="217.4" y="115.0" text-anchor="start" fill="#9aa0a9" font-size="11">A2</text>
+<rect x="399.1" y="100.9" width="148.7" height="247.8" fill="#3b3d42" stroke="#fbfbfa" stroke-width="2"/>
+<line x1="399.1" y1="150.4" x2="547.8" y2="150.4" stroke="#4a4d53" stroke-width="0.6"/>
+<line x1="399.1" y1="200.0" x2="547.8" y2="200.0" stroke="#4a4d53" stroke-width="0.6"/>
+<line x1="399.1" y1="249.6" x2="547.8" y2="249.6" stroke="#4a4d53" stroke-width="0.6"/>
+<line x1="399.1" y1="299.1" x2="547.8" y2="299.1" stroke="#4a4d53" stroke-width="0.6"/>
+<line x1="448.7" y1="100.9" x2="448.7" y2="348.7" stroke="#4a4d53" stroke-width="0.6"/>
+<line x1="498.2" y1="100.9" x2="498.2" y2="348.7" stroke="#4a4d53" stroke-width="0.6"/>
+<text x="415.6" y="115.0" text-anchor="start" fill="#9aa0a9" font-size="11">A3</text>
+<rect x="52.2" y="348.7" width="148.7" height="247.8" fill="none" stroke="#c9ced6" stroke-dasharray="5 4"/>
+<text x="126.5" y="472.6" text-anchor="middle" fill="#667085" font-size="11">not printed</text>
+<rect x="200.9" y="348.7" width="198.2" height="247.8" fill="#3b3d42" stroke="#fbfbfa" stroke-width="2"/>
+<line x1="200.9" y1="398.2" x2="399.1" y2="398.2" stroke="#4a4d53" stroke-width="0.6"/>
+<line x1="200.9" y1="447.8" x2="399.1" y2="447.8" stroke="#4a4d53" stroke-width="0.6"/>
+<line x1="200.9" y1="497.4" x2="399.1" y2="497.4" stroke="#4a4d53" stroke-width="0.6"/>
+<line x1="200.9" y1="546.9" x2="399.1" y2="546.9" stroke="#4a4d53" stroke-width="0.6"/>
+<line x1="250.4" y1="348.7" x2="250.4" y2="596.5" stroke="#4a4d53" stroke-width="0.6"/>
+<line x1="300.0" y1="348.7" x2="300.0" y2="596.5" stroke="#4a4d53" stroke-width="0.6"/>
+<line x1="349.6" y1="348.7" x2="349.6" y2="596.5" stroke="#4a4d53" stroke-width="0.6"/>
+<text x="217.4" y="362.8" text-anchor="start" fill="#9aa0a9" font-size="11">B2</text>
+<rect x="399.1" y="348.7" width="148.7" height="247.8" fill="none" stroke="#c9ced6" stroke-dasharray="5 4"/>
+<text x="473.5" y="472.6" text-anchor="middle" fill="#667085" font-size="11">not printed</text>
+<clipPath id="top-panel"><rect x="20" y="100" width="580" height="520"/></clipPath>
+<polygon clip-path="url(#top-panel)" points="-26.0,58.1 626.0,58.1 587.0,529.0 13.0,529.0" fill="#f2c94c" fill-opacity="0.10" stroke="#d9a400" stroke-width="1.2" stroke-dasharray="6 4"/>
+<path d="M205.6 200.0 A94.4 94.4 0 0 0 394.4 200.0" fill="none" stroke="#7fb3ff" stroke-width="1" stroke-dasharray="3 3"/>
+<path d="M54.6 200.0 A245.4 245.4 0 0 0 545.4 200.0" fill="none" stroke="#7fb3ff" stroke-width="1" stroke-dasharray="3 3"/>
+<rect x="200.9" y="249.6" width="198.2" height="99.1" fill="#17171a" stroke="#55585e"/>
+<text x="300.0" y="303.8" text-anchor="middle" fill="#d0d3d8" font-size="11">inspection backdrop</text>
+<rect x="200.9" y="348.7" width="198.2" height="99.1" fill="#1f1f21" stroke="#6b6e75"/>
+<rect x="343.7" y="351.0" width="44.8" height="44.8" fill="#2b2c2f" stroke="#6b6e75" rx="3"/>
+<text x="366.1" y="378.2" text-anchor="middle" fill="#e6e7ea" font-size="12" font-weight="600">1</text>
+<rect x="277.6" y="351.0" width="44.8" height="44.8" fill="#2b2c2f" stroke="#6b6e75" rx="3"/>
+<text x="300.0" y="378.2" text-anchor="middle" fill="#e6e7ea" font-size="12" font-weight="600">2</text>
+<rect x="211.5" y="351.0" width="44.8" height="44.8" fill="#2b2c2f" stroke="#6b6e75" rx="3"/>
+<text x="233.9" y="378.2" text-anchor="middle" fill="#e6e7ea" font-size="12" font-weight="600">3</text>
+<rect x="343.7" y="400.6" width="44.8" height="44.8" fill="#2b2c2f" stroke="#6b6e75" rx="3"/>
+<text x="366.1" y="427.7" text-anchor="middle" fill="#e6e7ea" font-size="12" font-weight="600">4</text>
+<rect x="277.6" y="400.6" width="44.8" height="44.8" fill="#2b2c2f" stroke="#6b6e75" rx="3"/>
+<text x="300.0" y="427.7" text-anchor="middle" fill="#e6e7ea" font-size="12" font-weight="600">5</text>
+<rect x="211.5" y="400.6" width="44.8" height="44.8" fill="#2b2c2f" stroke="#6b6e75" rx="3"/>
+<text x="233.9" y="427.7" text-anchor="middle" fill="#e6e7ea" font-size="12" font-weight="600">6</text>
+<rect x="52.2" y="200.0" width="148.7" height="148.7" fill="#80858c" fill-opacity="0.9" stroke="#fbfbfa" rx="5"/>
+<rect x="65.2" y="213.0" width="122.7" height="122.7" fill="#111214" fill-opacity="0.55" rx="3"/>
+<text x="126.5" y="279.1" text-anchor="middle" fill="#ffffff" font-weight="600">OK bin</text>
+<rect x="399.1" y="200.0" width="148.7" height="148.7" fill="#e6731a" fill-opacity="0.9" stroke="#fbfbfa" rx="5"/>
+<rect x="412.1" y="213.0" width="122.7" height="122.7" fill="#111214" fill-opacity="0.55" rx="3"/>
+<text x="473.5" y="279.1" text-anchor="middle" fill="#ffffff" font-weight="600">REJECT bin</text>
+<rect x="66.4" y="103.2" width="70.8" height="70.8" fill="#f4f4f4" stroke="#9aa0a9"/>
+<rect x="73.4" y="110.3" width="56.6" height="56.6" fill="#111"/>
+<text x="101.8" y="143.4" text-anchor="middle" fill="#fff" font-size="10">tag 0</text>
+<rect x="462.8" y="103.2" width="70.8" height="70.8" fill="#f4f4f4" stroke="#9aa0a9"/>
+<rect x="469.9" y="110.3" width="56.6" height="56.6" fill="#111"/>
+<text x="498.2" y="143.4" text-anchor="middle" fill="#fff" font-size="10">tag 1</text>
+<rect x="202.1" y="449.0" width="47.2" height="47.2" fill="#f4f4f4" stroke="#9aa0a9"/>
+<rect x="206.8" y="453.7" width="37.8" height="37.8" fill="#111"/>
+<text x="225.7" y="477.3" text-anchor="middle" fill="#fff" font-size="10">tag 2</text>
+<rect x="350.7" y="449.0" width="47.2" height="47.2" fill="#f4f4f4" stroke="#9aa0a9"/>
+<rect x="355.5" y="453.7" width="37.8" height="37.8" fill="#111"/>
+<text x="374.3" y="477.3" text-anchor="middle" fill="#fff" font-size="10">tag 3</text>
+<circle cx="300.0" cy="200.0" r="40.1" fill="#f1f1ee" stroke="#8a8f98" stroke-width="1.5"/>
+<text x="300.0" y="204.7" text-anchor="middle" fill="#1f2328" font-weight="700">SO-101</text>
+<circle cx="300.0" cy="353.4" r="13" fill="none" stroke="#f2c94c" stroke-width="1.6" stroke-dasharray="3 3"/>
+<rect x="276.4" y="537.5" width="47.2" height="47.2" fill="#e2701a" stroke="#fbfbfa" rx="2"/>
+<circle cx="300.0" cy="481.3" r="7" fill="#111" stroke="#f2c94c" stroke-width="2"/>
+<text x="410.9" y="565.8" text-anchor="start" fill="#1f2328" font-size="11">camera mast</text>
+<text x="300.0" y="462.4" text-anchor="middle" fill="#e6e7ea" font-size="11">camera</text>
+<line x1="28" y1="650" x2="50" y2="650" stroke="#d9a400" stroke-width="2" stroke-dasharray="5 3"/>
+<text x="58" y="654" fill="#667085">area the camera sees (C310, narrow-end assumption)</text>
+<line x1="28" y1="668" x2="50" y2="668" stroke="#7fb3ff" stroke-width="2" stroke-dasharray="5 3"/>
+<text x="58" y="672" fill="#667085">vertical grasp band: 80–208 mm</text>
+<line x1="28" y1="686" x2="50" y2="686" stroke="#f2c94c" stroke-width="2" stroke-dasharray="5 3"/>
+<text x="58" y="690" fill="#667085">inspection pose: the part is shown to the camera here, 12 cm up</text>
+<text x="28" y="712" fill="#667085">Baseplate 420 × 420 mm, T-shaped, 4 tiles (A1, A2, A3, B2).</text>
+<text x="28" y="730" fill="#667085">Arm at the top; same orientation as the top camera image. Pocket 1 is on the arm's left.</text>
+<text x="640" y="92" font-size="14" font-weight="600" fill="#1f2328">Side view</text>
+<polygon points="847.8,190.5 625.4,600.0 872.8,600.0" fill="#f2c94c" fill-opacity="0.12" stroke="#d9a400" stroke-dasharray="6 4"/>
+<rect x="647.9" y="600.0" width="130.2" height="5.0" fill="#3b3d42"/>
+<rect x="778.1" y="600.0" width="130.2" height="5.0" fill="#3b3d42"/>
+<rect x="778.1" y="596.6" width="52.1" height="3.4" fill="#1f1f21"/>
+<rect x="726.0" y="598.8" width="52.1" height="1.2" fill="#17171a"/>
+<rect x="874.8" y="569.0" width="29.8" height="31.0" fill="#2c2d31"/>
+<rect x="877.3" y="441.9" width="24.8" height="127.1" fill="#232427" stroke="#fbfbfa" stroke-width="1.5"/>
+<text x="907.1" y="505.4" fill="#667085" font-size="11">segment 1</text>
+<rect x="877.3" y="314.8" width="24.8" height="127.1" fill="#232427" stroke="#fbfbfa" stroke-width="1.5"/>
+<text x="907.1" y="378.4" fill="#667085" font-size="11">segment 2</text>
+<rect x="877.3" y="187.7" width="24.8" height="127.1" fill="#232427" stroke="#fbfbfa" stroke-width="1.5"/>
+<text x="907.1" y="251.2" fill="#667085" font-size="11">segment 3</text>
+<rect x="875.5" y="185.8" width="28.5" height="29.8" fill="#e2701a"/>
+<line x1="875.5" y1="201.3" x2="859.8" y2="174.5" stroke="#e2701a" stroke-width="7"/>
+<g transform="translate(847.8 190.5) rotate(12.5)"><rect x="-13" y="-17" width="26" height="17" rx="5" fill="#111"/><circle cx="0" cy="0" r="4" fill="#f2c94c"/></g>
+<text x="692.8" y="169.4" fill="#1f2328" font-size="12">Logitech C310, tilted 12.5° (articulated)</text>
+<rect x="664.0" y="541.1" width="53.3" height="58.9" fill="#f1f1ee" stroke="#8a8f98"/>
+<polyline points="719.4,526.2 661.0,484.4 732.9,441.6 751.2,474.5 780.6,525.6" fill="none" stroke="#8a8f98" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="719.4,526.2 661.0,484.4 732.9,441.6 751.2,474.5 780.6,525.6" fill="none" stroke="#f1f1ee" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+<line x1="847.8" y1="190.5" x2="765.7" y2="600.0" stroke="#d9a400" stroke-width="1.2"/>
+<rect x="775.3" y="525.3" width="18" height="18" rx="3" fill="#a9adb5" stroke="#1f2328"/>
+<text x="799.2" y="524.4" fill="#1f2328" font-size="11">inspection pose</text>
+<text x="785.6" y="583.9" fill="#667085" font-size="11">tray</text>
+<text x="727.3" y="614.9" fill="#667085" font-size="11">backdrop</text>
+<text x="607.0" y="562.8" fill="#1f2328" font-size="12" font-weight="700">SO-101</text>
+<line x1="946.8" y1="600.0" x2="946.8" y2="187.7" stroke="#667085"/>
+<line x1="941.8" y1="600.0" x2="951.8" y2="600.0" stroke="#667085"/>
+<line x1="941.8" y1="187.7" x2="951.8" y2="187.7" stroke="#667085"/>
+<text x="951.7" y="393.9" fill="#1f2328" font-size="11">mast 665 mm</text>
+<text x="951.7" y="403.8" fill="#667085" font-size="11">lens 661 mm</text>
+<text x="610.7" y="626.0" fill="#667085" font-size="11">baseplate 8 mm</text>
+<text x="640" y="690" font-size="14" font-weight="600" fill="#1f2328">Print order: hardware/print/</text>
+<rect x="640" y="702" width="14" height="14" rx="3" fill="#2b2c30" stroke="#9aa0a9"/>
+<text x="662" y="714" fill="#1f2328"><tspan font-weight="700">01</tspan> test<tspan fill="#667085"> · 3 parts</tspan></text>
+<rect x="640" y="727" width="14" height="14" rx="3" fill="#2b2c30" stroke="#9aa0a9"/>
+<text x="662" y="739" fill="#1f2328"><tspan font-weight="700">02</tspan> camera head<tspan fill="#667085"> · 5 parts</tspan></text>
+<rect x="640" y="752" width="14" height="14" rx="3" fill="#2b2c30" stroke="#9aa0a9"/>
+<text x="662" y="764" fill="#1f2328"><tspan font-weight="700">03</tspan> baseplate A2 arm seat<tspan fill="#667085"> · 3 parts</tspan></text>
+<rect x="640" y="777" width="14" height="14" rx="3" fill="#2b2c30" stroke="#9aa0a9"/>
+<text x="662" y="789" fill="#1f2328"><tspan font-weight="700">04</tspan> baseplate B2 mast socket<tspan fill="#667085"> · 1 parts</tspan></text>
+<rect x="640" y="802" width="14" height="14" rx="3" fill="#8d9199" stroke="#9aa0a9"/>
+<text x="662" y="814" fill="#1f2328"><tspan font-weight="700">05</tspan> mast<tspan fill="#667085"> · 3 parts</tspan></text>
+<rect x="640" y="827" width="14" height="14" rx="3" fill="#2b2c30" stroke="#9aa0a9"/>
+<text x="662" y="839" fill="#1f2328"><tspan font-weight="700">06</tspan> tray backdrop single color<tspan fill="#667085"> · 2 parts</tspan></text>
+<rect x="640" y="852" width="14" height="14" rx="3" fill="#2b2c30" stroke="#9aa0a9"/>
+<text x="662" y="864" fill="#1f2328"><tspan font-weight="700">07</tspan> baseplate A1 and liners<tspan fill="#667085"> · 3 parts</tspan></text>
+<rect x="640" y="877" width="14" height="14" rx="3" fill="#2b2c30" stroke="#9aa0a9"/>
+<text x="662" y="889" fill="#1f2328"><tspan font-weight="700">08</tspan> baseplate A3<tspan fill="#667085"> · 1 parts</tspan></text>
+<rect x="640" y="902" width="14" height="14" rx="3" fill="#8d9199" stroke="#9aa0a9"/>
+<text x="662" y="914" fill="#1f2328"><tspan font-weight="700">09</tspan> bin ok<tspan fill="#667085"> · 1 parts</tspan></text>
+<rect x="958" y="702" width="14" height="14" rx="3" fill="#2b2c30" stroke="#9aa0a9"/>
+<text x="980" y="714" fill="#1f2328"><tspan font-weight="700">10</tspan> tag tiles<tspan fill="#667085"> · 4 parts</tspan></text>
+<rect x="958" y="727" width="14" height="14" rx="3" fill="#eeeee8" stroke="#9aa0a9"/>
+<text x="980" y="739" fill="#1f2328"><tspan font-weight="700">11</tspan> parts white 1<tspan fill="#667085"> · 16 parts</tspan></text>
+<rect x="958" y="752" width="14" height="14" rx="3" fill="#eeeee8" stroke="#9aa0a9"/>
+<text x="980" y="764" fill="#1f2328"><tspan font-weight="700">12</tspan> parts white 2<tspan fill="#667085"> · 16 parts</tspan></text>
+<rect x="958" y="777" width="14" height="14" rx="3" fill="#e2701a" stroke="#9aa0a9"/>
+<text x="980" y="789" fill="#1f2328"><tspan font-weight="700">13</tspan> parts orange<tspan fill="#667085"> · 28 parts</tspan></text>
+<rect x="958" y="802" width="14" height="14" rx="3" fill="#eeeee8" stroke="#9aa0a9"/>
+<text x="980" y="814" fill="#1f2328"><tspan font-weight="700">14</tspan> heldout white<tspan fill="#667085"> · 8 parts</tspan></text>
+<rect x="958" y="827" width="14" height="14" rx="3" fill="#e2701a" stroke="#9aa0a9"/>
+<text x="980" y="839" fill="#1f2328"><tspan font-weight="700">15</tspan> heldout orange<tspan fill="#667085"> · 8 parts</tspan></text>
+<rect x="958" y="852" width="14" height="14" rx="3" fill="#e2701a" stroke="#9aa0a9"/>
+<text x="980" y="864" fill="#1f2328"><tspan font-weight="700">16</tspan> bin reject and D-T-04<tspan fill="#667085"> · 2 parts</tspan></text>
+<rect x="958" y="877" width="14" height="14" rx="3" fill="#8d9199" stroke="#9aa0a9"/>
+<text x="980" y="889" fill="#1f2328"><tspan font-weight="700">17</tspan> optional mast foot<tspan fill="#667085"> · 1 parts</tspan></text>
+<rect x="958" y="902" width="14" height="14" rx="3" fill="#55585e" stroke="#9aa0a9"/>
+<text x="980" y="914" fill="#1f2328"><tspan font-weight="700">18</tspan> optional cable clips<tspan fill="#667085"> · 8 parts</tspan></text>
+</svg>

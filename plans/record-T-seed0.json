@@ -1,0 +1,986 @@
+{
+ "order": "T",
+ "seed": 0,
+ "trays": [
+  {
+   "tray": 1,
+   "pockets": [
+    "L-T-02",
+    "B-W-07",
+    "J-W-08",
+    "J-W-06",
+    "D-W-02",
+    "D-W-06"
+   ],
+   "picks": [
+    {
+     "part": "D-W-06",
+     "pocket": 6,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "B-W-07",
+     "pocket": 2,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "D-W-02",
+     "pocket": 5,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "L-T-02",
+     "pocket": 1,
+     "command": "reject",
+     "probe": true
+    },
+    {
+     "part": "J-W-06",
+     "pocket": 4,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "J-W-08",
+     "pocket": 3,
+     "command": "reject",
+     "probe": false
+    }
+   ]
+  },
+  {
+   "tray": 2,
+   "pockets": [
+    "L-T-06",
+    "J-T-06",
+    "B-T-03",
+    "D-T-07",
+    "B-W-02",
+    "L-W-08"
+   ],
+   "picks": [
+    {
+     "part": "L-T-06",
+     "pocket": 1,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "B-T-03",
+     "pocket": 3,
+     "command": "ok",
+     "probe": false
+    },
+    {
+     "part": "J-T-06",
+     "pocket": 2,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "B-W-02",
+     "pocket": 5,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "D-T-07",
+     "pocket": 4,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "L-W-08",
+     "pocket": 6,
+     "command": "reject",
+     "probe": false
+    }
+   ]
+  },
+  {
+   "tray": 3,
+   "pockets": [
+    "B-W-08",
+    "B-W-03",
+    "J-T-01",
+    "B-T-01",
+    "J-T-04",
+    "J-T-03"
+   ],
+   "picks": [
+    {
+     "part": "J-T-03",
+     "pocket": 6,
+     "command": "reject",
+     "probe": true
+    },
+    {
+     "part": "J-T-04",
+     "pocket": 5,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "B-W-03",
+     "pocket": 2,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "B-W-08",
+     "pocket": 1,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "B-T-01",
+     "pocket": 4,
+     "command": "ok",
+     "probe": false
+    },
+    {
+     "part": "J-T-01",
+     "pocket": 3,
+     "command": "ok",
+     "probe": false
+    }
+   ]
+  },
+  {
+   "tray": 4,
+   "pockets": [
+    "B-W-04",
+    "D-W-08",
+    "D-T-05",
+    "D-W-05",
+    "J-T-02",
+    "D-T-01"
+   ],
+   "picks": [
+    {
+     "part": "D-T-05",
+     "pocket": 3,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "J-T-02",
+     "pocket": 5,
+     "command": "reject",
+     "probe": true
+    },
+    {
+     "part": "D-W-08",
+     "pocket": 2,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "D-W-05",
+     "pocket": 4,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "B-W-04",
+     "pocket": 1,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "D-T-01",
+     "pocket": 6,
+     "command": "ok",
+     "probe": false
+    }
+   ]
+  },
+  {
+   "tray": 5,
+   "pockets": [
+    "J-T-07",
+    "L-W-04",
+    "J-W-05",
+    "B-T-07",
+    "B-T-04",
+    "L-W-06"
+   ],
+   "picks": [
+    {
+     "part": "J-T-07",
+     "pocket": 1,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "L-W-04",
+     "pocket": 2,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "B-T-04",
+     "pocket": 5,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "J-W-05",
+     "pocket": 3,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "L-W-06",
+     "pocket": 6,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "B-T-07",
+     "pocket": 4,
+     "command": "reject",
+     "probe": false
+    }
+   ]
+  },
+  {
+   "tray": 6,
+   "pockets": [
+    "D-T-03",
+    "B-T-02",
+    "B-W-05",
+    "L-W-01",
+    "L-T-05",
+    "L-T-07"
+   ],
+   "picks": [
+    {
+     "part": "L-W-01",
+     "pocket": 4,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "L-T-07",
+     "pocket": 6,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "L-T-05",
+     "pocket": 5,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "D-T-03",
+     "pocket": 1,
+     "command": "reject",
+     "probe": true
+    },
+    {
+     "part": "B-W-05",
+     "pocket": 3,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "B-T-02",
+     "pocket": 2,
+     "command": "ok",
+     "probe": false
+    }
+   ]
+  },
+  {
+   "tray": 7,
+   "pockets": [
+    "L-W-07",
+    "J-W-03",
+    "D-T-04",
+    "D-W-01",
+    "B-T-05",
+    "B-W-01"
+   ],
+   "picks": [
+    {
+     "part": "D-T-04",
+     "pocket": 3,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "J-W-03",
+     "pocket": 2,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "B-W-01",
+     "pocket": 6,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "B-T-05",
+     "pocket": 5,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "L-W-07",
+     "pocket": 1,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "D-W-01",
+     "pocket": 4,
+     "command": "ok",
+     "probe": true
+    }
+   ]
+  },
+  {
+   "tray": 8,
+   "pockets": [
+    "B-T-06",
+    "L-W-02",
+    "B-W-06",
+    "D-T-06",
+    "J-T-05",
+    "D-W-03"
+   ],
+   "picks": [
+    {
+     "part": "B-W-06",
+     "pocket": 3,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "J-T-05",
+     "pocket": 5,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "L-W-02",
+     "pocket": 2,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "D-T-06",
+     "pocket": 4,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "B-T-06",
+     "pocket": 1,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "D-W-03",
+     "pocket": 6,
+     "command": "ok",
+     "probe": true
+    }
+   ]
+  },
+  {
+   "tray": 9,
+   "pockets": [
+    "L-T-04",
+    "D-W-04",
+    "J-W-04",
+    "L-T-03",
+    "J-W-07",
+    "J-W-02"
+   ],
+   "picks": [
+    {
+     "part": "L-T-04",
+     "pocket": 1,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "J-W-02",
+     "pocket": 6,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "J-W-04",
+     "pocket": 3,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "L-T-03",
+     "pocket": 4,
+     "command": "reject",
+     "probe": true
+    },
+    {
+     "part": "D-W-04",
+     "pocket": 2,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "J-W-07",
+     "pocket": 5,
+     "command": "reject",
+     "probe": false
+    }
+   ]
+  },
+  {
+   "tray": 10,
+   "pockets": [
+    "L-W-05",
+    "D-T-02",
+    "J-W-01",
+    "D-W-07",
+    "L-T-01",
+    "L-W-03"
+   ],
+   "picks": [
+    {
+     "part": "D-T-02",
+     "pocket": 2,
+     "command": "ok",
+     "probe": false
+    },
+    {
+     "part": "J-W-01",
+     "pocket": 3,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "L-W-03",
+     "pocket": 6,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "L-W-05",
+     "pocket": 1,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "D-W-07",
+     "pocket": 4,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "L-T-01",
+     "pocket": 5,
+     "command": "reject",
+     "probe": true
+    }
+   ]
+  },
+  {
+   "tray": 11,
+   "pockets": [
+    "L-W-03",
+    "D-T-05",
+    "L-W-02",
+    "D-W-02",
+    "B-T-06",
+    "D-W-05"
+   ],
+   "picks": [
+    {
+     "part": "L-W-03",
+     "pocket": 1,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "D-W-05",
+     "pocket": 6,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "B-T-06",
+     "pocket": 5,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "L-W-02",
+     "pocket": 3,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "D-T-05",
+     "pocket": 2,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "D-W-02",
+     "pocket": 4,
+     "command": "reject",
+     "probe": false
+    }
+   ]
+  },
+  {
+   "tray": 12,
+   "pockets": [
+    "B-T-05",
+    "D-T-03",
+    "L-T-06",
+    "D-W-08",
+    "J-W-01",
+    "J-T-07"
+   ],
+   "picks": [
+    {
+     "part": "J-W-01",
+     "pocket": 5,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "D-T-03",
+     "pocket": 2,
+     "command": "ok",
+     "probe": false
+    },
+    {
+     "part": "J-T-07",
+     "pocket": 6,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "D-W-08",
+     "pocket": 4,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "L-T-06",
+     "pocket": 3,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "B-T-05",
+     "pocket": 1,
+     "command": "ok",
+     "probe": true
+    }
+   ]
+  },
+  {
+   "tray": 13,
+   "pockets": [
+    "B-T-07",
+    "B-T-01",
+    "J-W-02",
+    "J-T-03",
+    "D-W-06",
+    "L-W-01"
+   ],
+   "picks": [
+    {
+     "part": "B-T-01",
+     "pocket": 2,
+     "command": "reject",
+     "probe": true
+    },
+    {
+     "part": "B-T-07",
+     "pocket": 1,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "J-W-02",
+     "pocket": 3,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "D-W-06",
+     "pocket": 5,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "J-T-03",
+     "pocket": 4,
+     "command": "ok",
+     "probe": false
+    },
+    {
+     "part": "L-W-01",
+     "pocket": 6,
+     "command": "reject",
+     "probe": false
+    }
+   ]
+  },
+  {
+   "tray": 14,
+   "pockets": [
+    "J-W-08",
+    "D-W-03",
+    "L-T-04",
+    "J-W-07",
+    "D-W-01",
+    "D-T-04"
+   ],
+   "picks": [
+    {
+     "part": "J-W-08",
+     "pocket": 1,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "D-W-01",
+     "pocket": 5,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "D-W-03",
+     "pocket": 2,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "J-W-07",
+     "pocket": 4,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "D-T-04",
+     "pocket": 6,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "L-T-04",
+     "pocket": 3,
+     "command": "ok",
+     "probe": true
+    }
+   ]
+  },
+  {
+   "tray": 15,
+   "pockets": [
+    "L-T-07",
+    "J-T-04",
+    "D-T-01",
+    "D-W-04",
+    "B-T-02",
+    "L-T-01"
+   ],
+   "picks": [
+    {
+     "part": "B-T-02",
+     "pocket": 5,
+     "command": "reject",
+     "probe": true
+    },
+    {
+     "part": "J-T-04",
+     "pocket": 2,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "L-T-07",
+     "pocket": 1,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "D-W-04",
+     "pocket": 4,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "L-T-01",
+     "pocket": 6,
+     "command": "ok",
+     "probe": false
+    },
+    {
+     "part": "D-T-01",
+     "pocket": 3,
+     "command": "reject",
+     "probe": true
+    }
+   ]
+  },
+  {
+   "tray": 16,
+   "pockets": [
+    "B-W-07",
+    "B-T-04",
+    "B-W-04",
+    "B-T-03",
+    "D-T-07",
+    "L-W-05"
+   ],
+   "picks": [
+    {
+     "part": "B-W-04",
+     "pocket": 3,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "D-T-07",
+     "pocket": 5,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "B-T-03",
+     "pocket": 4,
+     "command": "reject",
+     "probe": true
+    },
+    {
+     "part": "B-T-04",
+     "pocket": 2,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "B-W-07",
+     "pocket": 1,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "L-W-05",
+     "pocket": 6,
+     "command": "reject",
+     "probe": false
+    }
+   ]
+  },
+  {
+   "tray": 17,
+   "pockets": [
+    "J-W-06",
+    "L-T-03",
+    "D-T-02",
+    "L-W-06",
+    "B-W-01",
+    "L-T-02"
+   ],
+   "picks": [
+    {
+     "part": "L-T-02",
+     "pocket": 6,
+     "command": "ok",
+     "probe": false
+    },
+    {
+     "part": "L-T-03",
+     "pocket": 2,
+     "command": "ok",
+     "probe": false
+    },
+    {
+     "part": "B-W-01",
+     "pocket": 5,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "J-W-06",
+     "pocket": 1,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "D-T-02",
+     "pocket": 3,
+     "command": "reject",
+     "probe": true
+    },
+    {
+     "part": "L-W-06",
+     "pocket": 4,
+     "command": "reject",
+     "probe": false
+    }
+   ]
+  },
+  {
+   "tray": 18,
+   "pockets": [
+    "J-W-04",
+    "B-W-08",
+    "J-T-05",
+    "B-W-05",
+    "J-T-01",
+    "B-W-03"
+   ],
+   "picks": [
+    {
+     "part": "J-T-01",
+     "pocket": 5,
+     "command": "reject",
+     "probe": true
+    },
+    {
+     "part": "J-W-04",
+     "pocket": 1,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "J-T-05",
+     "pocket": 3,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "B-W-08",
+     "pocket": 2,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "B-W-05",
+     "pocket": 4,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "B-W-03",
+     "pocket": 6,
+     "command": "ok",
+     "probe": true
+    }
+   ]
+  },
+  {
+   "tray": 19,
+   "pockets": [
+    "J-T-02",
+    "D-T-06",
+    "D-W-07",
+    "B-W-02",
+    "J-T-06",
+    "L-W-07"
+   ],
+   "picks": [
+    {
+     "part": "B-W-02",
+     "pocket": 4,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "L-W-07",
+     "pocket": 6,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "D-T-06",
+     "pocket": 2,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "J-T-02",
+     "pocket": 1,
+     "command": "ok",
+     "probe": false
+    },
+    {
+     "part": "J-T-06",
+     "pocket": 5,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "D-W-07",
+     "pocket": 3,
+     "command": "reject",
+     "probe": false
+    }
+   ]
+  },
+  {
+   "tray": 20,
+   "pockets": [
+    "J-W-03",
+    "J-W-05",
+    "L-W-08",
+    "B-W-06",
+    "L-W-04",
+    "L-T-05"
+   ],
+   "picks": [
+    {
+     "part": "L-T-05",
+     "pocket": 6,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "L-W-04",
+     "pocket": 5,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "J-W-03",
+     "pocket": 1,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "B-W-06",
+     "pocket": 4,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "J-W-05",
+     "pocket": 2,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "L-W-08",
+     "pocket": 3,
+     "command": "ok",
+     "probe": true
+    }
+   ]
+  }
+ ]
+}

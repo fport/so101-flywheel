@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 330" width="1000" height="330"><rect width="1000" height="330" fill="#ffffff"/><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#3b4250"/></marker><marker id="ahs" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#3b4250"/></marker></defs>
+<rect x="15" y="40" width="205" height="58" rx="6" fill="#f1ecf8" stroke="#6b4fa0" stroke-width="1.4"/>
+<text x="24" y="61" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#6b4fa0" text-anchor="start">COLLECTING</text>
+<text x="24" y="81.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">batch + correction demos</text>
+<path d="M220,69 L265,69" fill="none" stroke="#3b4250" stroke-width="1.6" marker-end="url(#ah)"/>
+<rect x="265" y="40" width="205" height="58" rx="6" fill="#f1ecf8" stroke="#6b4fa0" stroke-width="1.4"/>
+<text x="274" y="61" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#6b4fa0" text-anchor="start">VERIFYING</text>
+<text x="274" y="81.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">L0–L2, per episode</text>
+<path d="M470,69 L515,69" fill="none" stroke="#3b4250" stroke-width="1.6" marker-end="url(#ah)"/>
+<rect x="515" y="40" width="205" height="58" rx="6" fill="#f1ecf8" stroke="#6b4fa0" stroke-width="1.4"/>
+<text x="524" y="61" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#6b4fa0" text-anchor="start">REVIEWING</text>
+<text x="524" y="81.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">queue empty + audit clean</text>
+<path d="M720,69 L765,69" fill="none" stroke="#3b4250" stroke-width="1.6" marker-end="url(#ah)"/>
+<rect x="765" y="40" width="205" height="58" rx="6" fill="#f1ecf8" stroke="#6b4fa0" stroke-width="1.4"/>
+<text x="774" y="61" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#6b4fa0" text-anchor="start">BUILDING_DATASET</text>
+<text x="774" y="81.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">push + tag ds-vNNN</text>
+<rect x="765" y="190" width="205" height="58" rx="6" fill="#f1ecf8" stroke="#6b4fa0" stroke-width="1.4"/>
+<text x="774" y="211" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#6b4fa0" text-anchor="start">TRAINING</text>
+<text x="774" y="231.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">HF Jobs, per family</text>
+<rect x="515" y="190" width="205" height="58" rx="6" fill="#f1ecf8" stroke="#6b4fa0" stroke-width="1.4"/>
+<text x="524" y="211" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#6b4fa0" text-anchor="start">EVALUATING</text>
+<text x="524" y="231.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">paired, 32 → 64 → 96</text>
+<rect x="265" y="190" width="205" height="58" rx="6" fill="#f1ecf8" stroke="#6b4fa0" stroke-width="1.4"/>
+<text x="274" y="211" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#6b4fa0" text-anchor="start">GATING</text>
+<text x="274" y="231.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">McNemar + guardrails</text>
+<rect x="15" y="190" width="205" height="58" rx="6" fill="#e9f6ee" stroke="#2e8b57" stroke-width="1.4"/>
+<text x="24" y="211" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#2e8b57" text-anchor="start">PROMOTED / KEPT</text>
+<text x="24" y="231.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">pointer updated or kept</text>
+<path d="M867.5,98 L867.5,190" fill="none" stroke="#3b4250" stroke-width="1.6" marker-end="url(#ah)"/>
+<path d="M765,219 L720,219" fill="none" stroke="#3b4250" stroke-width="1.6" marker-end="url(#ah)"/>
+<path d="M515,219 L470,219" fill="none" stroke="#3b4250" stroke-width="1.6" marker-end="url(#ah)"/>
+<path d="M265,219 L220,219" fill="none" stroke="#3b4250" stroke-width="1.6" marker-end="url(#ah)"/>
+<path d="M117.5,190 L117.5,98" fill="none" stroke="#3b4250" stroke-width="1.6" marker-end="url(#ah)"/>
+<text x="125.5" y="149.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.2" font-weight="normal" fill="#5b6470" text-anchor="start">next iteration</text>
+<path d="M575,248 L575,270 L660,270 L660,248" fill="none" stroke="#3b4250" stroke-width="1.6" marker-end="url(#ah)"/>
+<text x="617" y="288" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.2" font-weight="normal" fill="#5b6470" text-anchor="middle">inconclusive → +32 trials</text>
+<path d="M825,248 L825,270 L910,270 L910,248" fill="none" stroke="#3b4250" stroke-width="1.6" marker-end="url(#ah)"/>
+<text x="867" y="288" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.2" font-weight="normal" fill="#5b6470" text-anchor="middle">error → retry / Colab</text>
+<rect x="265" y="128" width="455" height="34" rx="5" fill="#fff7e6" stroke="#c47f00" stroke-width="1.4"/>
+<text x="492" y="150" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.2" font-weight="normal" fill="#7a4d00" text-anchor="middle">Any state → PAUSED: e-stop, safety violation, budget limit, human needed</text>
+</svg>

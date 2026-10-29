@@ -1,0 +1,276 @@
+{
+ "order": "W",
+ "seed": 0,
+ "trays": [
+  {
+   "tray": 1,
+   "pockets": [
+    "L-W-09",
+    "J-T-08",
+    "B-T-08",
+    "D-W-09",
+    "B-W-10",
+    "D-W-10"
+   ],
+   "picks": [
+    {
+     "part": "D-W-09",
+     "pocket": 4,
+     "command": "ok",
+     "probe": false
+    },
+    {
+     "part": "D-W-10",
+     "pocket": 6,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "B-W-10",
+     "pocket": 5,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "J-T-08",
+     "pocket": 2,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "L-W-09",
+     "pocket": 1,
+     "command": "reject",
+     "probe": true
+    },
+    {
+     "part": "B-T-08",
+     "pocket": 3,
+     "command": "ok",
+     "probe": true
+    }
+   ]
+  },
+  {
+   "tray": 2,
+   "pockets": [
+    "B-T-09",
+    "B-W-09",
+    "J-W-09",
+    "D-T-08",
+    "J-T-09",
+    "J-W-10"
+   ],
+   "picks": [
+    {
+     "part": "J-W-10",
+     "pocket": 6,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "D-T-08",
+     "pocket": 4,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "B-W-09",
+     "pocket": 2,
+     "command": "ok",
+     "probe": false
+    },
+    {
+     "part": "J-W-09",
+     "pocket": 3,
+     "command": "reject",
+     "probe": true
+    },
+    {
+     "part": "B-T-09",
+     "pocket": 1,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "J-T-09",
+     "pocket": 5,
+     "command": "reject",
+     "probe": false
+    }
+   ]
+  },
+  {
+   "tray": 3,
+   "pockets": [
+    null,
+    "L-W-10",
+    "L-T-09",
+    "D-T-09",
+    null,
+    "L-T-08"
+   ],
+   "picks": [
+    {
+     "part": "D-T-09",
+     "pocket": 4,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "L-T-08",
+     "pocket": 6,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "L-T-09",
+     "pocket": 3,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "L-W-10",
+     "pocket": 2,
+     "command": "ok",
+     "probe": true
+    }
+   ]
+  },
+  {
+   "tray": 4,
+   "pockets": [
+    "J-W-09",
+    "D-W-09",
+    "B-T-09",
+    "L-T-08",
+    "D-T-09",
+    "B-W-10"
+   ],
+   "picks": [
+    {
+     "part": "D-W-09",
+     "pocket": 2,
+     "command": "reject",
+     "probe": true
+    },
+    {
+     "part": "L-T-08",
+     "pocket": 4,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "B-T-09",
+     "pocket": 3,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "B-W-10",
+     "pocket": 6,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "D-T-09",
+     "pocket": 5,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "J-W-09",
+     "pocket": 1,
+     "command": "ok",
+     "probe": false
+    }
+   ]
+  },
+  {
+   "tray": 5,
+   "pockets": [
+    "L-W-10",
+    "L-W-09",
+    "D-T-08",
+    "J-T-08",
+    "L-T-09",
+    "B-T-08"
+   ],
+   "picks": [
+    {
+     "part": "L-W-10",
+     "pocket": 1,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "D-T-08",
+     "pocket": 3,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "J-T-08",
+     "pocket": 4,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "B-T-08",
+     "pocket": 6,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "L-T-09",
+     "pocket": 5,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "L-W-09",
+     "pocket": 2,
+     "command": "ok",
+     "probe": false
+    }
+   ]
+  },
+  {
+   "tray": 6,
+   "pockets": [
+    "J-W-10",
+    null,
+    "D-W-10",
+    null,
+    "B-W-09",
+    "J-T-09"
+   ],
+   "picks": [
+    {
+     "part": "D-W-10",
+     "pocket": 3,
+     "command": "ok",
+     "probe": true
+    },
+    {
+     "part": "B-W-09",
+     "pocket": 5,
+     "command": "reject",
+     "probe": true
+    },
+    {
+     "part": "J-W-10",
+     "pocket": 1,
+     "command": "reject",
+     "probe": false
+    },
+    {
+     "part": "J-T-09",
+     "pocket": 6,
+     "command": "ok",
+     "probe": true
+    }
+   ]
+  }
+ ]
+}

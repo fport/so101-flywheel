@@ -1,0 +1,178 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 745" width="1000" height="745"><rect width="1000" height="745" fill="#ffffff"/><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#3b4250"/></marker><marker id="ahs" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#3b4250"/></marker></defs>
+<rect x="6" y="30" width="168" height="640" rx="8" fill="#fafafa" stroke="#d0d4da" stroke-width="1"/>
+<rect x="192" y="30" width="598" height="640" rx="8" fill="#fbfcfe" stroke="#d0d4da" stroke-width="1"/>
+<rect x="802" y="30" width="192" height="640" rx="8" fill="#fffaf4" stroke="#d0d4da" stroke-width="1"/>
+<text x="90" y="22" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#5b6470" text-anchor="middle">CELL</text>
+<text x="491" y="22" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#5b6470" text-anchor="middle">MAC M5 (LOCAL)</text>
+<text x="898" y="22" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#5b6470" text-anchor="middle">CLOUD</text>
+<rect x="15" y="60" width="150" height="100" rx="6" fill="#f2f2f2" stroke="#555555" stroke-width="1.4"/>
+<text x="24" y="81" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#555555" text-anchor="start">SO-101 cell</text>
+<text x="24" y="101.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">follower + leader</text>
+<text x="24" y="118.5" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">top + wrist camera</text>
+<text x="24" y="136.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">AprilTag 0–3</text>
+<text x="24" y="153.5" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">physical e-stop</text>
+<rect x="15" y="184" width="150" height="100" rx="6" fill="#f2f2f2" stroke="#555555" stroke-width="1.4" stroke-dasharray="6 4"/>
+<text x="24" y="205" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#555555" text-anchor="start">MuJoCo twin</text>
+<text x="24" y="225.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">QCSortSim + expert</text>
+<text x="24" y="242.5" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">exact outcome()</text>
+<text x="24" y="260.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">same Runner</text>
+<text x="24" y="277.5" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">interface</text>
+<rect x="205" y="60" width="180" height="224" rx="6" fill="#e8f1fb" stroke="#2f6db5" stroke-width="1.4"/>
+<text x="214" y="81" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#2f6db5" text-anchor="start">Safety layer</text>
+<text x="214" y="101.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">joint limits</text>
+<text x="214" y="118.5" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">Cartesian box</text>
+<text x="214" y="136.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">torque limit</text>
+<text x="214" y="153.5" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">e-stop (UI + physical)</text>
+<text x="214" y="171.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">N fails in a row → stop</text>
+<text x="214" y="188.5" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">servo temperature</text>
+<text x="214" y="206.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">approval gate:</text>
+<text x="214" y="223.5" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">allowlist → approve → log</text>
+<rect x="400" y="60" width="180" height="100" rx="6" fill="#e8f1fb" stroke="#2f6db5" stroke-width="1.4"/>
+<text x="409" y="81" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#2f6db5" text-anchor="start">Episode controller</text>
+<text x="409" y="101.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">phase 1: pick and show</text>
+<text x="409" y="118.5" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">phase 2: OK/REJECT bin</text>
+<text x="409" y="136.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">ACT: one-hot command</text>
+<text x="409" y="153.5" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">VLA: task text</text>
+<circle cx="567" cy="73" r="10" fill="#1b1f24"/>
+<text x="567" y="77.6" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="bold" fill="#ffffff" text-anchor="middle">1</text>
+<rect x="400" y="184" width="180" height="100" rx="6" fill="#e8f1fb" stroke="#2f6db5" stroke-width="1.4"/>
+<text x="409" y="205" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#2f6db5" text-anchor="start">Inspection</text>
+<text x="409" y="225.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">crop → 4 attributes</text>
+<text x="409" y="242.5" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">decide(attrs, order)</text>
+<text x="409" y="260.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">→ OK or REJECT</text>
+<rect x="595" y="60" width="180" height="100" rx="6" fill="#e8f1fb" stroke="#2f6db5" stroke-width="1.4"/>
+<text x="604" y="81" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#2f6db5" text-anchor="start">PolicyClient</text>
+<text x="604" y="101.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">LeRobotLocal (Mac)</text>
+<text x="604" y="118.5" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">LeRobotRemote (GPU)</text>
+<text x="604" y="136.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">Proxy (Pi API etc.)</text>
+<text x="604" y="153.5" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">policies/&lt;id&gt;.yaml</text>
+<rect x="595" y="184" width="180" height="100" rx="6" fill="#e9f6ee" stroke="#2e8b57" stroke-width="1.4"/>
+<text x="604" y="205" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#2e8b57" text-anchor="start">Recorder</text>
+<text x="604" y="225.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">LeRobot v3 dataset</text>
+<text x="604" y="242.5" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">+ episode metadata</text>
+<text x="604" y="260.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">no episode is</text>
+<text x="604" y="277.5" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">ever deleted</text>
+<circle cx="762" cy="197" r="10" fill="#1b1f24"/>
+<text x="762" y="201.6" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="bold" fill="#ffffff" text-anchor="middle">2</text>
+<rect x="595" y="308" width="180" height="100" rx="6" fill="#e9f6ee" stroke="#2e8b57" stroke-width="1.4"/>
+<text x="604" y="329" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#2e8b57" text-anchor="start">Verifier</text>
+<text x="604" y="349.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">L0 integrity</text>
+<text x="604" y="366.5" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">L1 geometry (decisive)</text>
+<text x="604" y="384.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">L2 VLM (annotate)</text>
+<text x="604" y="401.5" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">→ labels table</text>
+<circle cx="762" cy="321" r="10" fill="#1b1f24"/>
+<text x="762" y="325.6" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="bold" fill="#ffffff" text-anchor="middle">3</text>
+<rect x="400" y="308" width="180" height="100" rx="6" fill="#e9f6ee" stroke="#2e8b57" stroke-width="1.4"/>
+<text x="409" y="329" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#2e8b57" text-anchor="start">Routing</text>
+<text x="409" y="349.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">agree → auto-accept</text>
+<text x="409" y="366.5" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">conflict / low confidence</text>
+<text x="409" y="384.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">→ human queue</text>
+<text x="409" y="401.5" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">+ 10% blind audit</text>
+<rect x="205" y="308" width="180" height="100" rx="6" fill="#e9f6ee" stroke="#2e8b57" stroke-width="1.4"/>
+<text x="214" y="329" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14.4" font-weight="bold" fill="#2e8b57" text-anchor="start">Review + dashboard</text>
+<text x="214" y="349.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">phone (Tailscale)</text>
+<text x="214" y="366.5" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">confirm · relabel ·</text>
+<text x="214" y="384.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">exclude · ask for fix</text>
+<circle cx="372" cy="321" r="10" fill="#1b1f24"/>
+<text x="372" y="325.6" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="bold" fill="#ffffff" text-anchor="middle">4</text>
+<rect x="205" y="432" width="180" height="100" rx="6" fill="#f1ecf8" stroke="#6b4fa0" stroke-width="1.4"/>
+<text x="214" y="453" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#6b4fa0" text-anchor="start">Orchestrator</text>
+<text x="214" y="473.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">state machine</text>
+<text x="214" y="490.5" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">SQLite (single writer)</text>
+<text x="214" y="508.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">idempotent steps</text>
+<text x="214" y="525.5" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">cost ledger</text>
+<rect x="400" y="432" width="180" height="100" rx="6" fill="#f1ecf8" stroke="#6b4fa0" stroke-width="1.4"/>
+<text x="409" y="453" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#6b4fa0" text-anchor="start">Eval runner</text>
+<text x="409" y="473.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">held-out plan, paired</text>
+<text x="409" y="490.5" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">blind order</text>
+<text x="409" y="508.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">32 → 64 → 96 trials</text>
+<circle cx="567" cy="445" r="10" fill="#1b1f24"/>
+<text x="567" y="449.6" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="bold" fill="#ffffff" text-anchor="middle">7</text>
+<rect x="595" y="432" width="180" height="100" rx="6" fill="#e9f6ee" stroke="#2e8b57" stroke-width="1.4"/>
+<text x="604" y="453" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#2e8b57" text-anchor="start">Dataset builder</text>
+<text x="604" y="473.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">integrity checks</text>
+<text x="604" y="490.5" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">filter + merge</text>
+<text x="604" y="508.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">card + tag ds-vNNN</text>
+<circle cx="762" cy="445" r="10" fill="#1b1f24"/>
+<text x="762" y="449.6" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="bold" fill="#ffffff" text-anchor="middle">5</text>
+<rect x="205" y="556" width="180" height="100" rx="6" fill="#f1ecf8" stroke="#6b4fa0" stroke-width="1.4"/>
+<text x="214" y="577" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#6b4fa0" text-anchor="start">Configuration (git)</text>
+<text x="214" y="597.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">tasks/qc-sort/task.yaml</text>
+<text x="214" y="614.5" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">policies/&lt;id&gt;.yaml</text>
+<text x="214" y="632.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">uv.lock (LeRobot</text>
+<text x="214" y="649.5" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">0.6.1 pinned)</text>
+<rect x="400" y="556" width="180" height="100" rx="6" fill="#f1ecf8" stroke="#6b4fa0" stroke-width="1.4"/>
+<text x="409" y="577" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#6b4fa0" text-anchor="start">Gate</text>
+<text x="409" y="597.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">exact McNemar</text>
+<text x="409" y="614.5" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">(CP lower bound &gt; 0.5)</text>
+<text x="409" y="632.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">promote = pointer</text>
+<text x="409" y="649.5" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">rollback = revert</text>
+<circle cx="567" cy="569" r="10" fill="#1b1f24"/>
+<text x="567" y="573.6" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="bold" fill="#ffffff" text-anchor="middle">8</text>
+<rect x="595" y="556" width="180" height="100" rx="6" fill="#f1ecf8" stroke="#6b4fa0" stroke-width="1.4"/>
+<text x="604" y="577" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#6b4fa0" text-anchor="start">Training launcher</text>
+<text x="604" y="597.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">preflight</text>
+<text x="604" y="614.5" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">HF Jobs: submit, watch</text>
+<text x="604" y="632.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">Colab: emit command</text>
+<text x="604" y="649.5" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">(manual fallback)</text>
+<rect x="815" y="60" width="170" height="100" rx="6" fill="#fff3e6" stroke="#c26a00" stroke-width="1.4" stroke-dasharray="6 4"/>
+<text x="824" y="81" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#c26a00" text-anchor="start">GPU inference</text>
+<text x="824" y="101.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">π0.5 policy server</text>
+<text x="824" y="118.5" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">HF Jobs / RunPod</text>
+<text x="824" y="136.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">SSH tunnel</text>
+<text x="824" y="153.5" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">up only per session</text>
+<rect x="815" y="184" width="170" height="100" rx="6" fill="#fff3e6" stroke="#c26a00" stroke-width="1.4" stroke-dasharray="6 4"/>
+<text x="824" y="205" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#c26a00" text-anchor="start">Google Colab</text>
+<text x="824" y="225.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">manual fallback training</text>
+<text x="824" y="242.5" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">pushes model to Hub</text>
+<rect x="815" y="308" width="170" height="100" rx="6" fill="#fff3e6" stroke="#c26a00" stroke-width="1.4"/>
+<text x="824" y="329" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#c26a00" text-anchor="start">VLM API</text>
+<text x="824" y="349.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">Claude Sonnet 5.5</text>
+<text x="824" y="366.5" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">Gemini ER 2:</text>
+<text x="824" y="384.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">second opinion</text>
+<rect x="815" y="432" width="170" height="100" rx="6" fill="#fff3e6" stroke="#c26a00" stroke-width="1.4"/>
+<text x="824" y="453" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#c26a00" text-anchor="start">Hugging Face Hub</text>
+<text x="824" y="473.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">dataset: ds-vNNN</text>
+<text x="824" y="490.5" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">model: pv-NNN</text>
+<text x="824" y="508.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">revision SHA → DB</text>
+<rect x="815" y="556" width="170" height="100" rx="6" fill="#fff3e6" stroke="#c26a00" stroke-width="1.4"/>
+<text x="824" y="577" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#c26a00" text-anchor="start">HF Jobs</text>
+<text x="824" y="597.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">lerobot-train</text>
+<text x="824" y="614.5" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">--job.target=…</text>
+<text x="824" y="632.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">Trackio / W&amp;B</text>
+<circle cx="972" cy="569" r="10" fill="#1b1f24"/>
+<text x="972" y="573.6" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="bold" fill="#ffffff" text-anchor="middle">6</text>
+<path d="M165,110 L205,110" fill="none" stroke="#3b4250" stroke-width="1.6" marker-end="url(#ah)" marker-start="url(#ahs)"/>
+<path d="M165,234 L205,234" fill="none" stroke="#3b4250" stroke-width="1.6" marker-end="url(#ah)" marker-start="url(#ahs)"/>
+<path d="M385,110 L400,110" fill="none" stroke="#3b4250" stroke-width="1.6" marker-end="url(#ah)" marker-start="url(#ahs)"/>
+<path d="M580,100 L595,100" fill="none" stroke="#3b4250" stroke-width="1.6" marker-end="url(#ah)" marker-start="url(#ahs)"/>
+<path d="M450,160 L450,184" fill="none" stroke="#3b4250" stroke-width="1.6" marker-end="url(#ah)"/>
+<path d="M530,184 L530,160" fill="none" stroke="#3b4250" stroke-width="1.6" marker-end="url(#ah)"/>
+<path d="M555,160 L555,172 L685,172 L685,184" fill="none" stroke="#3b4250" stroke-width="1.6" marker-end="url(#ah)"/>
+<path d="M685,284 L685,308" fill="none" stroke="#3b4250" stroke-width="1.6" marker-end="url(#ah)"/>
+<path d="M595,358 L580,358" fill="none" stroke="#3b4250" stroke-width="1.6" marker-end="url(#ah)"/>
+<path d="M400,358 L385,358" fill="none" stroke="#3b4250" stroke-width="1.6" marker-end="url(#ah)"/>
+<path d="M490,408 L490,420 L640,420 L640,432" fill="none" stroke="#3b4250" stroke-width="1.6" marker-end="url(#ah)"/>
+<path d="M295,408 L295,432" fill="none" stroke="#3b4250" stroke-width="1.6" marker-end="url(#ah)"/>
+<path d="M255,556 L255,532" fill="none" stroke="#3b4250" stroke-width="1.6" marker-end="url(#ah)"/>
+<path d="M345,532 L345,544 L685,544 L685,556" fill="none" stroke="#3b4250" stroke-width="1.6" marker-end="url(#ah)"/>
+<path d="M440,532 L440,556" fill="none" stroke="#3b4250" stroke-width="1.6" marker-end="url(#ah)"/>
+<path d="M580,606 L588,606 L588,140 L595,140" fill="none" stroke="#3b4250" stroke-width="1.6" marker-end="url(#ah)"/>
+<path d="M775,110 L815,110" fill="none" stroke="#3b4250" stroke-width="1.6" marker-end="url(#ah)" marker-start="url(#ahs)" stroke-dasharray="5 4"/>
+<path d="M775,358 L815,358" fill="none" stroke="#3b4250" stroke-width="1.6" marker-end="url(#ah)" marker-start="url(#ahs)"/>
+<path d="M775,482 L815,482" fill="none" stroke="#3b4250" stroke-width="1.6" marker-end="url(#ah)"/>
+<path d="M775,606 L815,606" fill="none" stroke="#3b4250" stroke-width="1.6" marker-end="url(#ah)"/>
+<path d="M870,532 L870,556" fill="none" stroke="#3b4250" stroke-width="1.6" marker-end="url(#ah)"/>
+<path d="M930,556 L930,532" fill="none" stroke="#3b4250" stroke-width="1.6" marker-end="url(#ah)"/>
+<rect x="15" y="687" width="22" height="16" rx="3" fill="#e8f1fb" stroke="#2f6db5" stroke-width="1.4"/>
+<text x="45" y="700" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">real time (30 Hz)</text>
+<rect x="238.2" y="687" width="22" height="16" rx="3" fill="#e9f6ee" stroke="#2e8b57" stroke-width="1.4"/>
+<text x="268.2" y="700" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">post-episode, async</text>
+<rect x="469.0" y="687" width="22" height="16" rx="3" fill="#f1ecf8" stroke="#6b4fa0" stroke-width="1.4"/>
+<text x="499.0" y="700" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">control plane</text>
+<rect x="639.0" y="687" width="22" height="16" rx="3" fill="#fff3e6" stroke="#c26a00" stroke-width="1.4"/>
+<text x="669.0" y="700" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">cloud / external</text>
+<rect x="801.4" y="687" width="22" height="16" rx="3" fill="#f2f2f2" stroke="#555555" stroke-width="1.4"/>
+<text x="831.4" y="700" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.6" font-weight="normal" fill="#1b1f24" text-anchor="start">physical or sim</text>
+<text x="15" y="730" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13.2" font-weight="normal" fill="#5b6470" text-anchor="start">Dashed box: only when needed. Numbers give the loop order: 1 episode, 2 record, 3 verify, 4 review, 5 dataset, 6 train, 7 eval, 8 gate.</text>
+</svg>

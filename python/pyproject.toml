@@ -1,0 +1,36 @@
+[project]
+name = "so101-flywheel"
+version = "0.1.0"
+description = "SO-101 self-improving data flywheel: robot, training, verifier and simulation"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "mujoco==3.12.0",
+    "numpy>=2.0",
+    "pyyaml>=6.0",
+    "manifold3d>=3.0",
+    "pillow>=10.0",
+    "imageio[ffmpeg]>=2.34",
+    "opencv-python-headless>=4.9",
+]
+
+[project.scripts]
+flywheel-sim = "flywheel.sim.cli:main"
+flywheel-cad = "flywheel.hardware.cli:main"
+flywheel-robot = "flywheel.robot.cli:main"
+
+[project.optional-dependencies]
+robot = [
+    "lerobot[feetech,dataset,training]==0.6.1",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["flywheel"]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]

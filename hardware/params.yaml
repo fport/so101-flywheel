@@ -1,0 +1,133 @@
+# Single source of dimensions: CAD parts (hardware/) and the MuJoCo scene (python/flywheel/sim) derive from here.
+# If the setup changes, only this file is updated; `flywheel-sim build` regenerates the scene.
+#
+# Units: length mm, angle degrees. Coordinate system: origin = point where the shoulder_pan axis meets the
+# baseplate top surface, +x = direction the arm faces, +y = arm's left, +z = up.
+#
+# Values with `source: sim` were measured on the SO-101 MJCF model; update them once measured on the real arm
+# (docs/print-plan.md, "Measurements first").
+
+measured:
+  source: sim
+  gripper_open_max: 139     # tip to tip with the jaws fully open
+  jaw_depth: 59             # from jaw tip to palm
+  reach_min: 80             # nearest radius for a vertical (top-down) grasp
+  reach_comfort: 208        # farthest radius reached with a vertical grasp (260) minus 20%
+  base_footprint: [111, 87] # x, y size of the base footprint
+  cam_top_height: 660       # top camera lens height above the baseplate; same 66 cm as XOX
+
+printer:
+  name: Bambu Lab X2D
+  bed: [256, 256, 260]
+  shared_x: [20.5, 235.5]   # x range both nozzles reach; print jobs are laid out within it
+  max_tile_units: 5         # at most 5 tiles (210 mm) per print
+
+fit:
+  clearance: 0.2            # per-side clearance for fit parts
+
+grid:
+  pitch: 42                 # Gridfinity
+  thickness: 8.0            # 5.05 mm socket + 2.95 mm solid floor (for the bowtie keys)
+  x_units: [-2, 8]          # tile range the baseplate covers: 420 x 420 mm
+  y_units: [-5, 5]
+  tiles_x: [-2, 3, 8]       # print tile boundaries (in tile units); each piece must fit the bed
+  tiles_y: [-5, -2, 2, 5]   # middle strip keeps the arm seat on a single tile
+  skip: [B1, B3]            # the two far corner tiles stay empty; not printed, the baseplate is T-shaped
+
+tray:
+  center: [168, 0]          # 4u ahead
+  size: [84, 168]           # 2u x 4u
+  floor: 3
+  pocket_depth: 2.5
+  pocket_size: [38, 38]
+  finger_slot: 18           # finger slot in the pocket's y walls; lets the jaws reach the floor for low parts
+  rows: 2                   # along x
+  cols: 3                   # along y; pocket no = row * cols + col + 1, 1 = near-left
+
+bins:
+  size: [126, 126]          # 3u x 3u tile footprint; outer mouth size is 0.5 mm inside it
+  wall_height: 35
+  wall_tilt: 15             # outward angle
+  wall_thickness: 2.4
+  liner_thickness: 2        # floor liner: 1 mm sheet + 1 mm grid, PLA
+  ok:
+    center: [63, -147]      # tiles x 0..3u, y -5u..-2u (arm's right; left in the top camera frame)
+    color: [0.50, 0.52, 0.55]   # metal grey
+  reject:
+    center: [63, 147]       # tiles x 0..3u, y 2u..5u (arm's left)
+    color: [0.90, 0.45, 0.10]   # orange
+
+inspection:
+  backdrop_center: [84, 0]  # tiles x 1u..3u, y -2u..2u: between the tray and the arm base
+  backdrop_size: [84, 168]
+  backdrop_color: [0.09, 0.09, 0.10]  # matte black: highest contrast with metallic parts
+  # Point where the part is shown to the camera (x, height). The wrist limit keeps the arm from holding it vertical
+  # any closer/higher; the top camera's line of sight through this point lands on the backdrop (x ~ 103).
+  pose: [130, 120]
+  pose_tilt: 30             # forward tilt of the jaws from vertical; the hole on the top face stays visible
+
+cameras:
+  resolution: [640, 480]
+  top:
+    # Logitech C310, in the articulated cradle at the top of the mast. Position and view direction are computed from the
+    # mast + head dimensions and mast.head.tilt (flywheel.sim.params.top_camera_pose). FOV not measured: Logitech gives 60
+    # degrees diagonal, which is 32-38 degrees vertical in 4:3 mode; the narrow end was taken.
+    webcam: {model: Logitech C310, body: [71.15, 31.3, 25.95]}   # length, width, thickness (clip folded); outer dimensions given by Logitech
+    fovy: 32
+  wrist:
+    # in the gripper body frame (jaws extend along -z, +x is the moving jaw side)
+    position: [-4, 62, -8]
+    look_at: [-2, 0, -110]
+    fovy: 70
+
+tags:
+  family: apriltag_36h11
+  # size: tag size including the black border; units: tile size; tile: tile center. The tile prints in two colors:
+  # black body, the tag's white cells and the 1-cell quiet zone as a 1 mm white inlay on top.
+  # The two near tags are shifted 10 mm outward within the tile so the bin wall doesn't hide a corner from the top camera.
+  items:
+    - {id: 0, units: 2, size: 48, tile: [-42, -168], center: [-52, -168]}
+    - {id: 1, units: 2, size: 48, tile: [-42, 168], center: [-52, 168]}
+    - {id: 2, units: 1, size: 32, tile: [231, -63], center: [231, -63]}   # just beyond the tray, on tile B2
+    - {id: 3, units: 1, size: 32, tile: [231, 63], center: [231, 63]}
+
+mast:
+  # Top camera mast: fully printed, nesting parts. No screws, no off-the-shelf profiles.
+  pos: [306, 0]             # socket embedded in a baseplate tile (tile x 6u..8u, y -1u..1u)
+  size: 40                  # square tube outer size
+  wall: 1.6                 # 4 lines; by calculation the mast tip flexes about 0.5 mm
+  segment: 205              # visible length of one segment; print length including the spigot is 250 mm
+  segments: 3
+  spigot: 45                # tapered spigot length
+  fit: 0.3                  # total undersize of the male end vs the female bore (0.15 per side)
+  crush: 0.05               # per-side crush rib interference in the female bore; raise if loose, lower if it won't go in
+  head:
+    tilts: [0, 12.5, 25, 37.5, 50]   # joint detents: tilt from vertical toward the arm; 0 = straight down (XOX layout)
+    tilt: 12.5                       # detent used in this cell
+
+clips:
+  cable_d: 5                # servo / USB cable diameter
+  mast:                     # cable clamps on the mast segments
+    per_segment: 2
+    channel: [6, 9]         # channel inner size outward from the mast and along the face; fits two thin cables
+    mouth: 3.2              # mouth the cable is pressed through
+
+light:
+  # fixed light: lights the part at the inspection pose from the camera side, without shadows
+  position: [300, 120, 700]
+  look_at: [110, 0, 0]
+
+parts:
+  # automotive supplier end-of-line inspection: 4 part types, 15 training + 4 held-out parts per type.
+  # Color is a variant, not a defect; the work order says which variant is wanted (docs/experiment-design.md).
+  seed: 101
+  colors:                    # two filaments; the codes go into the part ID (J-W-03, J-T-03)
+    W: [0.93, 0.93, 0.91]    # white
+    T: [0.90, 0.45, 0.10]    # orange
+  train:                     # per type; defects exist in both colors
+    W: {good: 4, missing_hole: 2, broken_corner: 2}
+    T: {good: 3, missing_hole: 2, broken_corner: 2}
+  rim: {outer_d: 34, height: 14, bore_d: 7, spokes: 5, spoke_w: 4.5, floor: 4}      # rim
+  gear: {outer_d: 33, root_d: 26, teeth: 14, thickness: 10, hub_d: 18, height: 26, bore_d: 7}  # gear
+  pad: {length: 34, width: 24, plate: 3, block: [26, 20], height: 13, groove: 3, ear_hole_d: 3}  # brake pad
+  bracket: {length: 36, width: 24, thickness: 5, height: 30, hole_d: 7}             # mounting bracket

@@ -1,0 +1,94 @@
+{
+  "updated": "2026-10-29",
+  "now": "tags",
+  "status": {
+    "cell": "active",
+    "tags": "active",
+    "calib": "done",
+    "teleop": "done",
+    "cams": "todo",
+    "scene": "done",
+    "episode": "done",
+    "parts": "done",
+    "batch": "done",
+    "plan": "next",
+    "recorder": "active",
+    "record": "todo",
+    "dataset": "todo",
+    "train": "todo",
+    "verify": "todo",
+    "eval": "todo",
+    "loop": "todo"
+  },
+  "checks": {
+    "cell": [
+      true,
+      true,
+      true,
+      false
+    ],
+    "tags": [
+      false,
+      false,
+      false
+    ],
+    "calib": [
+      true,
+      true,
+      true
+    ],
+    "teleop": [
+      true,
+      true
+    ],
+    "scene": [
+      true,
+      true
+    ],
+    "episode": [
+      true,
+      true,
+      true
+    ],
+    "parts": [
+      true,
+      true
+    ],
+    "batch": [
+      true,
+      true
+    ],
+    "recorder": [
+      true,
+      false,
+      false
+    ]
+  },
+  "log": [
+    {
+      "date": "2026-10-29",
+      "text": "Wrote the plan-driven recorder (flywheel-robot record): 30 parts per session, two-phase task text, [ok, reject] command, end-of-tray backup and crash recovery, private Hugging Face push at the end of the session. Tested with fake hardware."
+    },
+    {
+      "date": "2026-10-29",
+      "text": "Checked AprilTag placement from a photo: layout is a mirror image of params.yaml (OK bin on the arm's left), tiles 0 and 1 rotated 90°. To be fixed."
+    },
+    {
+      "date": "2026-10-29",
+      "text": "Fixed wrist_roll alignment: both arms recalibrated at 17:41, wrist difference ~1°."
+    },
+    {
+      "date": "2026-10-29",
+      "text": "Calibrated follower and leader from scratch (lerobot 0.6.1). Teleop works."
+    },
+    {
+      "date": "2026-10-15",
+      "text": "Generated recording and held-out plans (seed 0, two work orders)."
+    },
+    {
+      "date": "2026-10-12",
+      "text": "MuJoCo scene and scripted expert: 360/360 on the recording plan, 64/64 held-out."
+    }
+  ],
+  "now_text": "Place the bins and tags"
+}

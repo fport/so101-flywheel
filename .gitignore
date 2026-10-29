@@ -1,0 +1,28 @@
+.venv/
+__pycache__/
+.pytest_cache/
+*.egg-info/
+.DS_Store
+outputs/
+# regenerated from params.yaml by `flywheel-sim build`
+python/flywheel/sim/assets/generated/
+
+# tool output
+MUJOCO_LOG.TXT
+result.json
+.env
+.claude/settings.local.json
+
+# personal notes, not part of the repo
+docs/icerik/
+
+# old screenshots and renders that no doc uses (`flywheel-cad showcase` still writes the last four)
+hardware/Screenshot*.png
+docs/media/hardware-preview.png
+docs/media/assembly-exploded.png
+docs/media/assembly-top.png
+docs/media/final-workspace.png
+docs/media/final-head-closeup.png
+
+# Turkish PDF renders of the reports, kept locally
+docs/report/**/*.pdf
