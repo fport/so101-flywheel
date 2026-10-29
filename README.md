@@ -1,3 +1,5 @@
+<p align="center">English · <a href="README.tr.md">Türkçe</a></p>
+
 <p align="center">
   <img src="docs/media/final.png" width="900" alt="The SO-101 QC cell in MuJoCo: overview, workspace, side view, camera head, top camera and wrist camera">
 </p>

@@ -67,28 +67,49 @@
   "log": [
     {
       "date": "2026-10-29",
-      "text": "Wrote the plan-driven recorder (flywheel-robot record): 30 parts per session, two-phase task text, [ok, reject] command, end-of-tray backup and crash recovery, private Hugging Face push at the end of the session. Tested with fake hardware."
+      "text": {
+        "en": "Wrote the plan-driven recorder (flywheel-robot record): 30 parts per session, two-phase task text, [ok, reject] command, end-of-tray backup and crash recovery, private Hugging Face push at the end of the session. Tested with fake hardware.",
+        "tr": "Plan güdümlü kaydedici yazıldı (flywheel-robot record): oturum başına 30 parça, iki fazlı görev metni, [ok, reject] komutu, tepsi sonu yedek ve çökme kurtarma, oturum sonunda private Hugging Face push. Sahte donanımla test edildi."
+      }
     },
     {
       "date": "2026-10-29",
-      "text": "Checked AprilTag placement from a photo: layout is a mirror image of params.yaml (OK bin on the arm's left), tiles 0 and 1 rotated 90°. To be fixed."
+      "text": {
+        "en": "Checked AprilTag placement from a photo: layout is a mirror image of params.yaml (OK bin on the arm's left), tiles 0 and 1 rotated 90°. To be fixed.",
+        "tr": "AprilTag yerleşimi fotoğraftan kontrol edildi: düzen params.yaml'ın ayna görüntüsü (OK kasası kolun solunda), 0 ve 1 karoları 90° dönük. Düzeltilecek."
+      }
     },
     {
       "date": "2026-10-29",
-      "text": "Fixed wrist_roll alignment: both arms recalibrated at 17:41, wrist difference ~1°."
+      "text": {
+        "en": "Fixed wrist_roll alignment: both arms recalibrated at 17:41, wrist difference ~1°.",
+        "tr": "wrist_roll hizası düzeltildi: iki kol 17:41'de yeniden kalibre edildi, bilek farkı ~1°."
+      }
     },
     {
       "date": "2026-10-29",
-      "text": "Calibrated follower and leader from scratch (lerobot 0.6.1). Teleop works."
+      "text": {
+        "en": "Calibrated follower and leader from scratch (lerobot 0.6.1). Teleop works.",
+        "tr": "Follower ve leader sıfırdan kalibre edildi (lerobot 0.6.1). Teleop çalışıyor."
+      }
     },
     {
       "date": "2026-10-15",
-      "text": "Generated recording and held-out plans (seed 0, two work orders)."
+      "text": {
+        "en": "Generated recording and held-out plans (seed 0, two work orders).",
+        "tr": "Kayıt ve held-out planları üretildi (seed 0, iki iş emri)."
+      }
     },
     {
       "date": "2026-10-12",
-      "text": "MuJoCo scene and scripted expert: 360/360 on the recording plan, 64/64 held-out."
+      "text": {
+        "en": "MuJoCo scene and scripted expert: 360/360 on the recording plan, 64/64 held-out.",
+        "tr": "MuJoCo sahnesi ve scripted uzman: 360/360 kayıt, 64/64 held-out."
+      }
     }
   ],
-  "now_text": "Place the bins and tags"
+  "now_text": {
+    "en": "Place the bins and tags",
+    "tr": "Kasaları ve tag'leri yerleştir"
+  }
 }

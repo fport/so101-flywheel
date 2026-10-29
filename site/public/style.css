@@ -44,6 +44,11 @@ code, .mono { font-family: var(--mono); font-variant-ligatures: none; }
 @keyframes ping { 70% { box-shadow: 0 0 0 8px rgba(255, 122, 38, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 122, 38, 0); } }
 .ghost { font-size: 12.5px; padding: 9px 16px; border: 1px solid var(--line); border-radius: 99px; color: var(--ink-2); background: var(--glass); backdrop-filter: blur(14px); }
 .ghost:hover { color: var(--ink); border-color: var(--line-2); }
+.lang { display: flex; padding: 0; }
+.lang button { padding: 9px 7px; color: var(--ink-3); transition: color 0.3s; }
+.lang button:first-child { padding-left: 13px; }
+.lang button:last-child { padding-right: 13px; }
+.lang button:hover, .lang button.on { color: var(--ink); }
 
 /* caption */
 .cap { position: fixed; left: 40px; bottom: 112px; width: min(520px, calc(100vw - 80px)); z-index: 5; pointer-events: none; }
@@ -141,6 +146,8 @@ code, .mono { font-family: var(--mono); font-variant-ligatures: none; }
 .loader-in b { font-weight: 600; font-size: 12px; letter-spacing: 0.2em; }
 .loader-in span { font: 400 11px var(--mono); color: var(--ink-3); }
 .loader-in span::after { content: "%"; }
+:lang(tr) .loader-in span::before { content: "%"; }
+:lang(tr) .loader-in span::after { content: none; }
 .loader-in i { grid-column: 1 / -1; height: 1px; background: var(--line-2); position: relative; }
 .loader-in em { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--ink); transition: width 0.3s; }
 

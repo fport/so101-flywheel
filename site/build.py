@@ -3,7 +3,7 @@
     python/.venv/bin/python site/export_scene.py   # scene and sim playback (only when the sim changes)
     python/.venv/bin/python site/build.py && (cd site && npx wrangler deploy)
 
-The only hand-written file is progress.json (step statuses); parts catalog, plans, sessions, recording progress,
+The only hand-written file is progress.json (step statuses, en/tr log); parts catalog, plans, sessions, recording progress,
 cell dimensions, tag patterns, calibration and versions are read from the repo so the site stays in sync with the code.
 """
 
@@ -31,6 +31,15 @@ def locked_versions():
     lock = (REPO / "python" / "uv.lock").read_text()
     found = dict(re.findall(r'\[\[package\]\]\nname = "([^"]+)"\nversion = "([^"]+)"', lock))
     return {name: found[name] for name in LOCKED if name in found}
+
+
+def progress():
+    """progress.json; every text it shows on the site (log entries, now_text) is {"en": ..., "tr": ...}."""
+    p = json.loads((SITE / "progress.json").read_text())
+    for text in [p["now_text"], *(entry["text"] for entry in p["log"])]:
+        if not (isinstance(text, dict) and text.get("en") and text.get("tr")):
+            sys.exit(f"progress.json: text needs both en and tr: {text!r}")
+    return p
 
 
 def catalog():
@@ -63,7 +72,7 @@ def recording():
 
 def main():
     data = {
-        "progress": json.loads((SITE / "progress.json").read_text()),
+        "progress": progress(),
         "parts": catalog(),
         "plans": {f.stem: json.loads(f.read_text()) for f in sorted((REPO / "plans").glob("*.json"))},
         "calibration": {f.stem: json.loads(f.read_text())
