@@ -90,7 +90,7 @@ Enter (start → shown to the camera → dropped). Each frame's task text follow
 ```bash
 cd python
 uv run flywheel-robot sessions                    # session status, part list of the next one
-uv run flywheel-robot record --session 1          # top camera 0, wrist 1; change with --top / --wrist
+uv run flywheel-robot record --session 1          # top camera 0, wrist 1; opens the Rerun panel (--no-display to skip)
 uv run flywheel-robot record --session 1 --fake   # dry run without hardware
 ```
 

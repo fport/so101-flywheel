@@ -154,6 +154,8 @@ def main():
         r.add_argument("--leader-port", default=LEADER_PORT)
         r.add_argument("--no-push", action="store_true", help="don't upload to the Hub at the end of the session")
         r.add_argument("--no-voice", dest="voice", action="store_false", help="turn off spoken prompts")
+        r.add_argument("--no-display", dest="display", action="store_false",
+                       help="do not open the Rerun panel (cameras and joint angles; on by default)")
         r.add_argument("--fake", action="store_true", help="no hardware: synthetic joints and images")
         r.add_argument("--auto", action="store_true", help=argparse.SUPPRESS)
         r.add_argument("--push-fake", action="store_true", help=argparse.SUPPRESS)

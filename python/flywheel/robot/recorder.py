@@ -345,6 +345,7 @@ def run(args):
     from lerobot.utils.constants import ACTION, OBS_STR
     from lerobot.utils.feature_utils import build_dataset_frame
     from lerobot.utils.robot_utils import precise_sleep
+    from lerobot.utils.visualization_utils import init_visualization, log_visualization_data, shutdown_visualization
 
     all_sessions = sessions(args.plan)
     if not 1 <= args.session <= len(all_sessions):
@@ -358,6 +359,8 @@ def run(args):
     print(f"\n{B}SO-101 recording · {args.plan} · session {args.session}/{len(all_sessions)}{RST}  "
           f"{DIM}{args.repo_id} → {root}{RST}")
 
+    if args.display:  # same Rerun panel as lerobot-record --display_data: cameras and joint angles
+        init_visualization("rerun", session_name="flywheel_record")
     robot, teleop = make_rig(args)
     if args.fake:
         robot = teleop = FakeRig(robot)
@@ -394,6 +397,8 @@ def run(args):
                 obs_p = obs_proc(obs)
                 act_p = teleop_proc((act, obs))
                 robot.send_action(robot_proc((act_p, obs)))
+                if args.display:
+                    log_visualization_data("rerun", observation=obs_p, action=act_p)
 
                 if state == "tray" and tray_shown != p.tray:
                     done_pockets = {q.pocket for q in plan_picks if q.tray == p.tray and q.index in done}
@@ -475,6 +480,8 @@ def run(args):
             if dev.is_connected:
                 dev.disconnect()
         signal.signal(signal.SIGTERM, signal.SIG_DFL)
+        if args.display:
+            shutdown_visualization("rerun")
 
     left = len([p for p in in_session if p.index not in done])
     print(f"\n{B}Session summary{RST}: {saved} episodes this run · {left} left in session · "
