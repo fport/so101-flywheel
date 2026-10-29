@@ -91,7 +91,7 @@ kameraya gösterdim → bıraktım). Her karenin görev metni fazına göre yaz�
 ```bash
 cd python
 uv run flywheel-robot sessions                    # seansların durumu, sıradakinin parça listesi
-uv run flywheel-robot record --session 1          # üst kamera 0, bilek 1; --top / --wrist ile değiştir
+uv run flywheel-robot record --session 1          # üst kamera 0, bilek 1; Rerun paneli açılır (--no-display ile kapat)
 uv run flywheel-robot record --session 1 --fake   # donanımsız deneme
 ```
 
