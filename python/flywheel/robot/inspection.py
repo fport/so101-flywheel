@@ -38,10 +38,13 @@ Part types, what a sound part looks like, and the defects:
 missing_hole = no hub hole; broken = one spoke missing, so only {_DIMS["rim"]["spokes"] - 1} spokes. Count the spokes.
 - gear (spur gear with a raised hub): a sound gear has {_DIMS["gear"]["teeth"]} evenly spaced teeth and a shaft bore \
 in the hub. missing_hole = no shaft bore; broken = two adjacent teeth missing, a visible gap in the ring of teeth.
-- pad (brake pad: rectangular friction block on a backing plate with an ear at each end): a sound pad has a small \
-mounting hole in each ear and square corners. missing_hole = the ears have no holes; broken = a chipped corner.
+- pad (brake pad: a raised rectangular friction block on a wider backing plate with an ear at each end): a sound pad \
+has a small mounting hole in each ear and a block with four square top corners. missing_hole = the ears have no \
+holes; broken = a chunk missing from one top corner of the raised block, seen as a diagonal cut across that corner \
+(the plate corners stay square, so look at the block).
 - bracket (L-shaped mounting bracket): a sound bracket has a hole in the flat base and square corners. \
-missing_hole = no hole in the base; broken = a chipped corner.
+missing_hole = no hole in the base; broken = a chunk missing from a top corner of the upright or from a corner at \
+the free end of the base, seen as a diagonal cut.
 
 variant is the colour: W = white, T = orange. Answer with the JSON object; note is one short sentence on what \
 decided it (for a rim, say how many spokes you counted)."""
