@@ -119,10 +119,14 @@ def cmd_check(args):
 
 
 def cmd_inspect(args):
-    from .inspection import run as inspect_run
+    from .inspection import live, run as inspect_run
 
+    if args.live:
+        _check_ports(args.follower_port, args.leader_port)
+        args.wrist = 0 if args.camera is None else args.camera
+        return live(args)
     if not (args.sim or args.camera is not None or args.image):
-        sys.exit("give --sim N, --camera INDEX or --image FILE ...")
+        sys.exit("give --live, --sim N, --camera INDEX or --image FILE ...")
     inspect_run(args)
 
 
@@ -183,6 +187,14 @@ def main():
     i.add_argument("--order", choices=["W", "T"], default="W", help="variant in the work order")
     i.add_argument("--effort", choices=["low", "medium", "high", "xhigh", "max"], help="lower is faster")
     i.add_argument("--seed", type=int, default=0)
+    i.add_argument("--live", action="store_true",
+                   help="teleop; → sends the wrist frame to Claude and it names the bin, you put the part there")
+    i.add_argument("--top", type=int, default=1, help="top camera index for the Rerun panel (--live)")
+    i.add_argument("--fps", type=int, default=30)
+    i.add_argument("--follower-port", default=FOLLOWER_PORT)
+    i.add_argument("--leader-port", default=LEADER_PORT)
+    i.add_argument("--no-voice", dest="voice", action="store_false")
+    i.add_argument("--no-display", dest="display", action="store_false")
     i.set_defaults(func=cmd_inspect)
     args = parser.parse_args()
     if args.cmd == "teleop" and args.extra[:1] == ["--"]:

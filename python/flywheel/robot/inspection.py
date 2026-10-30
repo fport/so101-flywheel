@@ -187,3 +187,94 @@ def run(args):
             attrs_right = sum(r["attributes"][k] == r["truth"][k] for r in scored for k in r["truth"])
             line += f" · bin {right}/{len(scored)} · attributes {attrs_right}/{4 * len(scored)}"
         print(line)
+
+
+def live(args):
+    """Teleop with inspection on demand: bring the arm above a part, → sends the wrist frame to Claude, the answer
+    (bin and seconds) is printed and spoken while the arm keeps following the leader; the operator puts the part in
+    that bin. Nothing is recorded to a dataset; frames and answers go to outputs/inspect/<time>/."""
+    import anthropic
+    import cv2
+    from concurrent.futures import ThreadPoolExecutor
+
+    from lerobot.utils.robot_utils import precise_sleep
+    from lerobot.utils.visualization_utils import init_visualization, log_visualization_data, shutdown_visualization
+
+    from .recorder import CONTROL_MULT, Keys, connect_robot, make_rig, say
+
+    if not os.environ.get("ANTHROPIC_API_KEY"):
+        sys.exit("ANTHROPIC_API_KEY is not set. In this terminal: export ANTHROPIC_API_KEY=... (console.anthropic.com)")
+    client = anthropic.Anthropic()
+    model = (args.model or ["claude-sonnet-5-5"])[0]
+    out = OUT_DIR / datetime.now().strftime("%Y%m%d-%H%M%S")
+    out.mkdir(parents=True, exist_ok=True)
+    pool = ThreadPoolExecutor(max_workers=1)
+    if args.display:
+        init_visualization("rerun", session_name="flywheel_inspect")
+    robot, teleop = make_rig(args)
+    try:
+        connect_robot(robot)
+    except (TimeoutError, ConnectionError) as e:
+        sys.exit(f"{ORANGE}{e}{RST}\nCheck the cameras (--top/--camera) and the follower's 12 V adapter.")
+    teleop.connect()
+    print(f"\n{B}live inspection{RST} · work order {args.order} ({'white' if args.order == 'W' else 'orange'} is the "
+          f"product) · {model} · effort {args.effort or 'default'}\n"
+          f"   bring the arm ~6 cm above a part, part centred in the wrist camera (Rerun), hold still, → or ENTER\n"
+          f"   Claude names the bin; put the part there yourself · Esc / q to quit · {DIM}{out}{RST}\n")
+    hz = args.fps * CONTROL_MULT
+    pending, n, rows = None, 0, []
+    try:
+        with Keys("→ / ENTER inspect · Esc / q quit") as keys:
+            tick = 0
+            while True:
+                t0 = time.perf_counter()
+                tick += 1
+                obs = robot.get_observation()
+                act = teleop.get_action()
+                robot.send_action(act)
+                if args.display and tick % CONTROL_MULT == 0:
+                    log_visualization_data("rerun", observation=obs, action=act)
+
+                key = keys.poll()
+                if key == "q":
+                    break
+                if key == "go":
+                    if pending is not None:
+                        print(f"   {DIM}still waiting for the previous answer{RST}")
+                    else:
+                        n += 1
+                        crop = center_crop(obs["wrist"])
+                        cv2.imwrite(str(out / f"{n:03d}.jpg"), crop[..., ::-1])
+                        pending = (n, pool.submit(ask, client, model, crop, args.effort))
+                        print(f"   #{n} sent to Claude …", flush=True)
+
+                if pending is not None and pending[1].done():
+                    k, fut = pending
+                    pending = None
+                    try:
+                        attrs, sec, usage = fut.result()
+                    except Exception as e:  # API error or unreadable answer: tell, keep driving
+                        print(f"   #{k} {ORANGE}{type(e).__name__}: {e}{RST}")
+                    else:
+                        bin_ = decide(attrs, args.order)
+                        color = GREEN if bin_ == "ok" else ORANGE
+                        seen = f"{attrs['type']} {'white' if attrs['variant'] == 'W' else 'orange'}" \
+                               f"{' · missing hole' if attrs['missing_hole'] else ''}{' · broken' if attrs['broken'] else ''}"
+                        print(f"   #{k} {color}{B}{bin_.upper()} bin{RST}  {sec:.2f} s  {seen}  {DIM}{attrs['note']}{RST}")
+                        say(f"{bin_.upper()} bin", args.voice)
+                        rows.append({"n": k, "model": model, "bin": bin_, "attributes": attrs,
+                                     "seconds": round(sec, 3), "usage": usage})
+                        (out / "results.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows))
+                precise_sleep(max(1 / hz - (time.perf_counter() - t0), 0.0))
+    except KeyboardInterrupt:
+        pass
+    finally:
+        pool.shutdown(wait=False, cancel_futures=True)
+        for dev in (robot, teleop):
+            if dev.is_connected:
+                dev.disconnect()
+        if args.display:
+            shutdown_visualization("rerun")
+    if rows:
+        secs = np.array([r["seconds"] for r in rows])
+        print(f"\n   {len(rows)} parts · median {np.median(secs):.2f} s · max {secs.max():.2f} s · {out}")

@@ -109,6 +109,7 @@ cd python
 export ANTHROPIC_API_KEY=...
 uv run flywheel-robot inspect --sim 24                      # sim parts in the look pose, scored against ground truth
 uv run flywheel-robot inspect --camera 0                    # real wrist camera, arm above the part
+uv run flywheel-robot inspect --live                        # teleop; → asks Claude, it names the bin, you put the part there
 uv run flywheel-robot inspect --sim 8 --model claude-haiku-5-5 --model claude-sonnet-5-5
 uv run flywheel-robot inspect --sim 8 --effort low                # less thinking, shorter wait
 ```

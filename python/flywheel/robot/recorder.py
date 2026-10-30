@@ -95,6 +95,9 @@ class Keys:
 
     KEYMAP = {"right": "go", "enter": "go", "space": "go", "n": "go", "left": "r", "r": "r", "esc": "q", "q": "q"}
 
+    def __init__(self, hint="→ / ENTER next · ← / r redo · Esc twice / q twice quit"):
+        self.hint = hint
+
     def __enter__(self):
         from lerobot.utils.keyboard_input import TerminalKeyListener, pynput_can_capture, pynput_listener_is_trusted
 
@@ -138,7 +141,7 @@ class Keys:
                 attrs = termios.tcgetattr(self.fd)
                 attrs[3] &= ~termios.ECHO
                 termios.tcsetattr(self.fd, termios.TCSADRAIN, attrs)
-        print(f"{DIM}keys ({mode}): → / ENTER next · ← / r redo · Esc twice / q twice quit{RST}")
+        print(f"{DIM}keys ({mode}): {self.hint}{RST}")
         return self
 
     def __exit__(self, *exc):
