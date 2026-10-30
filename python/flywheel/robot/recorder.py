@@ -88,40 +88,69 @@ def load_catalog():
 # --- keyboard ------------------------------------------------------------------------------------------------
 
 class Keys:
-    """Recording keys, same as lerobot-record: global (pynput) so they work while the Rerun window has focus, or the
-    terminal when macOS has not given the terminal Accessibility permission. Arrows as in lerobot-record:
-    right = next step, left = redo the episode, Esc = quit; ENTER/space, r and q do the same."""
+    """Recording keys. → ← Esc are global (pynput), so they work while the Rerun window has focus, like lerobot-record;
+    letters and ENTER only count while this terminal has focus, so typing in another window (or Cmd+Q) does nothing.
+    Without macOS Accessibility permission everything comes from the terminal."""
 
     KEYMAP = {"right": "go", "enter": "go", "space": "go", "n": "go", "left": "r", "r": "r", "esc": "q", "q": "q"}
 
     def __enter__(self):
-        from lerobot.utils.keyboard_input import TerminalKeyListener, create_key_listener
+        from lerobot.utils.keyboard_input import TerminalKeyListener, pynput_can_capture, pynput_listener_is_trusted
 
-        self.events = queue.SimpleQueue()
-        self.listener = create_key_listener(lambda name: self.events.put(name.lower()))
-        self.fd, self.saved = None, None
-        if self.listener is not None and not isinstance(self.listener, TerminalKeyListener) and sys.stdin.isatty():
-            # global listener: keep what is typed into this terminal from echoing and reaching the shell afterwards
-            self.fd = sys.stdin.fileno()
-            self.saved = termios.tcgetattr(self.fd)
-            tty.setcbreak(self.fd)
-            attrs = termios.tcgetattr(self.fd)
-            attrs[3] &= ~termios.ECHO
-            termios.tcsetattr(self.fd, termios.TCSADRAIN, attrs)
-        mode = "terminal (keep it focused)" if isinstance(self.listener, TerminalKeyListener) else "global"
+        self.events, self.last = queue.SimpleQueue(), None
+        self.listener, self.fd, self.saved = None, None, None
+        if pynput_can_capture():
+            from pynput import keyboard
+
+            names = {keyboard.Key.right: "right", keyboard.Key.left: "left", keyboard.Key.esc: "esc"}
+            mods = {keyboard.Key.cmd, keyboard.Key.cmd_r, keyboard.Key.ctrl, keyboard.Key.ctrl_r, keyboard.Key.alt,
+                    keyboard.Key.alt_r, keyboard.Key.shift, keyboard.Key.shift_r}
+            held = set()
+
+            def press(key):
+                if key in mods:
+                    held.add(key)
+                elif not held and key in names:  # Cmd+→ in an editor is not a recording key
+                    self.events.put(names[key])
+
+            def release(key):
+                held.discard(key)
+
+            self.listener = keyboard.Listener(on_press=press, on_release=release)
+            self.listener.start()
+            if not pynput_listener_is_trusted(self.listener):
+                self.listener.stop()
+                self.listener = None
+        if self.listener is None:
+            self.listener = TerminalKeyListener(lambda name: self.events.put(name.lower()))
+            self.listener.start()
+            mode = "terminal only, keep it focused (no Accessibility permission)"
+        else:
+            mode = "→ ← Esc from any window; ENTER r q in this terminal"
+            if sys.stdin.isatty():  # letters and ENTER: read from the terminal ourselves, without echo
+                self.fd = sys.stdin.fileno()
+                self.saved = termios.tcgetattr(self.fd)
+                tty.setcbreak(self.fd)
+                attrs = termios.tcgetattr(self.fd)
+                attrs[3] &= ~termios.ECHO
+                termios.tcsetattr(self.fd, termios.TCSADRAIN, attrs)
         print(f"{DIM}keys ({mode}): → / ENTER next · ← / r redo · Esc twice / q twice quit{RST}")
         return self
 
     def __exit__(self, *exc):
-        if self.listener is not None:
-            self.listener.stop()
+        self.listener.stop()
         if self.saved is not None:
             termios.tcflush(self.fd, termios.TCIFLUSH)
             termios.tcsetattr(self.fd, termios.TCSADRAIN, self.saved)
 
     def poll(self):
         if self.fd is not None and select.select([self.fd], [], [], 0)[0]:
-            os.read(self.fd, 64)  # drained; the global listener already saw these keys
+            data = os.read(self.fd, 64).decode(errors="ignore")
+            if not data.startswith("\x1b"):  # arrows and Esc already came from the global listener
+                for ch in data:
+                    name = {"\r": "enter", "\n": "enter", " ": "space"}.get(ch, ch.lower())
+                    if name in self.KEYMAP:
+                        self.events.put(name)
         try:
             self.last = self.events.get_nowait()
         except queue.Empty:

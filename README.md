@@ -84,7 +84,8 @@ file and the site:
 
 The recorder shows the next tray, pocket and bin on screen and says them out loud; the operator steps through with
 → or Enter (start → shown to the camera → dropped); ← redoes the episode, Esc twice quits. As in `lerobot-record`
-the keys are global, so they work while the Rerun window has focus. Each frame's task text follows its phase, and ACT's command goes into
+the arrows and Esc are global, so they work while the Rerun window has focus; Enter, `r` and `q` count only in the
+recorder's terminal. Each frame's task text follows its phase, and ACT's command goes into
 `observation.environment_state`. The arm is driven at 60 Hz like `lerobot-teleoperate`; every second tick goes into
 the 30 fps dataset. When a session ends `check` runs (joint ranges, follower tracking, command channel against the
 plan, videos) and only then is the dataset pushed privately to the Hugging Face Hub (`--no-push` skips it).
