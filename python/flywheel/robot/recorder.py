@@ -109,7 +109,7 @@ class Keys:
             attrs[3] &= ~termios.ECHO
             termios.tcsetattr(self.fd, termios.TCSADRAIN, attrs)
         mode = "terminal (keep it focused)" if isinstance(self.listener, TerminalKeyListener) else "global"
-        print(f"{DIM}keys ({mode}): → / ENTER next · ← / r redo · Esc / q quit{RST}")
+        print(f"{DIM}keys ({mode}): → / ENTER next · ← / r redo · Esc twice / q twice quit{RST}")
         return self
 
     def __exit__(self, *exc):
@@ -123,9 +123,10 @@ class Keys:
         if self.fd is not None and select.select([self.fd], [], [], 0)[0]:
             os.read(self.fd, 64)  # drained; the global listener already saw these keys
         try:
-            return self.KEYMAP.get(self.events.get_nowait())
+            self.last = self.events.get_nowait()
         except queue.Empty:
             return None
+        return self.KEYMAP.get(self.last)
 
 
 class AutoKeys:
@@ -457,6 +458,7 @@ def run(args):
         with AutoKeys(hz) if args.auto else Keys() as keys:
             i, tray_shown, card_shown = 0, None, None
             frames = switch_frame = tick = late = 0
+            quit_at = -1e9
             while i < len(todo):
                 t0 = time.perf_counter()
                 tick += 1
@@ -490,14 +492,22 @@ def run(args):
                         label = f"{ORANGE}phase 2 · put in bin{RST}" if phase2 else f"{BLUE}phase 1 · pick and show{RST}"
                         slow = f"  {ORANGE}loop is late {late}x (CPU busy?){RST}" if late > hz // 10 else ""
                         status(f"   {REJECT}●{RST} rec {frames / args.fps:5.1f} s  {label}{slow}  "
-                               f"{DIM}→ {'dropped, save' if phase2 else 'shown to camera'} · ← redo · Esc quit{RST}", end="")
+                               f"{DIM}→ {'dropped, save' if phase2 else 'shown to camera'} · ← redo · Esc×2 quit{RST}", end="")
                     if frames / args.fps >= args.episode_time:
                         status(f"   {REJECT}time is up ({args.episode_time:.0f} s){RST}: → save · ← redo")
                         state = "timeout"
 
                 key = keys.poll()
+                if key is not None and not args.auto:
+                    status(f"   {DIM}key {keys.last} → {key} ({state}){RST}")
                 if key == "q":
-                    break
+                    if time.perf_counter() - quit_at > 2:  # global keys: one stray Esc in another window must not end it
+                        quit_at = time.perf_counter()
+                        status(f"   {ORANGE}press Esc again within 2 s to quit{RST}")
+                        key = None
+                    else:
+                        status(f"   {DIM}quit (Esc/q){RST}")
+                        break
                 if key == "r" and state in ("phase1", "phase2", "timeout"):
                     dataset.clear_episode_buffer()
                     status(f"   {DIM}discarded; return the arm to start, → to restart{RST}")
@@ -538,7 +548,7 @@ def run(args):
                 late += spent > 1.5 / hz
                 precise_sleep(max(1 / hz - spent, 0.0))
     except KeyboardInterrupt:
-        pass
+        status(f"   {DIM}interrupted (Ctrl+C or SIGTERM){RST}")
     finally:
         if dataset.has_pending_frames():
             dataset.clear_episode_buffer()

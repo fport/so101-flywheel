@@ -83,7 +83,7 @@ file and the site:
 | Session | One `record --session N` run: 5 trays, 30 episodes, 30 different parts | 1–4 |
 
 The recorder shows the next tray, pocket and bin on screen and says them out loud; the operator steps through with
-→ or Enter (start → shown to the camera → dropped); ← redoes the episode, Esc quits. As in `lerobot-record`
+→ or Enter (start → shown to the camera → dropped); ← redoes the episode, Esc twice quits. As in `lerobot-record`
 the keys are global, so they work while the Rerun window has focus. Each frame's task text follows its phase, and ACT's command goes into
 `observation.environment_state`. The arm is driven at 60 Hz like `lerobot-teleoperate`; every second tick goes into
 the 30 fps dataset. When a session ends `check` runs (joint ranges, follower tracking, command channel against the
