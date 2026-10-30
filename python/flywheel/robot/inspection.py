@@ -2,7 +2,8 @@
 
     uv run flywheel-robot inspect --sim 24                  # sim parts with known ground truth
     uv run flywheel-robot inspect --camera 0                # the real wrist camera, now (arm above the part)
-    uv run flywheel-robot inspect --image a.jpg b.jpg
+    uv run flywheel-robot inspect --image a.jpg b.jpg                # a part ID in the name (pocket2_B-W-07) scores it
+    uv run flywheel-robot inspect --tray --parts J-W-03 B-W-07 - L-T-01 D-W-02 J-T-04   # top camera, 6 pockets
     uv run flywheel-robot inspect --sim 8 --model claude-haiku-5-5 --model claude-sonnet-5-5
 
 Claude only reports what it sees (type, colour, missing hole, broken); OK/REJECT comes from decide() and the work
@@ -156,11 +157,13 @@ def camera_frame(index):
 def image_frames(paths):
     import cv2
 
+    from .tray import truth_for
+
     for path in paths:
         f = cv2.imread(path)
         if f is None:
             sys.exit(f"cannot read {path}")
-        yield Path(path).stem, f[..., ::-1].copy(), None
+        yield Path(path).stem, f[..., ::-1].copy(), truth_for(Path(path).stem)
 
 
 def run(args):
@@ -180,6 +183,7 @@ def run(args):
           f"{', '.join(models)} · effort {args.effort or 'default'} · {out}{RST}\n")
     print(f"   {'part':<9}{'model':<20}{'bin':<8}{'truth':<8}{'seconds':>8}  seen")
     for name, frame, truth in frames:
+        name = name[:20]
         crop = center_crop(frame)
         cv2.imwrite(str(out / f"{name}.jpg"), crop[..., ::-1])
         for model in models:
@@ -317,3 +321,108 @@ def live(args):
         print(f"\n   {len(rows)} parts · median {np.median(secs):.2f} s · max {secs.max():.2f} s · {out}")
     else:
         print(f"\n   no part was inspected: press → with the arm above a part")
+
+
+def _cell(attrs):
+    """rim W · no hole · broken, for one table cell."""
+    if attrs is None:
+        return "-"
+    return (f"{attrs.get('type', '?')} {attrs.get('variant', '?')}{' · no hole' if attrs.get('missing_hole') else ''}"
+            f"{' · broken' if attrs.get('broken') else ''}")
+
+
+def tray_run(args):
+    """One top-camera frame of the tray -> 6 pocket crops -> measured attributes and Claude's, side by side.
+
+    The bin uses the measurement where it has one (holes, rim spokes, gear teeth, colour) and Claude for the rest
+    (part type, broken corners of pads and brackets). With --parts the crops are named after the part IDs, so the
+    catalog gives the truth and `inspect --image` can score them again later."""
+    import cv2
+    from concurrent.futures import ThreadPoolExecutor
+
+    from .tray import capture, find_tags, overlay, pocket_crops, measure, tray_homography, truth_for
+
+    parts = args.parts or ["?"] * 6
+    if len(parts) != 6:
+        sys.exit(f"--parts takes 6 IDs in pocket order (1 = near-left), '-' for an empty pocket; got {len(parts)}")
+    if args.image:
+        frame = cv2.imread(args.image[0])
+        if frame is None:
+            sys.exit(f"cannot read {args.image[0]}")
+        frame = frame[..., ::-1].copy()
+    else:
+        try:
+            frame = capture(args.top)
+        except RuntimeError as e:
+            sys.exit(str(e))
+    out = OUT_DIR / "tray" / datetime.now().strftime("%Y%m%d-%H%M%S")
+    out.mkdir(parents=True, exist_ok=True)
+    cv2.imwrite(str(out / "frame.png"), frame[..., ::-1])
+    tags = find_tags(frame)
+    try:
+        H = tray_homography(tags)
+    except RuntimeError as e:
+        sys.exit(f"{ORANGE}{e}{RST}  frame: {out / 'frame.png'}")
+    cv2.imwrite(str(out / "overlay.jpg"), overlay(frame, H, tags))
+
+    crops = []
+    for (k, crop), pid in zip(pocket_crops(frame, H), parts):
+        if pid == "-":
+            continue
+        name = f"pocket{k}" + (f"_{pid}" if pid != "?" else "")
+        cv2.imwrite(str(out / f"{name}.png"), crop[..., ::-1])
+        crops.append((k, name, crop, truth_for(pid)))
+
+    model = (args.model or ["claude-sonnet-5-5"])[0]
+    asked = {}
+    if os.environ.get("ANTHROPIC_API_KEY") and not args.no_claude:
+        import anthropic
+
+        client = anthropic.Anthropic()
+        with ThreadPoolExecutor(max_workers=6) as pool:  # all six at once: the tray waits for the slowest
+            futs = {k: pool.submit(ask, client, model, crop, args.effort) for k, _, crop, _ in crops}
+            for k, f in futs.items():
+                try:
+                    asked[k] = f.result()
+                except Exception as e:  # API error or unreadable answer: the measurement still stands
+                    print(f"   pocket {k}: {ORANGE}{type(e).__name__}: {e}{RST}")
+    elif not args.no_claude:
+        print(f"   {DIM}ANTHROPIC_API_KEY is not set: measurement only, part types from --parts{RST}")
+
+    print(f"{B}tray{RST} · work order {args.order} · tags {sorted(tags)} · {model if asked else 'no Claude'} · {out}\n")
+    print(f"   {'pocket':<22}{'truth':<26}{'measured':<26}{'Claude':<26}{'bin':<8}")
+    rows, score = [], {"measured": [0, 0], "claude": [0, 0], "bin": [0, 0]}
+    for k, name, crop, truth in crops:
+        claude, sec = (asked[k][0], asked[k][1]) if k in asked else (None, None)
+        ptype = (truth or claude or {}).get("type")
+        m = measure(crop, ptype) if ptype else None
+        if m is None or m.get("empty"):
+            print(f"   {name:<22}{ORANGE}{'empty pocket' if m else 'no part type: give --parts or an API key'}{RST}")
+            continue
+        seen = {"type": ptype, "variant": m["variant"]}
+        for key in ("missing_hole", "broken"):
+            seen[key] = m[key] if m[key] is not None else (claude or {}).get(key)
+        measured = {"type": ptype, "variant": m["variant"], "missing_hole": m["missing_hole"], "broken": m["broken"]}
+        # an unknown attribute only matters while everything known still says OK
+        known_reject = seen["variant"] != args.order or seen["missing_hole"] or seen["broken"]
+        bin_ = decide(seen, args.order) if None not in seen.values() else "reject" if known_reject else "?"
+        want = decide(truth, args.order) if truth else None
+        mark = "" if want is None else f" {GREEN}✓{RST}" if bin_ == want else f" {ORANGE}✗{RST}"
+        print(f"   {name:<22}{_cell(truth):<26}{_cell(measured):<26}{_cell(claude):<26}{bin_.upper():<6}{mark}")
+        nums = {key: m[key] for key in ("spokes", "teeth", "max_gap_deg", "ear_holes") if key in m}
+        print(f"   {'':<22}{DIM}{nums or ''} {(claude or {}).get('note', '')}{RST}")
+        if truth:
+            for key, src in (("measured", measured), ("claude", claude)):
+                if src:
+                    checks = [src.get(a) == truth[a] for a in ("variant", "missing_hole", "broken") if src.get(a) is not None]
+                    score[key][0] += sum(checks)
+                    score[key][1] += len(checks)
+            score["bin"][0] += bin_ == want
+            score["bin"][1] += 1
+        rows.append({"pocket": k, "name": name, "truth": truth, "measured": m, "claude": claude, "seconds": sec,
+                     "bin": bin_, "truth_bin": want})
+    (out / "results.jsonl").write_text("".join(json.dumps(r, default=float) + "\n" for r in rows))
+    if any(n for _, n in score.values()):
+        print("\n   " + " · ".join(f"{key} {r}/{n}" for key, (r, n) in score.items() if n) +
+              f"  {DIM}(attributes: colour, hole, broken where each one gave an answer){RST}")
+    print(f"\n   overlay (are the orange squares on the pockets?): {out / 'overlay.jpg'}")

@@ -95,3 +95,20 @@ def test_connect_retries_then_gives_up(monkeypatch):
     with pytest.raises(ConnectionError):
         connect_robot(robot)
     assert not robot.bus.is_connected  # port closed again, nothing left half open
+
+
+def test_tray_crops_and_measures_sim_frame():
+    # sim top camera at the inspection resolution: tags -> 6 crops -> gear teeth gap and bracket hole from the silhouette
+    from flywheel.robot.tray import find_tags, measure, pocket_crops, tray_homography, truth_for
+    from flywheel.sim.env import QCSortSim
+
+    ids = ["D-W-01", "D-W-07", "L-W-01", "L-W-05", "D-T-01", "D-T-07"]
+    frame = QCSortSim(part_ids=ids).render("top", 1280, 960)
+    tags = find_tags(frame)
+    assert sorted(tags) == [0, 1, 2, 3]
+    for (_, crop), pid in zip(pocket_crops(frame, tray_homography(tags)), ids):
+        truth, m = truth_for(pid), measure(crop, truth_for(pid)["type"])
+        assert m["variant"] == truth["variant"], pid
+        assert m["missing_hole"] == truth["missing_hole"], pid
+        if truth["type"] == "gear":
+            assert m["broken"] == truth["broken"], (pid, m)

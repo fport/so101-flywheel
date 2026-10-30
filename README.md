@@ -107,6 +107,8 @@ recording does not close cleanly (crash, power loss), the next run rolls back to
 ```bash
 cd python
 export ANTHROPIC_API_KEY=...
+uv run flywheel-robot inspect --tray --parts J-W-03 B-W-07 - L-T-01 D-W-02 J-T-04   # top camera, all 6 pockets
+uv run flywheel-robot inspect --image ../outputs/inspect/tray/*/pocket*_*.png         # score saved crops again
 uv run flywheel-robot inspect --sim 24                      # sim parts in the look pose, scored against ground truth
 uv run flywheel-robot inspect --camera 0                    # real wrist camera, arm above the part
 uv run flywheel-robot inspect --live                        # teleop; → asks Claude, it names the bin, you put the part there
@@ -116,6 +118,12 @@ uv run flywheel-robot inspect --sim 8 --effort low                # less thinkin
 
 Claude reports what it sees (type, colour, missing hole, broken); the bin comes from the work order rule, as with any
 classifier. Each request's time is printed; frames and answers go to `outputs/inspect/`.
+
+`--tray` takes one 1280×960 frame from the top camera, finds the four tags and cuts the six pockets out at a fixed
+4 px/mm. Next to Claude's answer it measures what the silhouette of a light part on the black tray shows: holes (the
+tray shows through), colour, rim spokes and the gap of missing gear teeth. The bin uses the measurement where there is
+one and Claude for the rest (broken corners of pads and brackets). With `--parts` (pocket order, `-` for empty) the
+crops are named after the part IDs and every column is scored against the catalog.
 
 ### Training (ACT v0)
 
