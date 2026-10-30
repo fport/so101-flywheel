@@ -20,7 +20,7 @@ from pathlib import Path
 
 import numpy as np
 
-from ..sim.params import REPO_ROOT
+from ..sim.params import REPO_ROOT, load_params
 from ..sim.parts import decide
 
 B, DIM, GREEN, ORANGE, RST = "\033[1m", "\033[2m", "\033[38;5;78m", "\033[38;5;208m", "\033[0m"
@@ -28,19 +28,23 @@ OUT_DIR = REPO_ROOT / "outputs" / "inspect"
 # in the look pose the part sits slightly above the centre of the 640x480 wrist image (sim: u ~307, v ~190)
 CROP_CENTER, CROP_SIZE = (320, 200), 288
 
-PROMPT = """You are the inspection camera of an end-of-line quality control cell. The image comes from a camera on the \
-robot's wrist, looking straight down at one 3D-printed part lying in a tray pocket; the gripper jaws may show at the \
-bottom edge. Inspect only the part in the middle of the image, ignore neighbouring pockets.
+_DIMS = load_params()["parts"]  # sound-part counts come from the same file as the printed parts
+PROMPT = f"""You are the inspection camera of an end-of-line quality control cell. The image looks straight down at one \
+3D-printed part lying in a tray pocket (top camera or wrist camera). Inspect only the part in the middle of the \
+image, ignore neighbouring pockets.
 
-Part types and their defects:
-- rim (small wheel rim, round with spokes): missing_hole = no hub hole in the centre; broken = one spoke missing.
-- gear (spur gear with a raised hub): missing_hole = no shaft bore in the hub; broken = two adjacent teeth missing.
-- pad (brake pad: rectangular friction block on a backing plate with an ear at each end): missing_hole = the ears \
-have no mounting holes; broken = a chipped corner.
-- bracket (L-shaped mounting bracket): missing_hole = no hole in the flat base; broken = a chipped corner.
+Part types, what a sound part looks like, and the defects:
+- rim (small wheel rim): a sound rim has exactly {_DIMS["rim"]["spokes"]} spokes and a hub hole in the centre. \
+missing_hole = no hub hole; broken = one spoke missing, so only {_DIMS["rim"]["spokes"] - 1} spokes. Count the spokes.
+- gear (spur gear with a raised hub): a sound gear has {_DIMS["gear"]["teeth"]} evenly spaced teeth and a shaft bore \
+in the hub. missing_hole = no shaft bore; broken = two adjacent teeth missing, a visible gap in the ring of teeth.
+- pad (brake pad: rectangular friction block on a backing plate with an ear at each end): a sound pad has a small \
+mounting hole in each ear and square corners. missing_hole = the ears have no holes; broken = a chipped corner.
+- bracket (L-shaped mounting bracket): a sound bracket has a hole in the flat base and square corners. \
+missing_hole = no hole in the base; broken = a chipped corner.
 
 variant is the colour: W = white, T = orange. Answer with the JSON object; note is one short sentence on what \
-decided it."""
+decided it (for a rim, say how many spokes you counted)."""
 
 SCHEMA = {  # structured output (output_config.format); forced tool_choice is not accepted by current models
     "type": "object",
