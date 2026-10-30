@@ -694,7 +694,7 @@ const ui = {
   },
   prepList: (c) => `<ol class="plist2">
     <li><i>1</i><div><b>${L(`Set aside ${c.nParts} parts from the box`, `${c.nParts} parçayı kutudan ayır`)}</b><button class="link" id="op-parts">${L("parts list", "parça listesi")}</button></div></li>
-    <li><i>2</i><div><b>${L("Return the arm to start, connect both cameras", "Kolu başa al, iki kamerayı bağla")}</b><span>${L("top camera 0 · wrist 1", "üst kamera 0 · bilek 1")}</span></div></li>
+    <li><i>2</i><div><b>${L("Return the arm to start, connect both cameras", "Kolu başa al, iki kamerayı bağla")}</b><span>${L("top camera 1 · wrist 0", "üst kamera 1 · bilek 0")}</span></div></li>
     <li><i>3</i><div><b>${L("Start recording in the terminal", "Terminalde kaydı aç")}</b>${ui.copy(c)}</div></li></ol>`,
   endList: (c) => `<ol class="plist2">
     <li><i>✓</i><div><b>${L("Dataset is uploaded as private", "Dataset private olarak yüklenir")}</b><a href="https://huggingface.co/datasets/${REC.R.repo}" target="_blank" rel="noopener">huggingface.co/${REC.R.repo}</a></div></li>
@@ -892,7 +892,7 @@ const CAL = "/Users/furkanportakal/www/so101-flywheel/hardware/calibration", FP 
 const CMDS = [
   [L("Recording", "Kayıt"), L("Session by session: each command is 30 episodes, private Hugging Face push when done.", "Seans seans kayıt: her komut 30 bölüm, bitince private Hugging Face."), [
     [L("Session status", "Seansların durumu"), "cd ~/www/so101-flywheel/python\nuv run flywheel-robot sessions"],
-    [L("Session 1", "Seans 1"), `uv run flywheel-robot record --session 1          # ${L("top camera 0, wrist 1", "üst kamera 0, bilek 1")}`],
+    [L("Session 1", "Seans 1"), `uv run flywheel-robot record --session 1          # ${L("top camera 1, wrist 0", "üst kamera 1, bilek 0")}`],
     [L("Trial (not pushed to the Hub)", "Deneme (Hub'a gitmez)"), "uv run flywheel-robot record --session 1 --no-push --repo-id fport/so101-qc-test"],
     [L("No hardware", "Donanımsız"), "uv run flywheel-robot record --session 1 --fake"],
     [L("Camera indices", "Kamera indeksleri"), "lerobot-find-cameras opencv"],
@@ -902,7 +902,7 @@ const CMDS = [
   ]],
   [L("Calibration and teleop", "Kalibrasyon ve teleop"), L("c + ENTER at the first prompt. Wrists at the same angle on both arms.", "İlk soruda c + ENTER. Bilekler iki kolda aynı açıda."), [
     [L("Both at once", "İkisi birden"), "uv run flywheel-robot calibrate both"],
-    ["Teleop", "uv run flywheel-robot teleop --top 0 --wrist 1"],
+    ["Teleop", "uv run flywheel-robot teleop --top 1 --wrist 0"],
     [L("Raw: follower", "Ham: follower"), `lerobot-calibrate \\\n  --robot.type=so101_follower --robot.port=${FP} \\\n  --robot.id=follower --robot.calibration_dir=${CAL}`],
     [L("Raw: leader", "Ham: leader"), `lerobot-calibrate \\\n  --teleop.type=so101_leader --teleop.port=${LP} \\\n  --teleop.id=leader --teleop.calibration_dir=${CAL}`],
   ]],

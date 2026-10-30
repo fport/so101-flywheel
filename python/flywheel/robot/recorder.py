@@ -380,11 +380,19 @@ def run(args):
         return
 
     hw_features = {k: v for k, v in dataset.features.items() if k != ENV_STATE}  # we write the command channel ourselves
+    try:
+        robot.connect()  # cameras first: a wrong or sleeping index (iPhone Continuity camera) times out here
+    except TimeoutError as e:
+        dataset.finalize()
+        if args.display:
+            shutdown_visualization("rerun")
+        sys.exit(f"{ORANGE}{e}{RST}\nCamera indices: --top {args.top} --wrist {args.wrist}. Check them with "
+                 "`uv run lerobot-find-cameras opencv` (frames go to outputs/captured_images); "
+                 "an iPhone nearby can shift the order. Nothing was recorded, run the command again.")
+    teleop.connect()
     signal.signal(signal.SIGTERM, _sigterm)
     writing_marker(root).touch()
     saved, state = 0, "tray"
-    teleop.connect()
-    robot.connect()
     try:
         with AutoKeys(args.fps) if args.auto else Keys() as keys:
             i, tray_shown, card_shown = 0, None, None
@@ -518,4 +526,4 @@ def print_sessions(args):
             ids = sorted(x for x in parts if catalog.get(x, {}).get("type") == t)
             if ids:
                 print(f"   {TYPE_NAMES[t]:<7} {' '.join(ids)}")
-        print(f"\n   uv run flywheel-robot record --session {nxt} --top 0 --wrist 1")
+        print(f"\n   uv run flywheel-robot record --session {nxt}")

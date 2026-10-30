@@ -64,7 +64,7 @@ Robot bağımlılıkları `robot` extra'sında (sim kurulumuna girmez):
 cd python
 uv sync --extra robot
 uv run flywheel-robot teleop                     # Ctrl+C ile çık
-uv run flywheel-robot teleop --top 0 --wrist 1   # kameralarla, Rerun açılır
+uv run flywheel-robot teleop --top 1 --wrist 0   # kameralarla, Rerun açılır
 ```
 
 Kalibrasyon `hardware/calibration/{follower,leader}.json` içinde. Yeniden kalibre etmek için
@@ -91,7 +91,7 @@ kameraya gösterdim → bıraktım). Her karenin görev metni fazına göre yaz�
 ```bash
 cd python
 uv run flywheel-robot sessions                    # seansların durumu, sıradakinin parça listesi
-uv run flywheel-robot record --session 1          # üst kamera 0, bilek 1; Rerun paneli açılır (--no-display ile kapat)
+uv run flywheel-robot record --session 1          # üst kamera 1, bilek 0; Rerun paneli açılır (--no-display ile kapat)
 uv run flywheel-robot record --session 1 --fake   # donanımsız deneme
 ```
 

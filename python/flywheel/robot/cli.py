@@ -146,8 +146,8 @@ def main():
         if name == "sessions":
             continue
         r.add_argument("--session", type=int, required=True, help="starts at 1; `flywheel-robot sessions` lists them")
-        r.add_argument("--top", type=int, default=0, help="top camera OpenCV index")
-        r.add_argument("--wrist", type=int, default=1, help="wrist camera OpenCV index")
+        r.add_argument("--top", type=int, default=1, help="top camera OpenCV index")
+        r.add_argument("--wrist", type=int, default=0, help="wrist camera OpenCV index")
         r.add_argument("--fps", type=int, default=30)
         r.add_argument("--episode-time", type=float, default=60, help="max seconds per episode")
         r.add_argument("--follower-port", default=FOLLOWER_PORT)
