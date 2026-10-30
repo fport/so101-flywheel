@@ -105,16 +105,19 @@ class Keys:
             names = {keyboard.Key.right: "right", keyboard.Key.left: "left", keyboard.Key.esc: "esc"}
             mods = {keyboard.Key.cmd, keyboard.Key.cmd_r, keyboard.Key.ctrl, keyboard.Key.ctrl_r, keyboard.Key.alt,
                     keyboard.Key.alt_r, keyboard.Key.shift, keyboard.Key.shift_r}
-            held = set()
+            held, down = set(), set()
 
             def press(key):
                 if key in mods:
                     held.add(key)
-                elif not held and key in names:  # Cmd+→ in an editor is not a recording key
-                    self.events.put(names[key])
+                elif key in names and key not in down:  # a held arrow repeats; only the first press counts
+                    down.add(key)
+                    if not held:  # Cmd+→ in an editor is not a recording key
+                        self.events.put(names[key])
 
             def release(key):
                 held.discard(key)
+                down.discard(key)
 
             self.listener = keyboard.Listener(on_press=press, on_release=release)
             self.listener.start()
@@ -320,6 +323,7 @@ def dataset_features(robot):
 ENCODING = {"streaming_encoding": True, "encoder_threads": 2}
 # the arm is driven at CONTROL_MULT x the dataset fps (60 Hz like lerobot-teleoperate); every CONTROL_MULT-th tick is recorded
 CONTROL_MULT = 2
+GO_GAP = 0.5  # seconds; a second → within this is ignored
 
 
 def resume(repo_id, root):
@@ -487,7 +491,7 @@ def run(args):
         with AutoKeys(hz) if args.auto else Keys() as keys:
             i, tray_shown, card_shown = 0, None, None
             frames = switch_frame = tick = late = 0
-            quit_at = -1e9
+            quit_at = go_at = -1e9
             while i < len(todo):
                 t0 = time.perf_counter()
                 tick += 1
@@ -527,6 +531,11 @@ def run(args):
                         state = "timeout"
 
                 key = keys.poll()
+                if key == "go" and not args.auto:
+                    if time.perf_counter() - go_at < GO_GAP:  # double tap: one step, not two
+                        key = None
+                    else:
+                        go_at = time.perf_counter()
                 if key is not None and not args.auto:
                     status(f"   {DIM}key {keys.last} → {key} ({state}){RST}")
                 if key == "q":
