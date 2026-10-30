@@ -180,6 +180,7 @@ def main():
     i.add_argument("--image", nargs="+", metavar="FILE", help="image files")
     i.add_argument("--model", action="append", help="repeat to compare (default claude-sonnet-5-5)")
     i.add_argument("--order", choices=["W", "T"], default="W", help="variant in the work order")
+    i.add_argument("--effort", choices=["low", "medium", "high", "xhigh", "max"], help="lower is faster")
     i.add_argument("--seed", type=int, default=0)
     i.set_defaults(func=cmd_inspect)
     args = parser.parse_args()

@@ -39,22 +39,20 @@ Part types and their defects:
 have no mounting holes; broken = a chipped corner.
 - bracket (L-shaped mounting bracket): missing_hole = no hole in the flat base; broken = a chipped corner.
 
-variant is the colour: W = white, T = orange. Report what you see with the report_part tool."""
+variant is the colour: W = white, T = orange. Answer with the JSON object; note is one short sentence on what \
+decided it."""
 
-TOOL = {
-    "name": "report_part",
-    "description": "Attributes of the inspected part.",
-    "input_schema": {
-        "type": "object",
-        "properties": {
-            "type": {"type": "string", "enum": ["rim", "gear", "pad", "bracket"]},
-            "variant": {"type": "string", "enum": ["W", "T"], "description": "W = white, T = orange"},
-            "missing_hole": {"type": "boolean"},
-            "broken": {"type": "boolean"},
-            "note": {"type": "string", "description": "one short sentence: what decided it"},
-        },
-        "required": ["type", "variant", "missing_hole", "broken", "note"],
+SCHEMA = {  # structured output (output_config.format); forced tool_choice is not accepted by current models
+    "type": "object",
+    "properties": {
+        "type": {"type": "string", "enum": ["rim", "gear", "pad", "bracket"]},
+        "variant": {"type": "string", "enum": ["W", "T"]},
+        "missing_hole": {"type": "boolean"},
+        "broken": {"type": "boolean"},
+        "note": {"type": "string"},
     },
+    "required": ["type", "variant", "missing_hole", "broken", "note"],
+    "additionalProperties": False,
 }
 
 
@@ -67,14 +65,17 @@ def center_crop(frame):
     return frame[v0 : v0 + s, u0 : u0 + s]
 
 
-def ask(client, model, rgb):
-    """-> (attributes, seconds, usage). rgb: HxWx3 uint8."""
+def ask(client, model, rgb, effort=None):
+    """-> (attributes, seconds, usage). rgb: HxWx3 uint8; effort: low … max, None = the model's default."""
     import cv2
 
     ok, jpg = cv2.imencode(".jpg", rgb[..., ::-1], [cv2.IMWRITE_JPEG_QUALITY, 92])
     t0 = time.perf_counter()
+    config = {"format": {"type": "json_schema", "schema": SCHEMA}}
+    if effort:
+        config["effort"] = effort
     msg = client.messages.create(
-        model=model, max_tokens=400, tools=[TOOL], tool_choice={"type": "tool", "name": "report_part"},
+        model=model, max_tokens=4000, output_config=config,
         messages=[{"role": "user", "content": [
             {"type": "image", "source": {"type": "base64", "media_type": "image/jpeg",
                                          "data": base64.b64encode(jpg.tobytes()).decode()}},
@@ -82,7 +83,7 @@ def ask(client, model, rgb):
         ]}],
     )
     seconds = time.perf_counter() - t0
-    attrs = next(b.input for b in msg.content if b.type == "tool_use")
+    attrs = json.loads(next(b.text for b in msg.content if b.type == "text"))
     return attrs, seconds, {"input": msg.usage.input_tokens, "output": msg.usage.output_tokens}
 
 
@@ -151,15 +152,15 @@ def run(args):
     out.mkdir(parents=True, exist_ok=True)
     rows = []
     print(f"{B}work order {args.order}{RST} {DIM}({'white' if args.order == 'W' else 'orange'} is the product) · "
-          f"{', '.join(models)} · {out}{RST}\n")
+          f"{', '.join(models)} · effort {args.effort or 'default'} · {out}{RST}\n")
     print(f"   {'part':<9}{'model':<20}{'bin':<8}{'truth':<8}{'seconds':>8}  seen")
     for name, frame, truth in frames:
         crop = center_crop(frame)
         cv2.imwrite(str(out / f"{name}.jpg"), crop[..., ::-1])
         for model in models:
             try:
-                attrs, sec, usage = ask(client, model, crop)
-            except anthropic.APIError as e:
+                attrs, sec, usage = ask(client, model, crop, args.effort)
+            except (anthropic.APIError, StopIteration, json.JSONDecodeError) as e:
                 print(f"   {name:<9}{model:<20}{ORANGE}{type(e).__name__}: {e}{RST}")
                 continue
             bin_ = decide(attrs, args.order)

@@ -111,6 +111,7 @@ export ANTHROPIC_API_KEY=...
 uv run flywheel-robot inspect --sim 24                      # bakma pozunda sim parçaları, gerçek etiketle puanlanır
 uv run flywheel-robot inspect --camera 0                    # gerçek bilek kamerası, kol parçanın üstünde
 uv run flywheel-robot inspect --sim 8 --model claude-haiku-5-5 --model claude-sonnet-5-5
+uv run flywheel-robot inspect --sim 8 --effort low                # daha az düşünür, daha kısa bekler
 ```
 
 Claude gördüğünü söyler (tip, renk, eksik delik, kırık); kasayı iş emri kuralı verir, her sınıflandırıcıda olduğu
