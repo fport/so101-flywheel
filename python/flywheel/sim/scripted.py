@@ -1,4 +1,4 @@
-"""Scripted expert: pick from the tray -> show to the top camera -> drop into the commanded bin.
+"""Scripted expert: look at the part from above (wrist camera) -> pick it from the tray -> drop into the commanded bin.
 
 Reads part poses from the sim state (privileged information); meant for generating demo data in sim and validating
 the scene. On the real arm this role is played by teleop demos and the trained policy.
@@ -141,9 +141,14 @@ class ScriptedSorter:
             target, frame, width = self.plan_grasp(pid)
             above = target + np.array([0, 0, 0.045])
 
+            # inspection happens here: the wrist camera sees the part in its pocket (env.inspection_crop)
+            self.phase = "inspect"
+            look, look_frame = env.look_pose(target, frame)
+            self.move_joints(np.r_[self.ik.solve(look, look_frame, q0=self.q[:5]).q, self.jaw_angle(width + OPEN_MARGIN)])
+            self.hold(inspect_seconds)
+
             self.phase = "reach"
-            self.move_joints(np.r_[self.ik.solve(above, frame, q0=self.q[:5]).q, self.jaw_angle(width + OPEN_MARGIN)])
-            self.move_line(target, frame, 0.7)
+            self.move_line(target, frame, 0.9)
 
             self.phase = "grasp"
             self.set_gripper(max(self.jaw_angle(width) - 0.16, env.model.jnt_range[5, 0]), 0.6)
@@ -151,11 +156,6 @@ class ScriptedSorter:
 
             self.phase = "lift"
             self.move_line(above, frame, 0.6)
-
-            self.phase = "inspect"
-            show, show_frame = self.env.inspection_pose()
-            self.move_joints(np.r_[self.ik.solve(show, show_frame, q0=self.q[:5]).q, self.q[5]])
-            self.hold(inspect_seconds)
 
             self.phase = "place"
             bx, by = mm(p["bins"][commanded_bin]["center"])

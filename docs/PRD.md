@@ -59,7 +59,7 @@ The primary user is the developer-operator who builds and runs the system. Secon
 
 ## Reference task: quality control
 
-The arm picks a part from the tray, shows it to the camera, and drops it into the **OK** bin if it is sound or the **REJECT** bin if it is defective. Because the success criterion is clear, the verifier is easy to test: is the part in the correct bin, and inside the bin?
+The arm looks at a part in the tray with its wrist camera, picks it, and drops it into the **OK** bin if it is sound or the **REJECT** bin if it is defective. Because the success criterion is clear, the verifier is easy to test: is the part in the correct bin, and inside the bin?
 
 **Physical setup**
 

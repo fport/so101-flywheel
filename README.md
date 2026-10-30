@@ -31,8 +31,8 @@ Record, verify, correct, retrain. Simulated in MuJoCo, printed on a Bambu X2D, t
 
 The arm records every attempt at a task, a VLM verifier judges success, failed attempts become new data through
 human correction, and the policy goes through retrain → eval → deploy. The first reference task is end-of-line
-quality control at an automotive supplier: the arm shows wheel rims, gears, brake pads and brackets to a camera;
-sound parts that match the work order go to the OK bin, defective parts and wrong variants go to the reject bin.
+quality control at an automotive supplier: the arm looks at wheel rims, gears, brake pads and brackets with its wrist
+camera before picking them; sound parts that match the work order go to the OK bin, defective parts and wrong variants go to the reject bin.
 
 | | |
 | --- | --- |
@@ -78,12 +78,12 @@ file and the site:
 
 | Level | What | Count |
 | --- | --- | --- |
-| Episode | One part: pick, show to the camera, drop into a bin | 1–120 |
+| Episode | One part: look at it from above (wrist camera), pick it, drop it into a bin | 1–120 |
 | Tray | Six parts laid out on the tray; the tray is empty after 6 episodes | 1–20 |
 | Session | One `record --session N` run: 5 trays, 30 episodes, 30 different parts | 1–4 |
 
 The recorder shows the next tray, pocket and bin on screen and says them out loud; the operator steps through with
-→ or Enter (start → shown to the camera → dropped); ← redoes the episode, Esc twice quits. As in `lerobot-record`
+→ or Enter (start → above the part, centred in the wrist camera → dropped); ← redoes the episode, Esc twice quits. As in `lerobot-record`
 the arrows and Esc are global, so they work while the Rerun window has focus; Enter, `r` and `q` count only in the
 recorder's terminal. Each frame's task text follows its phase, and ACT's command goes into
 `observation.environment_state`. The arm is driven at 60 Hz like `lerobot-teleoperate`; every second tick goes into

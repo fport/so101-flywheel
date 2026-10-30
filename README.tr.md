@@ -33,7 +33,7 @@ Kaydet, doğrula, düzelt, yeniden eğit. Simülasyon MuJoCo'da, baskılar Bambu
 
 Kol bir görevi her denemede kaydeder, bir VLM verifier başarıyı değerlendirir, başarısız denemeler insan düzeltmesiyle
 yeni veriye dönüşür ve policy retrain → eval → deploy döngüsünden geçer. İlk referans görev otomotiv yan sanayi hat
-sonu kalite kontrolü: kol jant, dişli, balata ve braketleri kameraya gösterir; iş emrine uyan sağlam parçalar OK
+sonu kalite kontrolü: kol jant, dişli, balata ve braketlere almadan önce bilek kamerasıyla bakar; iş emrine uyan sağlam parçalar OK
 kasasına, kusurlular ve yanlış varyantlar ret kasasına gider.
 
 | | |
@@ -79,12 +79,12 @@ Kayıt planı (`plans/record-W-seed0`) üç seviyedir; numaralar terminalde, pla
 
 | Seviye | Ne | Sayı |
 | --- | --- | --- |
-| Bölüm | Tek parça: al, kameraya göster, kasaya bırak | 1–120 |
+| Bölüm | Tek parça: üstten bak (bilek kamerası), al, kasaya bırak | 1–120 |
 | Tepsi | Tepsiye dizilmiş 6 parça; 6 bölümde tepsi boşalır | 1–20 |
 | Seans | Tek `record --session N` çalıştırması: 5 tepsi, 30 bölüm, 30 farklı parça | 1–4 |
 
 Kaydedici sıradaki tepsiyi, cebi ve kasayı ekranda gösterip sesle söyler; operatör → ya da ENTER ile ilerler (başlat →
-kameraya gösterdim → bıraktım); ← bölümü yeniden çeker, iki kez Esc çıkar. `lerobot-record`'daki gibi oklar ve Esc globaldir,
+üstündeyim, parça bilek kamerasının ortasında → bıraktım); ← bölümü yeniden çeker, iki kez Esc çıkar. `lerobot-record`'daki gibi oklar ve Esc globaldir,
 Rerun penceresi öndeyken de çalışır; ENTER, `r` ve `q` sadece kaydın terminalinde sayılır. Her karenin görev metni fazına göre yazılır, ACT'nin komutu
 `observation.environment_state` kanalına gider. Kol `lerobot-teleoperate` gibi 60 Hz'de sürülür, her ikinci adım
 30 fps dataset'e yazılır. Seans bitince `check` çalışır (eklem aralıkları, follower'ın leader'ı izlemesi, komut

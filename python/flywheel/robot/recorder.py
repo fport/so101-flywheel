@@ -1,14 +1,15 @@
 """Plan-driven teleop recording: two-phase task text, ACT command channel, private Hub push at the end of a session.
 
 Three levels; numbers are positions in the plan and match the tracking site:
-  episode (1–120)  one part: pick, show to the camera, drop into the bin
+  episode (1–120)  one part: look at it from above (wrist camera), pick it, drop it into the bin
   tray (1–20)      6 parts laid in the tray; after 6 episodes the tray is empty, move on to the next tray
   session (1–4)    one `record --session N` run: 5 trays, 30 episodes, Hub push at the end
 
 lerobot-record takes one task text per episode; here each frame's task is written by phase:
-phase 1 "pick the part and show it to the camera" + environment_state [0, 0], phase 2 "put the part in the
-<OK|REJECT> bin" + one-hot command. The operator advances with one key (→, ENTER or space): start → shown to camera →
-dropped. Which plan row is which episode is kept in <root>/flywheel/episodes.jsonl; an interrupted session
+phase 1 "look at the part from above" + environment_state [0, 0], phase 2 "put the part in the <OK|REJECT> bin" +
+one-hot command. Phase 1 ends with the open jaws ~6 cm straight above the part, so the wrist camera sees it in the
+middle of its image: that frame is what inspection decides on. The operator advances with one key (→, ENTER or
+space): start → above the part → dropped. Which plan row is which episode is kept in <root>/flywheel/episodes.jsonl; an interrupted session
 resumes where it left off with the same command.
 
 If the process dies before the LeRobot dataset is finalize()d, a half-written parquet makes all of it unreadable. So
@@ -522,10 +523,10 @@ def run(args):
                     })
                     frames += 1
                     if frames % max(args.fps // 3, 1) == 0:
-                        label = f"{ORANGE}phase 2 · put in bin{RST}" if phase2 else f"{BLUE}phase 1 · pick and show{RST}"
+                        label = f"{ORANGE}phase 2 · pick, put in bin{RST}" if phase2 else f"{BLUE}phase 1 · go above the part{RST}"
                         slow = f"  {ORANGE}loop is late {late}x (CPU busy?){RST}" if late > hz // 10 else ""
                         status(f"   {REJECT}●{RST} rec {frames / args.fps:5.1f} s  {label}{slow}  "
-                               f"{DIM}→ {'dropped, save' if phase2 else 'shown to camera'} · ← redo · Esc×2 quit{RST}", end="")
+                               f"{DIM}→ {'dropped, save' if phase2 else 'above it, part centred in wrist cam'} · ← redo · Esc×2 quit{RST}", end="")
                     if frames / args.fps >= args.episode_time:
                         status(f"   {REJECT}time is up ({args.episode_time:.0f} s){RST}: → save · ← redo")
                         state = "timeout"
@@ -578,7 +579,8 @@ def run(args):
 
                 if state == "ready" and card_shown != p.index:
                     print(pick_card(p, len(plan_picks), n_trays, args.session, catalog)
-                          + f"   {DIM}return the arm to start · → to start recording{RST}")
+                          + f"   {DIM}arm at start · → record · go ~6 cm above pocket {p.pocket}, part centred in the wrist cam, "
+                            f"hold still · → · pick it, {p.command.upper()} bin, back to start · → save{RST}")
                     say(f"Pocket {p.pocket}. {p.command.upper()} bin.", args.voice)
                     card_shown = p.index
 

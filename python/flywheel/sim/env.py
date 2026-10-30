@@ -95,8 +95,13 @@ class QCSortSim:
         f = height / 2 / np.tan(np.radians(self.model.cam_fovy[cam]) / 2)
         return width / 2 + f * local[0] / -local[2], height / 2 - f * local[1] / -local[2]
 
+    def look_pose(self, target, frame):
+        """Inspection pose: open jaws straight above the grasp point (target, frame), inspection.look_height higher.
+        The wrist camera sees the part in the tray from ~16 cm, near the image centre."""
+        return target + np.array([0, 0, mm(self.p["inspection"]["look_height"])]), frame
+
     def inspection_pose(self):
-        """(pinch position, gripper orientation): the part is held between the top camera and the backdrop plate.
+        """Earlier design, only drawn by the hardware diagram: the part held between the top camera and the backdrop.
 
         Jaws tilted forward-down, closing axis +y: the wrist camera stays on the arm side, the top camera sees the
         part's top and front faces without the palm in the way.
@@ -107,16 +112,12 @@ class QCSortSim:
         tilt = np.radians(ins["pose_tilt"])
         return show, grasp_frame([np.sin(tilt), 0, -np.cos(tilt)], [0, 1, 0])
 
-    def inspection_crop(self, size=128, scale=2):
-        """Input to the inspection classifier: a square crop of the part between the jaws from the top camera
-        image. Called while the arm is in the inspection pose. At the default size the crop's background
-        falls entirely on the inspection backdrop plate."""
+    def inspection_crop(self, pid, size=224, scale=1):
+        """Input to the inspection classifier: a square crop around the part from the wrist camera image. Called in
+        the look pose, before the grasp; at the default size the whole part and a margin of its pocket fit in."""
         w, h = self.p["cameras"]["resolution"]
-        image = self.render("top", w * scale, h * scale)
-        site = self.model.site("pinch").id
-        r = self.data.site_xmat[site].reshape(3, 3)
-        center = self.data.site_xpos[site] + 0.012 * r[:, 0] - 0.008 * r[:, 2]
-        u, v = self.project(center, "top", w * scale, h * scale)
+        image = self.render("wrist", w * scale, h * scale)
+        u, v = self.project(self.part_pos(pid), "wrist", w * scale, h * scale)
         u0 = int(np.clip(u - size / 2, 0, w * scale - size))
         v0 = int(np.clip(v - size / 2, 0, h * scale - size))
         return image[v0 : v0 + size, u0 : u0 + size]

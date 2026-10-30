@@ -189,7 +189,7 @@ def main(argv=None):
     add("view", cmd_view, "interactive MuJoCo viewer")
     sp = add("render", cmd_render, "save a single frame from the top + wrist camera")
     sp.add_argument("--out", default=str(Path(default_out) / "scene.png"))
-    sp = add("episode", cmd_episode, "scripted pick -> show -> drop episode for one part")
+    sp = add("episode", cmd_episode, "scripted look -> pick -> drop episode for one part")
     sp.add_argument("--part", help="part ID (default: first part in the tray)")
     sp.add_argument("--bin", choices=["ok", "reject"], help="target bin (default: correct bin per the work order)")
     sp.add_argument("--order", choices=list(VARIANTS), default="W", help="variant in the work order")

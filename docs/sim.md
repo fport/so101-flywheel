@@ -1,7 +1,7 @@
 # MuJoCo simulation
 
 The MuJoCo scene for the reference task: end-of-line quality control at an automotive supplier. The arm picks a part (wheel rim, gear,
-brake pad, bracket) from the tray, shows it to the top camera, and drops it into the OK bin if it matches the work order, or into the
+brake pad, bracket) from the tray after looking at it from above with the wrist camera, and drops it into the OK bin if it matches the work order, or into the
 reject bin if it does not. Why the part set and attempts are set up this way: [experiment-design.md](experiment-design.md).
 It is for trying out the layout, camera angles and part set before the real setup is printed, and then for generating synthetic data
 for the verifier and the policy. All dimensions come from [`hardware/params.yaml`](../hardware/params.yaml).
@@ -47,8 +47,11 @@ Part IDs carry no label: `J-W-03` is wheel rim, white, number 3 (`J` rim, `D` ge
 
 ## Inspection image
 
-The arm holds the part between the top camera and the matte black backdrop plate. `QCSortSim.inspection_crop()`
-returns this frame cropped to the part; this is the input to the inspection classifier.
+Before the grasp the open jaws stop straight above the part, `inspection.look_height` (60 mm) higher
+(`QCSortSim.look_pose()`); the wrist camera then sees the part in its pocket from ~16 cm, near the image centre.
+`QCSortSim.inspection_crop(pid)` returns that frame cropped to the part; this is the input to the inspection classifier.
+The earlier design lifted the part and showed it to the top camera, but from 66 cm a part is ~35 px there, too small
+for a missing hole.
 
 ![Inspection crops of sound and defective parts](media/sim-inspection.png)
 
@@ -67,7 +70,7 @@ In reversed-command attempts (`probe`) the only criterion is following the comma
 
 ## Scripted expert
 
-`flywheel/sim/scripted.py` reads the part pose from the sim state and plays a pick → show → drop episode with IK. On the balanced
+`flywheel/sim/scripted.py` reads the part pose from the sim state and plays a look → pick → drop episode with IK. On the balanced
 recording plan (120 episodes: 60 correct + 60 reversed command) it succeeds 360/360 over three runs with both work orders, and on the
 held-out plan (32 episodes) 64/64 over two runs (`flywheel-sim batch`). This is not a policy;
 it is proof that the scene works and a tool for generating demos in sim.
@@ -85,8 +88,9 @@ Findings that came up while building the scene and that affect the real setup:
   of offset is enough for the part to get squeezed between the pads and shoot out.
 - **Parts dropped at the same point stack into a tower.** After the third part it rises above the bin's edge; the drop point should
   be spread out inside the bin.
-- **The inspection pose is limited by kinematics.** Because of the wrist_flex limit, a part held at a 20-25° tilt cannot be lifted
-  higher than 14-16 cm; that is why the top camera stands beyond the tray, looking back.
+- **Showing the part to the top camera did not work.** Because of the wrist_flex limit, a part held at a 20-25° tilt cannot be
+  lifted higher than 14-16 cm, and from the top camera it is ~35 px. Inspection now uses the wrist camera from above the pocket,
+  before the grasp; a search over reachable poses gave 60 mm above the grasp point with a vertical gripper.
 
 - **The bins cannot sit level with the tray.** The bin wall hits the body of the jaw going down into the edge pockets; so the bins
   sit one tile behind the tray (x 0..3u).

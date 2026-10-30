@@ -13,7 +13,7 @@ from ..sim.params import REPO_ROOT
 
 PLANS_DIR = REPO_ROOT / "plans"
 TRAYS_PER_SESSION = 5  # 5 trays = 30 episodes, about 40 minutes
-PHASE1_TASK = "pick the part and show it to the camera"
+PHASE1_TASK = "look at the part from above"  # inspection: the wrist camera sees the part in its pocket
 
 
 def phase2_task(command):

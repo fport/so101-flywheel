@@ -61,10 +61,15 @@ inspection:
   backdrop_center: [84, 0]  # tiles x 1u..3u, y -2u..2u: between the tray and the arm base
   backdrop_size: [84, 168]
   backdrop_color: [0.09, 0.09, 0.10]  # matte black: highest contrast with metallic parts
-  # Point where the part is shown to the camera (x, height). The wrist limit keeps the arm from holding it vertical
-  # any closer/higher; the top camera's line of sight through this point lands on the backdrop (x ~ 103).
+  # Look pose: before the grasp the open jaws stop straight above the grasp point, look_height higher. The wrist
+  # camera then sees the part's top face near the image centre from ~16 cm (holes, broken corners, colour); from the
+  # top camera a part is ~35 px, too small for a missing hole. Height found by search in the sim: the highest pose the
+  # arm reaches above every pocket with a vertical gripper.
+  look_height: 60
+  # Earlier design: the part was lifted and shown to the top camera here (x, height; jaw tilt). Only the hardware
+  # side-view diagram still draws it.
   pose: [130, 120]
-  pose_tilt: 30             # forward tilt of the jaws from vertical; the hole on the top face stays visible
+  pose_tilt: 30
 
 cameras:
   resolution: [640, 480]
