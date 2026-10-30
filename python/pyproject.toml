@@ -20,7 +20,7 @@ flywheel-robot = "flywheel.robot.cli:main"
 
 [project.optional-dependencies]
 robot = [
-    "lerobot[feetech,dataset,training,viz]==0.6.1",
+    "lerobot[feetech,dataset,training,viz,pynput-dep]==0.6.1",
 ]
 
 [build-system]

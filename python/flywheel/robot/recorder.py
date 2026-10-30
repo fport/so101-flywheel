@@ -7,7 +7,7 @@ Three levels; numbers are positions in the plan and match the tracking site:
 
 lerobot-record takes one task text per episode; here each frame's task is written by phase:
 phase 1 "pick the part and show it to the camera" + environment_state [0, 0], phase 2 "put the part in the
-<OK|REJECT> bin" + one-hot command. The operator advances with one key (ENTER or space): start → shown to camera →
+<OK|REJECT> bin" + one-hot command. The operator advances with one key (→, ENTER or space): start → shown to camera →
 dropped. Which plan row is which episode is kept in <root>/flywheel/episodes.jsonl; an interrupted session
 resumes where it left off with the same command.
 
@@ -20,6 +20,7 @@ import json
 import logging
 import math
 import os
+import queue
 import select
 import shutil
 import signal
@@ -87,22 +88,44 @@ def load_catalog():
 # --- keyboard ------------------------------------------------------------------------------------------------
 
 class Keys:
-    """Reads single keys while the terminal has focus (cbreak); no accessibility permission needed, unlike pynput."""
+    """Recording keys, same as lerobot-record: global (pynput) so they work while the Rerun window has focus, or the
+    terminal when macOS has not given the terminal Accessibility permission. Arrows as in lerobot-record:
+    right = next step, left = redo the episode, Esc = quit; ENTER/space, r and q do the same."""
+
+    KEYMAP = {"right": "go", "enter": "go", "space": "go", "n": "go", "left": "r", "r": "r", "esc": "q", "q": "q"}
 
     def __enter__(self):
-        self.fd = sys.stdin.fileno()
-        self.saved = termios.tcgetattr(self.fd)
-        tty.setcbreak(self.fd)
+        from lerobot.utils.keyboard_input import TerminalKeyListener, create_key_listener
+
+        self.events = queue.SimpleQueue()
+        self.listener = create_key_listener(lambda name: self.events.put(name.lower()))
+        self.fd, self.saved = None, None
+        if self.listener is not None and not isinstance(self.listener, TerminalKeyListener) and sys.stdin.isatty():
+            # global listener: keep what is typed into this terminal from echoing and reaching the shell afterwards
+            self.fd = sys.stdin.fileno()
+            self.saved = termios.tcgetattr(self.fd)
+            tty.setcbreak(self.fd)
+            attrs = termios.tcgetattr(self.fd)
+            attrs[3] &= ~termios.ECHO
+            termios.tcsetattr(self.fd, termios.TCSADRAIN, attrs)
+        mode = "terminal (keep it focused)" if isinstance(self.listener, TerminalKeyListener) else "global"
+        print(f"{DIM}keys ({mode}): → / ENTER next · ← / r redo · Esc / q quit{RST}")
         return self
 
     def __exit__(self, *exc):
-        termios.tcsetattr(self.fd, termios.TCSADRAIN, self.saved)
+        if self.listener is not None:
+            self.listener.stop()
+        if self.saved is not None:
+            termios.tcflush(self.fd, termios.TCIFLUSH)
+            termios.tcsetattr(self.fd, termios.TCSADRAIN, self.saved)
 
     def poll(self):
-        if select.select([sys.stdin], [], [], 0)[0]:
-            ch = os.read(self.fd, 1).decode(errors="ignore")
-            return "go" if ch in ("\n", "\r", " ") else ch.lower()
-        return None
+        if self.fd is not None and select.select([self.fd], [], [], 0)[0]:
+            os.read(self.fd, 64)  # drained; the global listener already saw these keys
+        try:
+            return self.KEYMAP.get(self.events.get_nowait())
+        except queue.Empty:
+            return None
 
 
 class AutoKeys:
@@ -449,7 +472,7 @@ def run(args):
 
                 if state == "tray" and tray_shown != p.tray:
                     done_pockets = {q.pocket for q in plan_picks if q.tray == p.tray and q.index in done}
-                    print(f"\n{B}TRAY {p.tray}{RST}{DIM}/{n_trays} · lay these 6 parts in the tray, then ENTER{RST}\n"
+                    print(f"\n{B}TRAY {p.tray}{RST}{DIM}/{n_trays} · lay these 6 parts in the tray, then →{RST}\n"
                           + tray_box(args.plan, p.tray, done_pockets, catalog))
                     say(f"Tray {p.tray}. Lay out the tray.", args.voice)
                     tray_shown = p.tray
@@ -467,9 +490,9 @@ def run(args):
                         label = f"{ORANGE}phase 2 · put in bin{RST}" if phase2 else f"{BLUE}phase 1 · pick and show{RST}"
                         slow = f"  {ORANGE}loop is late {late}x (CPU busy?){RST}" if late > hz // 10 else ""
                         status(f"   {REJECT}●{RST} rec {frames / args.fps:5.1f} s  {label}{slow}  "
-                               f"{DIM}ENTER: {'dropped, save' if phase2 else 'shown to camera'} · r: redo · q: quit{RST}", end="")
+                               f"{DIM}→ {'dropped, save' if phase2 else 'shown to camera'} · ← redo · Esc quit{RST}", end="")
                     if frames / args.fps >= args.episode_time:
-                        status(f"   {REJECT}time is up ({args.episode_time:.0f} s){RST}: ENTER save · r redo")
+                        status(f"   {REJECT}time is up ({args.episode_time:.0f} s){RST}: → save · ← redo")
                         state = "timeout"
 
                 key = keys.poll()
@@ -477,7 +500,7 @@ def run(args):
                     break
                 if key == "r" and state in ("phase1", "phase2", "timeout"):
                     dataset.clear_episode_buffer()
-                    status(f"   {DIM}discarded; return the arm to start, ENTER to restart{RST}")
+                    status(f"   {DIM}discarded; return the arm to start, → to restart{RST}")
                     state = "ready"
                 elif key == "go":
                     if state == "tray":
@@ -507,7 +530,7 @@ def run(args):
 
                 if state == "ready" and card_shown != p.index:
                     print(pick_card(p, len(plan_picks), n_trays, args.session, catalog)
-                          + f"   {DIM}return the arm to start · ENTER to start recording{RST}")
+                          + f"   {DIM}return the arm to start · → to start recording{RST}")
                     say(f"Pocket {p.pocket}. {p.command.upper()} bin.", args.voice)
                     card_shown = p.index
 

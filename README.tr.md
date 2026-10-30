@@ -83,8 +83,9 @@ Kayıt planı (`plans/record-W-seed0`) üç seviyedir; numaralar terminalde, pla
 | Tepsi | Tepsiye dizilmiş 6 parça; 6 bölümde tepsi boşalır | 1–20 |
 | Seans | Tek `record --session N` çalıştırması: 5 tepsi, 30 bölüm, 30 farklı parça | 1–4 |
 
-Kaydedici sıradaki tepsiyi, cebi ve kasayı ekranda gösterip sesle söyler; operatör ENTER ile ilerler (başlat →
-kameraya gösterdim → bıraktım). Her karenin görev metni fazına göre yazılır, ACT'nin komutu
+Kaydedici sıradaki tepsiyi, cebi ve kasayı ekranda gösterip sesle söyler; operatör → ya da ENTER ile ilerler (başlat →
+kameraya gösterdim → bıraktım); ← bölümü yeniden çeker, Esc çıkar. `lerobot-record`'daki gibi tuşlar globaldir,
+Rerun penceresi öndeyken de çalışır. Her karenin görev metni fazına göre yazılır, ACT'nin komutu
 `observation.environment_state` kanalına gider. Kol `lerobot-teleoperate` gibi 60 Hz'de sürülür, her ikinci adım
 30 fps dataset'e yazılır. Seans bitince `check` çalışır (eklem aralıkları, follower'ın leader'ı izlemesi, komut
 kanalının planla eşleşmesi, videolar), ancak ondan sonra dataset private olarak Hugging Face Hub'a yüklenir
