@@ -112,6 +112,12 @@ def cmd_sessions(args):
     print_sessions(_dataset_args(args))
 
 
+def cmd_check(args):
+    from .check import main as check_main
+
+    check_main(_dataset_args(args))
+
+
 def cmd_teleop(args):
     _check_ports(args.follower_port, args.leader_port)
     argv = [_lerobot("lerobot-teleoperate"), *teleop_argv(args)]
@@ -137,13 +143,14 @@ def main():
     c.add_argument("--leader-port", default=LEADER_PORT)
     c.set_defaults(func=cmd_calibrate)
     for name, fn, help_ in (("record", cmd_record, "plan-driven recording: record one session (5 trays, 30 episodes), private Hub push at the end"),
-                            ("sessions", cmd_sessions, "session status and the parts list for the next session")):
+                            ("sessions", cmd_sessions, "session status and the parts list for the next session"),
+                            ("check", cmd_check, "check a recorded dataset (servos, command channel, videos); runs before every push")):
         r = sub.add_parser(name, help=help_)
         r.add_argument("--plan", default="record-W-seed0", help="plans/<name>.json")
         r.add_argument("--repo-id", default="fport/so101-qc")
         r.add_argument("--root", help="local dataset folder (default outputs/datasets/<repo name>)")
         r.set_defaults(func=fn)
-        if name == "sessions":
+        if name in ("sessions", "check"):
             continue
         r.add_argument("--session", type=int, required=True, help="starts at 1; `flywheel-robot sessions` lists them")
         r.add_argument("--top", type=int, default=1, help="top camera OpenCV index")

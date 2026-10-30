@@ -895,6 +895,7 @@ const CMDS = [
     [L("Session 1", "Seans 1"), `uv run flywheel-robot record --session 1          # ${L("top camera 1, wrist 0", "üst kamera 1, bilek 0")}`],
     [L("Trial (not pushed to the Hub)", "Deneme (Hub'a gitmez)"), "uv run flywheel-robot record --session 1 --no-push --repo-id fport/so101-qc-test"],
     [L("No hardware", "Donanımsız"), "uv run flywheel-robot record --session 1 --fake"],
+    [L("Check the dataset (runs before every push)", "Dataset kontrolü (her push'tan önce çalışır)"), "uv run flywheel-robot check --repo-id fport/so101-qc-test"],
     [L("Camera indices", "Kamera indeksleri"), "lerobot-find-cameras opencv"],
   ]],
   [L("Training", "Eğitim"), L("After recording, ACT v0. mps on the Mac; --policy.device=cuda on Colab/RunPod.", "Kayıt bitince, ACT v0. Mac'te mps; Colab/RunPod'da --policy.device=cuda."), [

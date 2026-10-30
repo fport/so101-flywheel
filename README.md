@@ -84,14 +84,16 @@ file and the site:
 
 The recorder shows the next tray, pocket and bin on screen and says them out loud; the operator steps through with
 Enter (start → shown to the camera → dropped). Each frame's task text follows its phase, and ACT's command goes into
-`observation.environment_state`. When a session ends the dataset is pushed privately to the Hugging Face Hub
-(`--no-push` skips it).
+`observation.environment_state`. The arm is driven at 60 Hz like `lerobot-teleoperate`; every second tick goes into
+the 30 fps dataset. When a session ends `check` runs (joint ranges, follower tracking, command channel against the
+plan, videos) and only then is the dataset pushed privately to the Hugging Face Hub (`--no-push` skips it).
 
 ```bash
 cd python
 uv run flywheel-robot sessions                    # session status, part list of the next one
 uv run flywheel-robot record --session 1          # top camera 1, wrist 0; opens the Rerun panel (--no-display to skip)
 uv run flywheel-robot record --session 1 --fake   # dry run without hardware
+uv run flywheel-robot check                       # check the dataset by hand (--repo-id fport/so101-qc-test)
 ```
 
 The dataset is written to `outputs/datasets/so101-qc` and backed up to `so101-qc.snapshot` after every tray. If a

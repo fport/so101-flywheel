@@ -242,10 +242,17 @@ def dataset_features(robot):
     return features, procs
 
 
+# same as lerobot-record --dataset.streaming_encoding=true --dataset.encoder_threads=2: frames go to the encoder as
+# they arrive, so save_episode takes ~0.2 s instead of ~5 s (the arm is not driven while it runs)
+ENCODING = {"streaming_encoding": True, "encoder_threads": 2}
+# the arm is driven at CONTROL_MULT x the dataset fps (60 Hz like lerobot-teleoperate); every CONTROL_MULT-th tick is recorded
+CONTROL_MULT = 2
+
+
 def resume(repo_id, root):
     from lerobot.datasets import LeRobotDataset
 
-    return LeRobotDataset.resume(repo_id, root=root, image_writer_threads=8)
+    return LeRobotDataset.resume(repo_id, root=root, image_writer_threads=8, **ENCODING)
 
 
 def restore(root):
@@ -286,7 +293,7 @@ def open_dataset(repo_id, root, robot, fps):
         sys.exit(f"{root} exists but is not a LeRobot dataset; pass a different --root")
     n_cams = sum(isinstance(v, tuple) for v in robot.observation_features.values())
     ds = LeRobotDataset.create(repo_id, fps, root=root, robot_type=robot.name, features=features,
-                               use_videos=True, image_writer_threads=4 * max(n_cams, 1))
+                               use_videos=True, image_writer_threads=4 * max(n_cams, 1), **ENCODING)
     return ds, procs
 
 
@@ -330,6 +337,13 @@ def log_episode(root, p, session, episode_index, frames, switch_frame):
 def push(repo_id, root):
     from lerobot.datasets import LeRobotDataset
 
+    from .check import check
+
+    print()
+    if check(repo_id, root):
+        print(f"{ORANGE}Not uploading. Fix the problems above, then: uv run flywheel-robot record ... again or "
+              f"push by hand once they are understood.{RST}")
+        return
     print(f"{DIM}Uploading to Hugging Face (private): {repo_id} …{RST}")
     LeRobotDataset(repo_id, root=root).push_to_hub(private=True, tags=HUB_TAGS)
     print(f"{GREEN}✓ https://huggingface.co/datasets/{repo_id}{RST}")
@@ -394,18 +408,21 @@ def run(args):
     writing_marker(root).touch()
     saved, state = 0, "tray"
     try:
-        with AutoKeys(args.fps) if args.auto else Keys() as keys:
+        hz = args.fps * CONTROL_MULT
+        with AutoKeys(hz) if args.auto else Keys() as keys:
             i, tray_shown, card_shown = 0, None, None
-            frames = switch_frame = 0
+            frames = switch_frame = tick = late = 0
             while i < len(todo):
                 t0 = time.perf_counter()
+                tick += 1
+                sample = tick % CONTROL_MULT == 0
                 p = todo[i]
                 obs = robot.get_observation()
                 act = teleop.get_action()
                 obs_p = obs_proc(obs)
                 act_p = teleop_proc((act, obs))
                 robot.send_action(robot_proc((act_p, obs)))
-                if args.display:
+                if args.display and sample:
                     log_visualization_data("rerun", observation=obs_p, action=act_p)
 
                 if state == "tray" and tray_shown != p.tray:
@@ -415,7 +432,7 @@ def run(args):
                     say(f"Tray {p.tray}. Lay out the tray.", args.voice)
                     tray_shown = p.tray
 
-                if state in ("phase1", "phase2"):
+                if state in ("phase1", "phase2") and sample:
                     phase2 = state == "phase2"
                     dataset.add_frame({
                         **build_dataset_frame(hw_features, obs_p, prefix=OBS_STR),
@@ -426,7 +443,8 @@ def run(args):
                     frames += 1
                     if frames % max(args.fps // 3, 1) == 0:
                         label = f"{ORANGE}phase 2 · put in bin{RST}" if phase2 else f"{BLUE}phase 1 · pick and show{RST}"
-                        status(f"   {REJECT}●{RST} rec {frames / args.fps:5.1f} s  {label}  "
+                        slow = f"  {ORANGE}loop is late {late}x (CPU busy?){RST}" if late > hz // 10 else ""
+                        status(f"   {REJECT}●{RST} rec {frames / args.fps:5.1f} s  {label}{slow}  "
                                f"{DIM}ENTER: {'dropped, save' if phase2 else 'shown to camera'} · r: redo · q: quit{RST}", end="")
                     if frames / args.fps >= args.episode_time:
                         status(f"   {REJECT}time is up ({args.episode_time:.0f} s){RST}: ENTER save · r redo")
@@ -443,7 +461,7 @@ def run(args):
                     if state == "tray":
                         state = "ready"
                     elif state == "ready":
-                        state, frames, switch_frame = "phase1", 0, 0
+                        state, frames, switch_frame, late = "phase1", 0, 0, 0
                         say("Start", args.voice)
                     elif state == "phase1":
                         state, switch_frame = "phase2", frames
@@ -471,7 +489,9 @@ def run(args):
                     say(f"Pocket {p.pocket}. {p.command.upper()} bin.", args.voice)
                     card_shown = p.index
 
-                precise_sleep(max(1 / args.fps - (time.perf_counter() - t0), 0.0))
+                spent = time.perf_counter() - t0
+                late += spent > 1.5 / hz
+                precise_sleep(max(1 / hz - spent, 0.0))
     except KeyboardInterrupt:
         pass
     finally:
