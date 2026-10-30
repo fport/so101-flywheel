@@ -118,6 +118,14 @@ def cmd_check(args):
     check_main(_dataset_args(args))
 
 
+def cmd_inspect(args):
+    from .inspection import run as inspect_run
+
+    if not (args.sim or args.camera is not None or args.image):
+        sys.exit("give --sim N, --camera INDEX or --image FILE ...")
+    inspect_run(args)
+
+
 def cmd_teleop(args):
     _check_ports(args.follower_port, args.leader_port)
     argv = [_lerobot("lerobot-teleoperate"), *teleop_argv(args)]
@@ -166,6 +174,14 @@ def main():
         r.add_argument("--fake", action="store_true", help="no hardware: synthetic joints and images")
         r.add_argument("--auto", action="store_true", help=argparse.SUPPRESS)
         r.add_argument("--push-fake", action="store_true", help=argparse.SUPPRESS)
+    i = sub.add_parser("inspect", help="ask Claude which bin a part goes to, from a wrist-camera frame; prints the time")
+    i.add_argument("--sim", type=int, metavar="N", help="N sim parts in the look pose, scored against ground truth")
+    i.add_argument("--camera", type=int, metavar="INDEX", help="one frame from the real wrist camera (0)")
+    i.add_argument("--image", nargs="+", metavar="FILE", help="image files")
+    i.add_argument("--model", action="append", help="repeat to compare (default claude-sonnet-5-5)")
+    i.add_argument("--order", choices=["W", "T"], default="W", help="variant in the work order")
+    i.add_argument("--seed", type=int, default=0)
+    i.set_defaults(func=cmd_inspect)
     args = parser.parse_args()
     if args.cmd == "teleop" and args.extra[:1] == ["--"]:
         args.extra = args.extra[1:]

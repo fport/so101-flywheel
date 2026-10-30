@@ -20,6 +20,7 @@ flywheel-robot = "flywheel.robot.cli:main"
 
 [project.optional-dependencies]
 robot = [
+    "anthropic>=2.3.0",
     "lerobot[feetech,dataset,training,viz,pynput-dep]==0.6.1",
 ]
 

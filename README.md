@@ -102,6 +102,19 @@ The dataset is written to `outputs/datasets/so101-qc` and backed up to `so101-qc
 recording does not close cleanly (crash, power loss), the next run rolls back to the last tray backup and carries on.
 `so101-qc/flywheel/episodes.jsonl` maps each episode to its plan row.
 
+### Inspection test with Claude
+
+```bash
+cd python
+export ANTHROPIC_API_KEY=...
+uv run flywheel-robot inspect --sim 24                      # sim parts in the look pose, scored against ground truth
+uv run flywheel-robot inspect --camera 0                    # real wrist camera, arm above the part
+uv run flywheel-robot inspect --sim 8 --model claude-haiku-5-5 --model claude-sonnet-5-5
+```
+
+Claude reports what it sees (type, colour, missing hole, broken); the bin comes from the work order rule, as with any
+classifier. Each request's time is printed; frames and answers go to `outputs/inspect/`.
+
 ### Training (ACT v0)
 
 ```bash
