@@ -23,6 +23,11 @@ def check(repo_id, root):
     """Prints a report and returns the list of problems (empty: safe to push)."""
     from lerobot.datasets import LeRobotDataset
 
+    info = Path(root) / "meta" / "info.json"
+    if not info.exists() or not json.loads(info.read_text())["total_episodes"]:
+        # LeRobotDataset would go looking for it on the Hub
+        print(f"{B}{repo_id}{RST} {DIM}{root}{RST}\n{ORANGE}   no saved episodes{RST}")
+        return ["dataset has no episodes"]
     ds = LeRobotDataset(repo_id, root=root, video_backend="pyav")  # torchcodec does not load with Homebrew FFmpeg
     meta, h = ds.meta, ds.hf_dataset.with_format("numpy")
     problems = []
@@ -30,8 +35,6 @@ def check(repo_id, root):
     cams = [k for k, v in meta.features.items() if v["dtype"] == "video"]
     print(f"{B}{repo_id}{RST} {DIM}{root}{RST}\n   {meta.total_episodes} episodes · {meta.total_frames} frames · "
           f"{meta.fps} fps · {meta.total_frames / meta.fps / 60:.1f} min · cameras {', '.join(c.split('.')[-1] for c in cams)}")
-    if not meta.total_episodes:
-        return ["dataset has no episodes"]
 
     state, action = np.asarray(h["observation.state"]), np.asarray(h["action"])
     env, ep, fi = np.asarray(h["observation.environment_state"]), np.asarray(h["episode_index"]), np.asarray(h["frame_index"])
