@@ -176,7 +176,8 @@ def main():
         r.add_argument("--push-fake", action="store_true", help=argparse.SUPPRESS)
     i = sub.add_parser("inspect", help="ask Claude which bin a part goes to, from a wrist-camera frame; prints the time")
     i.add_argument("--sim", type=int, metavar="N", help="N sim parts in the look pose, scored against ground truth")
-    i.add_argument("--camera", type=int, metavar="INDEX", help="one frame from the real wrist camera (0)")
+    i.add_argument("--camera", type=int, nargs="?", const=0, metavar="INDEX",
+                   help="one frame from the real wrist camera (index 0 when left out)")
     i.add_argument("--image", nargs="+", metavar="FILE", help="image files")
     i.add_argument("--model", action="append", help="repeat to compare (default claude-sonnet-5-5)")
     i.add_argument("--order", choices=["W", "T"], default="W", help="variant in the work order")
