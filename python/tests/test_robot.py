@@ -1,6 +1,8 @@
 import json
 
-from flywheel.robot.recorder import episode_log, reconcile, recorded, restore, snapshot_dir, writing_marker
+import pytest
+
+from flywheel.robot.recorder import connect_robot, episode_log, reconcile, recorded, restore, snapshot_dir, writing_marker
 from flywheel.robot.session import command_onehot, phase2_task, picks, session_parts, sessions, tray_layout
 
 
@@ -61,3 +63,35 @@ def test_restore_returns_to_checkpoint(tmp_path, capsys):
     assert not writing_marker(root).exists()
     assert len(list(tmp_path.glob("ds.broken-*"))) == 1
     assert "restored the checkpoint" in capsys.readouterr().out
+
+
+class _Part:
+    is_connected = False
+
+    def disconnect(self, **_):
+        self.is_connected = False
+
+
+class _Robot:
+    """Servo bus that misses a packet on the first `fails` connects, like Lock on id 2 with no status packet."""
+
+    def __init__(self, fails):
+        self.fails, self.bus, self.cameras = fails, _Part(), {"top": _Part()}
+
+    def connect(self):
+        self.bus.is_connected = True
+        if self.fails:
+            self.fails -= 1
+            raise ConnectionError("Failed to write 'Lock' on id_=2")
+        self.cameras["top"].is_connected = True
+
+
+def test_connect_retries_then_gives_up(monkeypatch):
+    monkeypatch.setattr("flywheel.robot.recorder.time.sleep", lambda _: None)
+    robot = _Robot(fails=2)
+    connect_robot(robot)
+    assert robot.bus.is_connected and robot.cameras["top"].is_connected
+    robot = _Robot(fails=3)
+    with pytest.raises(ConnectionError):
+        connect_robot(robot)
+    assert not robot.bus.is_connected  # port closed again, nothing left half open

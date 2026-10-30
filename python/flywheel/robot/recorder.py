@@ -124,6 +124,26 @@ class AutoKeys:
 
 # --- hardware -----------------------------------------------------------------------------------------------
 
+def connect_robot(robot, tries=3):
+    """robot.connect() with retries. A camera can miss its first frame (TimeoutError) and a servo can miss one packet
+    while torque is switched on (ConnectionError "no status packet"); lerobot does not retry either. Between tries
+    whatever did connect is closed again, so the next connect() starts clean."""
+    for attempt in range(1, tries + 1):
+        try:
+            return robot.connect()
+        except (TimeoutError, ConnectionError) as e:
+            for cam in getattr(robot, "cameras", {}).values():
+                if cam.is_connected:
+                    cam.disconnect()
+            bus = getattr(robot, "bus", None)
+            if bus is not None and bus.is_connected:
+                bus.disconnect(disable_torque=False)
+            if attempt == tries:
+                raise
+            print(f"{ORANGE}connect failed ({e}); retrying {attempt + 1}/{tries}{RST}")
+            time.sleep(1)
+
+
 def make_rig(args):
     from lerobot.cameras.opencv import OpenCVCameraConfig
     from lerobot.robots import make_robot_from_config
@@ -395,14 +415,16 @@ def run(args):
 
     hw_features = {k: v for k, v in dataset.features.items() if k != ENV_STATE}  # we write the command channel ourselves
     try:
-        robot.connect()  # cameras first: a wrong or sleeping index (iPhone Continuity camera) times out here
-    except TimeoutError as e:
+        connect_robot(robot)
+    except (TimeoutError, ConnectionError) as e:
         dataset.finalize()
         if args.display:
             shutdown_visualization("rerun")
-        sys.exit(f"{ORANGE}{e}{RST}\nCamera indices: --top {args.top} --wrist {args.wrist}. Check them with "
-                 "`uv run lerobot-find-cameras opencv` (frames go to outputs/captured_images); "
-                 "an iPhone nearby can shift the order. Nothing was recorded, run the command again.")
+        hint = (f"Camera indices: --top {args.top} --wrist {args.wrist}. Check them with "
+                "`uv run lerobot-find-cameras opencv` (frames go to outputs/captured_images); an iPhone nearby can "
+                "shift the order." if isinstance(e, TimeoutError) else
+                "A servo did not answer: check the follower's 12 V adapter and the cable between the servos.")
+        sys.exit(f"{ORANGE}{e}{RST}\n{hint} Nothing was recorded, run the command again.")
     teleop.connect()
     signal.signal(signal.SIGTERM, _sigterm)
     writing_marker(root).touch()
