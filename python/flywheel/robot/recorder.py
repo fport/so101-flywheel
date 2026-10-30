@@ -507,7 +507,8 @@ def run(args):
                 act_p = teleop_proc((act, obs))
                 robot.send_action(robot_proc((act_p, obs)))
                 if args.display and sample:
-                    log_visualization_data("rerun", observation=obs_p, action=act_p)
+                    # JPEG: raw 640x480 frames from two cameras fill Rerun's 1 GiB buffer in about half a minute
+                    log_visualization_data("rerun", observation=obs_p, action=act_p, compress_images=True)
 
                 if state == "tray" and tray_shown != p.tray:
                     done_pockets = {q.pocket for q in plan_picks if q.tray == p.tray and q.index in done}

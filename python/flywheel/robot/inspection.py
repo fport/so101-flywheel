@@ -219,7 +219,8 @@ def live(args):
     teleop.connect()
     print(f"\n{B}live inspection{RST} · work order {args.order} ({'white' if args.order == 'W' else 'orange'} is the "
           f"product) · {model} · effort {args.effort or 'default'}\n"
-          f"   bring the arm ~6 cm above a part, part centred in the wrist camera (Rerun), hold still, → or ENTER\n"
+          f"   bring the arm ~6 cm above a part, part centred in the wrist camera (Rerun), hold still, then\n"
+          f"   {B}→{RST} (works in any window, Rerun too) or ENTER (only while this terminal has focus)\n"
           f"   Claude names the bin; put the part there yourself · Esc / q to quit · {DIM}{out}{RST}\n")
     hz = args.fps * CONTROL_MULT
     pending, n, rows = None, 0, []
@@ -233,9 +234,11 @@ def live(args):
                 act = teleop.get_action()
                 robot.send_action(act)
                 if args.display and tick % CONTROL_MULT == 0:
-                    log_visualization_data("rerun", observation=obs, action=act)
+                    log_visualization_data("rerun", observation=obs, action=act, compress_images=True)
 
                 key = keys.poll()
+                if key is not None:
+                    print(f"   {DIM}key {keys.last}{RST}")
                 if key == "q":
                     break
                 if key == "go":
@@ -278,3 +281,5 @@ def live(args):
     if rows:
         secs = np.array([r["seconds"] for r in rows])
         print(f"\n   {len(rows)} parts · median {np.median(secs):.2f} s · max {secs.max():.2f} s · {out}")
+    else:
+        print(f"\n   no part was inspected: press → with the arm above a part")
