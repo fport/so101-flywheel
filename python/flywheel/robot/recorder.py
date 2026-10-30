@@ -17,6 +17,7 @@ at the end of each tray the dataset is closed and copied incrementally to <root>
 dataset is restored from there and the log is trimmed to match. At worst only that tray is re-recorded.
 """
 
+import faulthandler
 import json
 import logging
 import math
@@ -28,6 +29,7 @@ import signal
 import subprocess
 import sys
 import termios
+import threading
 import time
 import tty
 import warnings
@@ -163,6 +165,32 @@ class Keys:
         except queue.Empty:
             return None
         return self.KEYMAP.get(self.last)
+
+
+class Watchdog:
+    """Explains a frozen control loop afterwards: when the loop stops ticking for `after` seconds, every thread's Python
+    stack goes to `path` once per stall; `kill -USR1 <pid>` writes it on demand."""
+
+    def __init__(self, path, after=1.0):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        self.path, self.after, self.last, self.dumped = path, after, time.monotonic(), False
+        self.f = path.open("a")
+        faulthandler.register(signal.SIGUSR1, file=self.f, all_threads=True)
+        threading.Thread(target=self._watch, daemon=True).start()
+
+    def tick(self):
+        self.last, self.dumped = time.monotonic(), False
+
+    def _watch(self):
+        while True:
+            time.sleep(0.25)
+            stalled = time.monotonic() - self.last
+            if stalled > self.after and not self.dumped:
+                self.dumped = True
+                self.f.write(f"\n--- control loop stalled {stalled:.1f} s · {datetime.now():%H:%M:%S} ---\n")
+                self.f.flush()
+                faulthandler.dump_traceback(self.f, all_threads=True)
+                self.f.flush()
 
 
 class AutoKeys:
@@ -492,12 +520,15 @@ def run(args):
     saved, state = 0, "tray"
     try:
         hz = args.fps * CONTROL_MULT
+        wd = Watchdog(DATASETS_DIR.parent / "logs" / f"record-{datetime.now():%Y%m%d-%H%M%S}.log")
+        print(f"{DIM}loop log: {wd.path} (pid {os.getpid()}){RST}")
         with AutoKeys(hz) if args.auto else Keys() as keys:
             i, tray_shown, card_shown = 0, None, None
             frames = switch_frame = tick = late = 0
             quit_at = go_at = -1e9
             while i < len(todo):
                 t0 = time.perf_counter()
+                wd.tick()
                 tick += 1
                 sample = tick % CONTROL_MULT == 0
                 p = todo[i]

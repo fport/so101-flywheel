@@ -200,7 +200,7 @@ def live(args):
     from lerobot.utils.robot_utils import precise_sleep
     from lerobot.utils.visualization_utils import init_visualization, log_visualization_data, shutdown_visualization
 
-    from .recorder import CONTROL_MULT, Keys, connect_robot, make_rig, say
+    from .recorder import CONTROL_MULT, Keys, Watchdog, connect_robot, make_rig, say
 
     if not os.environ.get("ANTHROPIC_API_KEY"):
         sys.exit("ANTHROPIC_API_KEY is not set. In this terminal: export ANTHROPIC_API_KEY=... (console.anthropic.com)")
@@ -217,24 +217,32 @@ def live(args):
     except (TimeoutError, ConnectionError) as e:
         sys.exit(f"{ORANGE}{e}{RST}\nCheck the cameras (--top/--camera) and the follower's 12 V adapter.")
     teleop.connect()
+    wd = Watchdog(out / "loop.log")
     print(f"\n{B}live inspection{RST} · work order {args.order} ({'white' if args.order == 'W' else 'orange'} is the "
           f"product) · {model} · effort {args.effort or 'default'}\n"
           f"   bring the arm ~6 cm above a part, part centred in the wrist camera (Rerun), hold still, then\n"
           f"   {B}→{RST} (works in any window, Rerun too) or ENTER (only while this terminal has focus)\n"
-          f"   Claude names the bin; put the part there yourself · Esc / q to quit · {DIM}{out}{RST}\n")
+          f"   Claude names the bin; put the part there yourself · Esc / q to quit · {DIM}{out}{RST}\n"
+          f"   {DIM}loop log: {wd.path} (pid {os.getpid()}){RST}\n")
     hz = args.fps * CONTROL_MULT
     pending, n, rows = None, 0, []
     try:
         with Keys("→ / ENTER inspect · Esc / q quit") as keys:
-            tick = 0
+            tick, worst, beat = 0, 0.0, time.perf_counter()
             while True:
                 t0 = time.perf_counter()
+                wd.tick()
                 tick += 1
+                if t0 - beat >= 1:  # once a second: how fast the arm is really being driven
+                    wd.f.write(f"{datetime.now():%H:%M:%S} {tick / (t0 - beat):5.1f} Hz · slowest step "
+                               f"{worst * 1000:.0f} ms{' · waiting for Claude' if pending else ''}\n")
+                    wd.f.flush()
+                    tick, worst, beat = 0, 0.0, t0
                 obs = robot.get_observation()
                 act = teleop.get_action()
                 robot.send_action(act)
                 if args.display and tick % CONTROL_MULT == 0:
-                    log_visualization_data("rerun", observation=obs, action=act, compress_images=True)
+                    log_visualization_data("rerun", observation=obs, action=act)
 
                 key = keys.poll()
                 if key is not None:
@@ -268,6 +276,7 @@ def live(args):
                         rows.append({"n": k, "model": model, "bin": bin_, "attributes": attrs,
                                      "seconds": round(sec, 3), "usage": usage})
                         (out / "results.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows))
+                worst = max(worst, time.perf_counter() - t0)
                 precise_sleep(max(1 / hz - (time.perf_counter() - t0), 0.0))
     except KeyboardInterrupt:
         pass
