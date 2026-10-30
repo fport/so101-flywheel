@@ -30,37 +30,52 @@ CROP_CENTER, CROP_SIZE = (320, 200), 288
 
 _DIMS = load_params()["parts"]  # sound-part counts come from the same file as the printed parts
 PROMPT = f"""You are the inspection camera of an end-of-line quality control cell. The image looks straight down at one \
-3D-printed part lying in a tray pocket (top camera or wrist camera). Inspect only the part in the middle of the \
-image, ignore neighbouring pockets.
+3D-printed part lying in a pocket of a matte black tray (top camera or wrist camera; the crop is small and enlarged, so \
+edges are soft). Inspect only the part in the middle of the image, ignore neighbouring pockets and markers.
+
+How to see a hole: every hole goes all the way through the part, so the black tray shows through it as a dark, round \
+spot with a crisp edge. A light or grey surface with a shaded ring around it is a solid face, not a hole. Look for the \
+black spot itself; if the place where the hole belongs is the same light colour as the part, the hole is missing.
 
 Part types, what a sound part looks like, and the defects:
-- rim (small wheel rim): a sound rim has exactly {_DIMS["rim"]["spokes"]} spokes and a hub hole in the centre. \
-missing_hole = no hub hole; broken = one spoke missing, so only {_DIMS["rim"]["spokes"] - 1} spokes. Count the spokes.
-- gear (spur gear with a raised hub): a sound gear has {_DIMS["gear"]["teeth"]} evenly spaced teeth and a shaft bore \
-in the hub. missing_hole = no shaft bore; broken = two adjacent teeth missing, a visible gap in the ring of teeth.
-- pad (brake pad: a raised rectangular friction block on a wider backing plate with an ear at each end): a sound pad \
-has a small mounting hole in each ear and a block with four square top corners. missing_hole = the ears have no \
-holes; broken = a chunk missing from one top corner of the raised block, seen as a diagonal cut across that corner \
-(the plate corners stay square, so look at the block).
-- bracket (L-shaped mounting bracket): a sound bracket has a hole in the flat base and square corners. \
-missing_hole = no hole in the base; broken = a chunk missing from a top corner of the upright or from a corner at \
+- rim (small wheel rim, {_DIMS["rim"]["outer_d"]} mm): a sound rim has exactly {_DIMS["rim"]["spokes"]} spokes from a \
+hub to the outer ring, and a {_DIMS["rim"]["bore_d"]} mm hub hole (about a fifth of the rim's width) in the centre of \
+the hub. The windows between the spokes have a solid floor, so they look grey and shaded, not black; they are not \
+holes. missing_hole = the hub centre is solid, no black spot; broken = one spoke missing, so only \
+{_DIMS["rim"]["spokes"] - 1} spokes and one window twice as wide. Count the spokes.
+- gear (spur gear, {_DIMS["gear"]["outer_d"]} mm, with a raised round hub in the middle): a sound gear has \
+{_DIMS["gear"]["teeth"]} evenly spaced teeth and a {_DIMS["gear"]["bore_d"]} mm shaft bore, a black spot in the \
+centre of the hub's flat top. missing_hole = the hub top is one solid light disc (its rim may look shaded); broken = \
+two adjacent teeth missing, a gap in the ring of teeth about three teeth wide.
+- pad (brake pad, {_DIMS["pad"]["length"]} x {_DIMS["pad"]["width"]} mm: a raised rectangular friction block on a \
+slightly larger backing plate whose two short ends stick out as ears): a sound pad has a small \
+{_DIMS["pad"]["ear_hole_d"]} mm mounting hole in each ear and a block with four square corners. One straight groove \
+across the middle of the block is normal, not a crack. missing_hole = neither ear has a black spot; broken = a chunk \
+missing from one corner of the raised block, seen as a diagonal cut across that corner (the plate corners stay \
+square, so look at the block).
+- bracket (L-shaped mounting bracket): from above you see a flat base and, at one end, the top of the upright as a \
+narrow strip. A sound bracket has a {_DIMS["bracket"]["hole_d"]} mm hole in the base and square corners. \
+missing_hole = no hole in the base; broken = a chunk missing from a corner of the upright's top or from a corner at \
 the free end of the base, seen as a diagonal cut.
 
-variant is the colour: W = white, T = orange. Answer with the JSON object; note is one short sentence on what \
-decided it (for a rim, say how many spokes you counted)."""
+variant is the colour: W = white, T = orange. Fill look first: what you see at each place that decides the part \
+(the hole: black spot or solid; the spoke or tooth count; each corner), then the fields that follow from it. note is \
+one short sentence on what decided it."""
 
 SCHEMA = {  # structured output (output_config.format); forced tool_choice is not accepted by current models
     "type": "object",
-    "properties": {
+    "properties": {  # look comes first: the observations are written before the verdicts that depend on them
+        "look": {"type": "string"},
         "type": {"type": "string", "enum": ["rim", "gear", "pad", "bracket"]},
         "variant": {"type": "string", "enum": ["W", "T"]},
         "missing_hole": {"type": "boolean"},
         "broken": {"type": "boolean"},
         "note": {"type": "string"},
     },
-    "required": ["type", "variant", "missing_hole", "broken", "note"],
+    "required": ["look", "type", "variant", "missing_hole", "broken", "note"],
     "additionalProperties": False,
 }
+UPSCALE_TO = 768  # a 224 px crop is ~70 image tokens; enlarged, the model gets more patches on a 7 mm hole
 
 
 def center_crop(frame):
@@ -76,6 +91,9 @@ def ask(client, model, rgb, effort=None):
     """-> (attributes, seconds, usage). rgb: HxWx3 uint8; effort: low … max, None = the model's default."""
     import cv2
 
+    if max(rgb.shape[:2]) < UPSCALE_TO:
+        f = UPSCALE_TO / max(rgb.shape[:2])
+        rgb = cv2.resize(rgb, None, fx=f, fy=f, interpolation=cv2.INTER_CUBIC)
     ok, jpg = cv2.imencode(".jpg", rgb[..., ::-1], [cv2.IMWRITE_JPEG_QUALITY, 92])
     t0 = time.perf_counter()
     config = {"format": {"type": "json_schema", "schema": SCHEMA}}
