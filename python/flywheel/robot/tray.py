@@ -3,8 +3,8 @@
 The four baseplate tags have known positions (params.yaml), so a homography maps the tray plane in mm to the image.
 Each pocket is warped to a square at a fixed scale (PX_PER_MM), the same for every frame, so the measurements below
 are in mm. measure() checks what can be counted on the silhouette of a light part on the black tray: holes (the tray
-shows through), rim spokes and the gap of missing gear teeth. Broken corners on pads and brackets are on top of the
-silhouette (block corner, upright top) and are not measured here; that is left to Claude.
+shows through), rim spokes, the gap of missing gear teeth, and the corner bitten off a broken pad or bracket (cut
+through the whole part since 2026-10-31, so it shows in the outline).
 """
 
 import json
@@ -18,6 +18,7 @@ from ..sim.params import CATALOG_JSON, load_params, pocket_centers
 PX_PER_MM = 4.0  # rectified crop scale; the 1280x960 frame has ~2.2 px/mm at the tray, so crops are enlarged ~2x
 WINDOW_MM = 56  # crop side; a 38 mm pocket with room for a part that is off its pocket centre
 RECENTER_MM = 12  # largest shift towards the part found near the pocket centre
+BRIDGE_MM = 1.5  # dark lines thinner than this inside a part don't split it
 DARK = 50  # lowest tray/part split; the split itself is Otsu's per crop (real tray < 20, sim tray ~ 60, parts > 90)
 ID_RE = re.compile(r"[JDBL]-[WT]-\d\d")
 
@@ -90,13 +91,22 @@ def _central_part(rgb, min_mm2=150):
     """Light component nearest the crop centre -> (mask, centre col, centre row) or None for an empty pocket."""
     g = cv2.cvtColor(rgb, cv2.COLOR_RGB2GRAY)
     split = max(DARK, cv2.threshold(g, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[0])
-    n, lab, st, cen = cv2.connectedComponentsWithStats((g > split).astype(np.uint8))
+    light = (g > split).astype(np.uint8)
+    # pieces split by a thin dark line (a shaded groove across a pad) still belong to one part
+    n, lab, st, cen = cv2.connectedComponentsWithStats(cv2.dilate(light, _disc(BRIDGE_MM)))
     h, w = g.shape
     big = [i for i in range(1, n) if st[i, cv2.CC_STAT_AREA] >= min_mm2 * PX_PER_MM ** 2]
     if not big:
         return None
     k = min(big, key=lambda i: np.hypot(cen[i][0] - w / 2, cen[i][1] - h / 2))
-    return (lab == k).astype(np.uint8), cen[k][0], cen[k][1]
+    mask = ((lab == k) & (light > 0)).astype(np.uint8)
+    m = cv2.moments(mask, binaryImage=True)
+    return mask, m["m10"] / m["m00"], m["m01"] / m["m00"]
+
+
+def _disc(mm):
+    n = max(3, int(round(mm * PX_PER_MM)) | 1)
+    return cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (n, n))
 
 
 def _ring(gray, cx, cy, r_mm, n=360, min_deg=5):
@@ -129,6 +139,29 @@ def _ring(gray, cx, cy, r_mm, n=360, min_deg=5):
     return sum(lit), int(max(gaps) if gaps else 360)
 
 
+CORNER_MM = 12  # side of the square checked at each corner of the outline
+# a broken corner (18 x 9 mm on a pad, 10 x 16 mm on a bracket) leaves 60-130 mm2 of its square empty; a sound corner
+# under 30 seen from the top camera. In the sim's top view a bracket upright widens the outline more (up to ~75 at
+# every corner), so for brackets one corner must also stand out from the others.
+CORNER_GAP_MM2, CORNER_LEAD_MM2 = 45, 25
+
+
+def _corner_gaps(mask, outline):
+    """Empty area (mm2) in a CORNER_MM square at each corner of the smallest rectangle around the part."""
+    box = cv2.boxPoints(cv2.minAreaRect(outline))
+    gaps = []
+    for corner in box:
+        # square spanned by the two rectangle edges that meet at this corner, CORNER_MM along each
+        others = sorted(box, key=lambda q: np.hypot(*(q - corner)))[1:3]
+        u, v = [(q - corner) / np.hypot(*(q - corner)) * CORNER_MM * PX_PER_MM for q in others]
+        square = np.int32([corner, corner + u, corner + u + v, corner + v])
+        region = np.zeros_like(mask)
+        cv2.fillPoly(region, [square], 1)
+        empty = np.sum((region > 0) & (mask == 0)) / PX_PER_MM ** 2
+        gaps.append(round(float(empty), 1))
+    return gaps
+
+
 def measure(rgb, ptype):
     """What the silhouette shows, in mm. ptype picks the checks. -> dict with missing_hole / broken as True, False
     or None (not measurable here), plus the numbers they came from."""
@@ -138,11 +171,12 @@ def measure(rgb, ptype):
         return {"empty": True, "missing_hole": None, "broken": None}
     mask, cx, cy = found
     g = cv2.GaussianBlur(cv2.cvtColor(rgb, cv2.COLOR_RGB2GRAY), (3, 3), 0)
+    # the outline comes from the mask with thin dark lines closed; holes from the mask as it is
+    solid = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, _disc(BRIDGE_MM))
+    outline = max(cv2.findContours(solid, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)[0], key=cv2.contourArea)
     cs, hier = cv2.findContours(mask, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_NONE)
-    outer = max((i for i in range(len(cs)) if hier[0][i][3] == -1), key=lambda i: cv2.contourArea(cs[i]))
     holes = []
-    j = hier[0][outer][2]
-    while j != -1:
+    for j in (i for i in range(len(cs)) if hier[0][i][3] != -1):
         a = cv2.contourArea(cs[j]) / PX_PER_MM ** 2
         if a >= 1.0:
             m = cv2.moments(cs[j])
@@ -151,7 +185,6 @@ def measure(rgb, ptype):
                 holes.append({"mm2": round(a, 1), "round": round(4 * np.pi * a / perim ** 2, 2),
                               "dx": round(float(m["m10"] / m["m00"] - cx) / PX_PER_MM, 1),
                               "dy": round(float(m["m01"] / m["m00"] - cy) / PX_PER_MM, 1)})
-        j = hier[0][j][0]
     r = {"holes": holes, "missing_hole": None, "broken": None}
 
     hsv = cv2.cvtColor(rgb, cv2.COLOR_RGB2HSV)
@@ -165,15 +198,23 @@ def measure(rgb, ptype):
     elif ptype == "bracket":
         r["missing_hole"] = not any(h["mm2"] >= 8 and h["round"] >= 0.5 for h in holes)
     elif ptype == "pad":
-        (_, _), (w, h), ang = cv2.minAreaRect(cs[outer])
+        (_, _), (w, h), ang = cv2.minAreaRect(outline)
         axis = np.radians(ang if w >= h else ang + 90)
         ears = [x for x in holes if x["mm2"] >= 2.5
                 and abs(x["dx"] * np.cos(axis) + x["dy"] * np.sin(axis)) >= dims["pad"]["block"][0] / 2 - 2]
         r["ear_holes"] = len(ears)
         r["missing_hole"] = len(ears) == 0
 
+    if ptype in ("pad", "bracket"):
+        gaps = _corner_gaps(solid, outline)
+        r["corner_gap_mm2"] = gaps
+        g = sorted(gaps)
+        if ptype == "pad":
+            r["broken"] = g[-1] >= CORNER_GAP_MM2
+        else:  # a bracket upright seen at an angle can widen every corner a little: one must also stand out
+            r["broken"] = g[-1] >= CORNER_GAP_MM2 and g[-1] - g[-2] >= CORNER_LEAD_MM2
     if ptype in ("rim", "gear"):
-        (ex, ey), _ = cv2.minEnclosingCircle(cs[outer])
+        (ex, ey), _ = cv2.minEnclosingCircle(outline)
     if ptype == "rim":  # between the hub (6.5 mm) and the inner lip (14.4 mm), clear of both
         counts = [_ring(g, ex, ey, rr)[0] for rr in (8.0, 9.0, 10.0)]
         r["spokes"] = int(np.median(counts))

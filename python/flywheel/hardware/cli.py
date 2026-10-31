@@ -43,6 +43,13 @@ EXTRA_JOBS = [  # come after the QC plates
     ("optional_mast_foot", "metal grey", ["mast_foot"]),
     ("optional_cable_clips", "any", ["cable_clip", "usb_strain_relief"]),
 ]
+# Broken pads and brackets redesigned on 2026-10-31: the old chip sat on top of the silhouette (pad block corner,
+# bracket upright top) and the top camera could not see it. Same IDs, printed again; the old ones are thrown away.
+REDESIGNED = ["B-W-07", "B-W-08", "L-W-07", "L-W-08", "L-W-10", "B-T-06", "B-T-07", "B-T-09", "L-T-06", "L-T-07"]
+EXTRA_JOBS += [  # one colour per job: no nozzle swap on every layer
+    ("broken_corner_reprint_white", "white", [n for n in REDESIGNED if "-W-" in n]),
+    ("broken_corner_reprint_orange", "orange", [n for n in REDESIGNED if "-T-" in n]),
+]
 QC_JOBS = {
     ("train", "W"): ("parts_white", "white"),
     ("train", "T"): ("parts_orange", "orange"),

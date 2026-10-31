@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 from manifold3d import Error
 
-from flywheel.hardware.cli import REPRINTS, check_fit, print_jobs
+from flywheel.hardware.cli import REDESIGNED, REPRINTS, check_fit, print_jobs
 from flywheel.hardware.fixtures import build_all
 from flywheel.hardware.geom import write_3mf
 from flywheel.sim.params import load_params, mast_top, top_camera_pose
@@ -39,7 +39,8 @@ def test_jobs_are_numbered_and_cover_every_part_once(built):
     _, items, jobs = built
     assert [name[:2] for name, _, _ in jobs] == [f"{k:02d}" for k in range(1, len(jobs) + 1)]
     placed = [obj for _, _, objs in jobs for obj, _, _ in objs]
-    assert len(placed) - len(REPRINTS) == len(set(placed)) == sum(i.qty for i in items)  # skipped-and-reprinted parts appear twice
+    # skipped-and-reprinted and redesigned parts appear twice
+    assert len(placed) - len(REPRINTS) - len(REDESIGNED) == len(set(placed)) == sum(i.qty for i in items)
 
 
 def test_every_job_fits_the_bed_without_overlap(built):
@@ -61,7 +62,7 @@ def test_heldout_parts_print_on_their_own_plates(built):
     assert len(heldout) == 16
     for name, _, objs in jobs:
         on_plate = {obj for obj, _, _ in objs}
-        if on_plate & heldout:
+        if on_plate & heldout and not on_plate <= set(REDESIGNED):  # the reprint plate mixes them; IDs are engraved
             assert on_plate <= heldout and "heldout" in name
 
 
@@ -129,3 +130,22 @@ def test_footed_parts_print_without_long_bridges(built):
             continue
         base, feet = body.slice(0.05).area(), body.slice(-0.05).area()
         assert feet > 0.9 * base, item.name
+
+
+def test_redesigned_broken_corners_cut_the_outline(built):
+    # the top camera only sees the outline of pads and brackets: a broken corner must take a clear bite out of it
+    from flywheel.sim.parts import generate
+
+    p, _, jobs = built
+    sound = {}
+    for part, body in generate(p):
+        footprint = body.slice(0.5)
+        area, rings = footprint.area(), len(footprint.to_polygons())  # outline + one ring per through hole
+        if part.defect is None:
+            sound.setdefault(part.type, (area, rings))
+        elif part.id in REDESIGNED:
+            assert sound[part.type][0] - area >= 75, part.id  # 18 x 9 mm (pad), 10 x 16 mm (bracket): ~80 mm2
+            assert rings == sound[part.type][1], part.id  # the cut keeps clear of the ear holes and the base hole
+    white, orange = jobs[-2:]
+    assert white[1] == "white" and {o[0] for o in white[2]} == {n for n in REDESIGNED if "-W-" in n}
+    assert orange[1] == "orange" and {o[0] for o in orange[2]} == {n for n in REDESIGNED if "-T-" in n}

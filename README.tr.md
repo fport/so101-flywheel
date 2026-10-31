@@ -122,8 +122,8 @@ gibi. Her isteğin süresi yazılır; kareler ve cevaplar `outputs/inspect/` alt
 
 `--tray` üst kameradan 1280×960 tek kare alır, dört tag'i bulur ve altı cebi sabit 4 px/mm ölçekle keser. Claude'un
 cevabının yanında, siyah tepsideki açık renkli parçanın silüetinden ölçülebilenleri ölçer: delik (tepsi içinden
-görünür), renk, jant kolları ve dişlideki eksik diş boşluğu. Kasa kararında ölçüm olan yerde ölçüm, kalanında (balata
-ve braketin kırık köşesi) Claude kullanılır. `--parts` verilirse (cep sırasıyla, boş cep için `-`) kırpmalar parça
+görünür), renk, jant kolları, dişlideki eksik diş boşluğu ve kırık balata ya da braketin kesik köşesi. Kasa kararında
+ölçüm olan yerde ölçüm, kalanında (parça tipi) Claude kullanılır. `--parts` verilirse (cep sırasıyla, boş cep için `-`) kırpmalar parça
 ID'siyle adlandırılır ve her sütun kataloğa göre puanlanır.
 
 ### Eğitim (ACT v0)

@@ -22,3 +22,5 @@ Each file is a single print job; the number is the print order.
 | `16_bin_reject_and_D-T-04.3mf` | orange | `bin_reject`, `D-T-04` |
 | `17_optional_mast_foot.3mf` | metal grey | `mast_foot` |
 | `18_optional_cable_clips.3mf` | any | 6 × `cable_clip`, 2 × `usb_strain_relief` |
+| `19_broken_corner_reprint_white.3mf` | white | `L-W-07`, `L-W-08`, `L-W-10`, `B-W-07`, `B-W-08` |
+| `20_broken_corner_reprint_orange.3mf` | orange | `L-T-06`, `L-T-07`, `B-T-06`, `B-T-07`, `B-T-09` |

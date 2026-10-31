@@ -541,7 +541,8 @@ def qc_parts(p):
             x = -d["thickness"] / 2
             lines = [(prefix, x, 7.6, 0), (bin_, x, -7.6, 0)]
         elif part.type == "pad":
-            lines = [(prefix, 0, 6.6, 0), (bin_, 0, -6.6, 0)]
+            y = 4.4 if part.defect == "broken_corner" else 6.6  # broken: moved in, clear of the cut corner
+            lines = [(prefix, 0, y, 0), (bin_, 0, -y, 0)]
         else:  # rim and gear: on both sides of the hub bore
             r = d["outer_d"] / 2 * 0.62
             lines = [(prefix, 0, r, 0), (bin_, 0, -r, 0)]

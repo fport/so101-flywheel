@@ -144,22 +144,26 @@
 <text x="662" y="889" fill="#1f2328"><tspan font-weight="700">08</tspan> baseplate A3<tspan fill="#667085"> · 1 parts</tspan></text>
 <rect x="640" y="902" width="14" height="14" rx="3" fill="#8d9199" stroke="#9aa0a9"/>
 <text x="662" y="914" fill="#1f2328"><tspan font-weight="700">09</tspan> bin ok<tspan fill="#667085"> · 1 parts</tspan></text>
-<rect x="958" y="702" width="14" height="14" rx="3" fill="#2b2c30" stroke="#9aa0a9"/>
-<text x="980" y="714" fill="#1f2328"><tspan font-weight="700">10</tspan> tag tiles<tspan fill="#667085"> · 4 parts</tspan></text>
+<rect x="640" y="927" width="14" height="14" rx="3" fill="#2b2c30" stroke="#9aa0a9"/>
+<text x="662" y="939" fill="#1f2328"><tspan font-weight="700">10</tspan> tag tiles<tspan fill="#667085"> · 4 parts</tspan></text>
+<rect x="958" y="702" width="14" height="14" rx="3" fill="#eeeee8" stroke="#9aa0a9"/>
+<text x="980" y="714" fill="#1f2328"><tspan font-weight="700">11</tspan> parts white 1<tspan fill="#667085"> · 16 parts</tspan></text>
 <rect x="958" y="727" width="14" height="14" rx="3" fill="#eeeee8" stroke="#9aa0a9"/>
-<text x="980" y="739" fill="#1f2328"><tspan font-weight="700">11</tspan> parts white 1<tspan fill="#667085"> · 16 parts</tspan></text>
-<rect x="958" y="752" width="14" height="14" rx="3" fill="#eeeee8" stroke="#9aa0a9"/>
-<text x="980" y="764" fill="#1f2328"><tspan font-weight="700">12</tspan> parts white 2<tspan fill="#667085"> · 16 parts</tspan></text>
-<rect x="958" y="777" width="14" height="14" rx="3" fill="#e2701a" stroke="#9aa0a9"/>
-<text x="980" y="789" fill="#1f2328"><tspan font-weight="700">13</tspan> parts orange<tspan fill="#667085"> · 28 parts</tspan></text>
-<rect x="958" y="802" width="14" height="14" rx="3" fill="#eeeee8" stroke="#9aa0a9"/>
-<text x="980" y="814" fill="#1f2328"><tspan font-weight="700">14</tspan> heldout white<tspan fill="#667085"> · 8 parts</tspan></text>
+<text x="980" y="739" fill="#1f2328"><tspan font-weight="700">12</tspan> parts white 2<tspan fill="#667085"> · 16 parts</tspan></text>
+<rect x="958" y="752" width="14" height="14" rx="3" fill="#e2701a" stroke="#9aa0a9"/>
+<text x="980" y="764" fill="#1f2328"><tspan font-weight="700">13</tspan> parts orange<tspan fill="#667085"> · 28 parts</tspan></text>
+<rect x="958" y="777" width="14" height="14" rx="3" fill="#eeeee8" stroke="#9aa0a9"/>
+<text x="980" y="789" fill="#1f2328"><tspan font-weight="700">14</tspan> heldout white<tspan fill="#667085"> · 8 parts</tspan></text>
+<rect x="958" y="802" width="14" height="14" rx="3" fill="#e2701a" stroke="#9aa0a9"/>
+<text x="980" y="814" fill="#1f2328"><tspan font-weight="700">15</tspan> heldout orange<tspan fill="#667085"> · 8 parts</tspan></text>
 <rect x="958" y="827" width="14" height="14" rx="3" fill="#e2701a" stroke="#9aa0a9"/>
-<text x="980" y="839" fill="#1f2328"><tspan font-weight="700">15</tspan> heldout orange<tspan fill="#667085"> · 8 parts</tspan></text>
-<rect x="958" y="852" width="14" height="14" rx="3" fill="#e2701a" stroke="#9aa0a9"/>
-<text x="980" y="864" fill="#1f2328"><tspan font-weight="700">16</tspan> bin reject and D-T-04<tspan fill="#667085"> · 2 parts</tspan></text>
-<rect x="958" y="877" width="14" height="14" rx="3" fill="#8d9199" stroke="#9aa0a9"/>
-<text x="980" y="889" fill="#1f2328"><tspan font-weight="700">17</tspan> optional mast foot<tspan fill="#667085"> · 1 parts</tspan></text>
-<rect x="958" y="902" width="14" height="14" rx="3" fill="#55585e" stroke="#9aa0a9"/>
-<text x="980" y="914" fill="#1f2328"><tspan font-weight="700">18</tspan> optional cable clips<tspan fill="#667085"> · 8 parts</tspan></text>
+<text x="980" y="839" fill="#1f2328"><tspan font-weight="700">16</tspan> bin reject and D-T-04<tspan fill="#667085"> · 2 parts</tspan></text>
+<rect x="958" y="852" width="14" height="14" rx="3" fill="#8d9199" stroke="#9aa0a9"/>
+<text x="980" y="864" fill="#1f2328"><tspan font-weight="700">17</tspan> optional mast foot<tspan fill="#667085"> · 1 parts</tspan></text>
+<rect x="958" y="877" width="14" height="14" rx="3" fill="#55585e" stroke="#9aa0a9"/>
+<text x="980" y="889" fill="#1f2328"><tspan font-weight="700">18</tspan> optional cable clips<tspan fill="#667085"> · 8 parts</tspan></text>
+<rect x="958" y="902" width="14" height="14" rx="3" fill="#eeeee8" stroke="#9aa0a9"/>
+<text x="980" y="914" fill="#1f2328"><tspan font-weight="700">19</tspan> broken corner reprint white<tspan fill="#667085"> · 5 parts</tspan></text>
+<rect x="958" y="927" width="14" height="14" rx="3" fill="#e2701a" stroke="#9aa0a9"/>
+<text x="980" y="939" fill="#1f2328"><tspan font-weight="700">20</tspan> broken corner reprint orange<tspan fill="#667085"> · 5 parts</tspan></text>
 </svg>

@@ -28,6 +28,7 @@ to the printer.
 | Build the fit into the body instead of using loose small parts (wedge, clip) | The user wants few parts; the dovetails were moved onto the tiles as tongues |
 | Don't add parts nobody asked for; ask before adding | Cable clips were printed without being asked for |
 | Defects must be visible from the top camera | The bracket's "missing hole" was in the side hole; the camera could never see it |
+| A broken corner must cut through the whole part, so it shows in the outline seen from above | The chip on the pad's block and the bracket upright's top sat inside the outline; same colour, no shadow, invisible from the top camera. The 10 broken pads and brackets were reprinted (jobs 19 and 20) |
 | Put an orientation mark on a symmetric part that can be fitted the wrong way round | The tag tile rotates 180° and the seat shifted; the tag number was engraved |
 | Brim (5 mm) on tall thin parts | The 250 mm mast pieces |
 | Two colours don't work with a full plate | Bambu puts the purge tower at the foot of the parts and it can't be controlled with settings; single-colour embossed text is enough |

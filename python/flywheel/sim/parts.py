@@ -25,6 +25,10 @@ TYPE_NAMES = {"rim": "rim", "gear": "gear", "pad": "pad", "bracket": "bracket"}
 DEFECTS = ("missing_hole", "broken_corner")  # structural defects; "wrong variant" comes from the work order
 VARIANTS = {"W": "white", "T": "orange"}  # order is the rng draw order in generation: don't change
 SEGMENTS = 48
+# Broken corner legs (along x, along y) in mm, before the 1.0-1.15x spread. Uneven so the cut stays clear of what
+# must survive: the pad's ear hole sits 2.4 mm from its short edge (keep the y leg short), the bracket's ID engraving
+# runs along x near the long edges (keep the x leg short). Both leave over 60 mm2 off the outline.
+CUT_LEGS = {"pad": (18.0, 9.0), "bracket": (10.0, 16.0)}
 TIP_REACH = 12.2  # pad center to jaw tip 9.4 + extra overhang of the moving jaw tip 1.8 + margin 1.0
 
 
@@ -70,11 +74,18 @@ def _box(sx, sy, sz, x0, y0, z0):
     return Manifold.cube([sx, sy, sz]).translate([x0, y0, z0])
 
 
-def _chip(rng, corner, size):
-    """Randomly rotated cube seated on a corner: boolean subtraction leaves an irregular chip."""
-    s = size * rng.uniform(0.8, 1.3)
-    rot = rng.uniform(15, 75, size=3)
-    return Manifold.cube([2 * s, 2 * s, 2 * s], True).rotate(list(rot)).translate(list(corner))
+def _corner_cut(rng, corner, outward, legs, height):
+    """Vertical triangular prism on a footprint corner: a diagonal break through the whole part, so it cuts the
+    outline the top camera sees. outward: (sx, sy) signs of the corner; legs: (along x, along y) in mm. Draws the same
+    random numbers as the old chip did, so the parts generated after this one don't change."""
+    k = 1 + 0.3 * (rng.uniform(0.8, 1.3) - 0.8)  # 1.0-1.15x: never smaller than legs
+    rng.uniform(15, 75, size=3)
+    sx, sy = outward
+    ax, ay = legs[0] * k, legs[1] * k
+    tri = CrossSection([[(0, 0), (-sx * ax, 0), (0, -sy * ay)]])
+    if sx * sy < 0:  # keep the polygon counter-clockwise
+        tri = CrossSection([[(0, 0), (0, -sy * ay), (-sx * ax, 0)]])
+    return tri.extrude(height + 2).translate([corner[0] + sx * 0.01, corner[1] + sy * 0.01, -1])
 
 
 def _gear_profile(d, missing=()):
@@ -90,7 +101,7 @@ def _shape(ptype, dims, defect, rng):
     """Returns (mesh, collision, grasp, height); lengths in mm."""
     hole = defect != "missing_hole"
     broken = defect == "broken_corner"
-    corners, chip_size = [], 0.0
+    cuts = []
     if ptype == "rim":
         od, h, floor, n = dims["outer_d"], dims["height"], dims["floor"], dims["spokes"]
         hub_r, lip = dims["bore_d"] / 2 + 3.0, 2.6
@@ -135,8 +146,8 @@ def _shape(ptype, dims, defect, rng):
             ex = ln / 2 - dims["ear_hole_d"] / 2 - 0.9  # 0.9 mm wall between hole and plate edge
             for sx in (-1, 1):
                 body -= _cyl(dims["ear_hole_d"], plate + 2, -1).translate([sx * ex, 0, 0])
-        corners = [(sx * bl / 2, sy * bw / 2, h) for sx in (-1, 1) for sy in (-1, 1)]
-        chip_size = bw * 0.24
+        # broken: a corner of the backing plate snapped off diagonally, through the block corner above it
+        cuts = [((sx * ln / 2, sy * w / 2), (sx, sy)) for sx in (-1, 1) for sy in (-1, 1)]
         col = [
             {"type": "box", "size": [ln / 2, w / 2, plate / 2], "pos": [0, 0, plate / 2]},
             {"type": "box", "size": [bl / 2, bw / 2, (h - plate) / 2], "pos": [0, 0, plate + (h - plate) / 2]},
@@ -158,8 +169,9 @@ def _shape(ptype, dims, defect, rng):
         body = base + up
         for hcut in holes:
             body -= hcut
-        corners = [(ln / 2 - t / 2, sy * w / 2, h) for sy in (-1, 1)] + [(-ln / 2, sy * w / 2, t) for sy in (-1, 1)]
-        chip_size = w * 0.2
+        # broken: a corner at the free end of the base snapped off diagonally. Listed twice so the corner is drawn
+        # from 4 like before (the upright's top corners used to be in the list; from above they don't show)
+        cuts = [((-ln / 2, sy * w / 2), (-1, sy)) for sy in (-1, 1)] * 2
         col = [
             {"type": "box", "size": [ln / 2, w / 2, t / 2], "pos": [0, 0, t / 2]},
             {"type": "box", "size": [t / 2, w / 2, (h - t) / 2], "pos": [ln / 2 - t / 2, 0, t + (h - t) / 2]},
@@ -168,8 +180,9 @@ def _shape(ptype, dims, defect, rng):
         height = h
     else:
         raise ValueError(ptype)
-    if broken and corners:
-        body -= _chip(rng, corners[int(rng.integers(len(corners)))], chip_size)
+    if broken and cuts:
+        (cx, cy), outward = cuts[int(rng.integers(len(cuts)))]
+        body -= _corner_cut(rng, (cx, cy), outward, CUT_LEGS[ptype], height)
     return body, col, grasp, height
 
 

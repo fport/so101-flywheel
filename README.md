@@ -121,8 +121,8 @@ classifier. Each request's time is printed; frames and answers go to `outputs/in
 
 `--tray` takes one 1280×960 frame from the top camera, finds the four tags and cuts the six pockets out at a fixed
 4 px/mm. Next to Claude's answer it measures what the silhouette of a light part on the black tray shows: holes (the
-tray shows through), colour, rim spokes and the gap of missing gear teeth. The bin uses the measurement where there is
-one and Claude for the rest (broken corners of pads and brackets). With `--parts` (pocket order, `-` for empty) the
+tray shows through), colour, rim spokes, the gap of missing gear teeth and the corner cut off a broken pad or bracket.
+The bin uses the measurement where there is one and Claude for the rest (the part type). With `--parts` (pocket order, `-` for empty) the
 crops are named after the part IDs and every column is scored against the catalog.
 
 ### Training (ACT v0)

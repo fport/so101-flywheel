@@ -334,8 +334,8 @@ def _cell(attrs):
 def tray_run(args):
     """One top-camera frame of the tray -> 6 pocket crops -> measured attributes and Claude's, side by side.
 
-    The bin uses the measurement where it has one (holes, rim spokes, gear teeth, colour) and Claude for the rest
-    (part type, broken corners of pads and brackets). With --parts the crops are named after the part IDs, so the
+    The bin uses the measurement where it has one (holes, rim spokes, gear teeth, broken corners, colour) and Claude
+    for the rest (the part type, and anything the measurement could not read). With --parts the crops are named after the part IDs, so the
     catalog gives the truth and `inspect --image` can score them again later."""
     import cv2
     from concurrent.futures import ThreadPoolExecutor
