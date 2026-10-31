@@ -1,14 +1,16 @@
-"""Inspection with Claude: one wrist-camera frame from the look pose -> part attributes -> decide() -> bin.
+"""Inspection: one top-camera frame of the tray -> 6 pocket crops -> part attributes -> decide() -> bin per pocket.
 
-    uv run flywheel-robot inspect --sim 24                  # sim parts with known ground truth
-    uv run flywheel-robot inspect --camera 0                # the real wrist camera, now (arm above the part)
-    uv run flywheel-robot inspect --image a.jpg b.jpg                # a part ID in the name (pocket2_B-W-07) scores it
-    uv run flywheel-robot inspect --tray --parts J-W-03 B-W-07 - L-T-01 D-W-02 J-T-04   # top camera, 6 pockets
-    uv run flywheel-robot inspect --sim 8 --model claude-haiku-5-5 --model claude-sonnet-5-5
+    uv run flywheel-robot inspect --tray --parts J-W-03 B-W-07 - L-T-01 D-W-02 J-T-04   # top camera, now
+    uv run flywheel-robot inspect --tray --image .../trays/record-W-seed0-tray01.png      # a frame the recorder kept
+    uv run flywheel-robot inspect --live                    # teleop; → inspects the tray in front of the arm
+    uv run flywheel-robot inspect --image pocket2_B-W-07.png  # Claude on saved crops; a part ID in the name scores it
+    uv run flywheel-robot inspect --sim 24 --model claude-haiku-5-5 --model claude-sonnet-5-5  # sim crops, compare models
 
-Claude only reports what it sees (type, colour, missing hole, broken); OK/REJECT comes from decide() and the work
-order, like it will with any other classifier. Prints the bin and how long the request took, and keeps every frame,
-answer and timing in outputs/inspect/<time>/.
+The arm is not involved: inspection happens once per tray, before the first pick, and the policy is then told "put the
+part from pocket N in the X bin". Holes, rim spokes, gear teeth, broken corners and colour are measured from the
+silhouette (robot.tray); Claude reports what it sees (type, colour, missing hole, broken) and covers what the
+measurement does not. OK/REJECT comes from decide() and the work order, like it will with any other classifier. Every
+frame, answer and timing is kept in outputs/inspect/<time>/.
 """
 
 import base64
@@ -26,13 +28,10 @@ from ..sim.parts import decide
 
 B, DIM, GREEN, ORANGE, RST = "\033[1m", "\033[2m", "\033[38;5;78m", "\033[38;5;208m", "\033[0m"
 OUT_DIR = REPO_ROOT / "outputs" / "inspect"
-# in the look pose the part sits slightly above the centre of the 640x480 wrist image (sim: u ~307, v ~190)
-CROP_CENTER, CROP_SIZE = (320, 200), 288
-
 _DIMS = load_params()["parts"]  # sound-part counts come from the same file as the printed parts
 PROMPT = f"""You are the inspection camera of an end-of-line quality control cell. The image looks straight down at one \
-3D-printed part lying in a pocket of a matte black tray (top camera or wrist camera; the crop is small and enlarged, so \
-edges are soft). Inspect only the part in the middle of the image, ignore neighbouring pockets and markers.
+3D-printed part lying in a pocket of a matte black tray (cut out of the top camera's frame of the whole tray; the crop is \
+small and enlarged, so edges are soft). Inspect only the part in the middle of the image, ignore neighbouring pockets and markers.
 
 How to see a hole: every hole goes all the way through the part, so the black tray shows through it as a dark, round \
 spot with a crisp edge. A light or grey surface with a shaded ring around it is a solid face, not a hole. Look for the \
@@ -51,13 +50,12 @@ two adjacent teeth missing, a gap in the ring of teeth about three teeth wide.
 - pad (brake pad, {_DIMS["pad"]["length"]} x {_DIMS["pad"]["width"]} mm: a raised rectangular friction block on a \
 slightly larger backing plate whose two short ends stick out as ears): a sound pad has a small \
 {_DIMS["pad"]["ear_hole_d"]} mm mounting hole in each ear and a block with four square corners. One straight groove \
-across the middle of the block is normal, not a crack. missing_hole = neither ear has a black spot; broken = a chunk \
-missing from one corner of the raised block, seen as a diagonal cut across that corner (the plate corners stay \
-square, so look at the block).
+across the middle of the block is normal, not a crack. missing_hole = neither ear has a black spot; broken = one \
+corner cut off through the whole pad, so the outline has a slanted edge there instead of a square corner.
 - bracket (L-shaped mounting bracket): from above you see a flat base and, at one end, the top of the upright as a \
 narrow strip. A sound bracket has a {_DIMS["bracket"]["hole_d"]} mm hole in the base and square corners. \
-missing_hole = no hole in the base; broken = a chunk missing from a corner of the upright's top or from a corner at \
-the free end of the base, seen as a diagonal cut.
+missing_hole = no hole in the base; broken = one corner at the free end of the base (away from the upright) cut off \
+through the whole part, so the outline has a slanted edge there instead of a square corner.
 
 variant is the colour: W = white, T = orange. Fill look first: what you see at each place that decides the part \
 (the hole: black spot or solid; the spoke or tooth count; each corner), then the fields that follow from it. note is \
@@ -77,15 +75,6 @@ SCHEMA = {  # structured output (output_config.format); forced tool_choice is no
     "additionalProperties": False,
 }
 UPSCALE_TO = 768  # a 224 px crop is ~70 image tokens; enlarged, the model gets more patches on a 7 mm hole
-
-
-def center_crop(frame):
-    """Same fixed crop for sim and real frames: the part's place in the wrist image in the look pose."""
-    h, w = frame.shape[:2]
-    s = min(CROP_SIZE, h, w)
-    u0 = int(np.clip(CROP_CENTER[0] - s / 2, 0, w - s))
-    v0 = int(np.clip(CROP_CENTER[1] - s / 2, 0, h - s))
-    return frame[v0 : v0 + s, u0 : u0 + s]
 
 
 def ask(client, model, rgb, effort=None):
@@ -114,9 +103,10 @@ def ask(client, model, rgb, effort=None):
 
 
 def sim_frames(n, seed):
-    """n parts spread over type x colour x defect (training parts only), wrist frame in the look pose."""
+    """n parts spread over type x colour x defect (training parts only), laid 6 to a tray; pocket crops from the sim top
+    camera at the inspection resolution, cut out by the tags like a real frame."""
     from ..sim.env import QCSortSim
-    from ..sim.scripted import ScriptedSorter
+    from .tray import find_tags, pocket_crops, tray_homography, truth_for
 
     catalog = json.loads((REPO_ROOT / "python/flywheel/sim/assets/generated/catalog.json").read_text())
     groups = {}
@@ -126,32 +116,15 @@ def sim_frames(n, seed):
     rng = np.random.default_rng(seed)
     keys = list(groups)
     rng.shuffle(keys)
+    ids = []
     for k in range(n):
-        g = groups[keys[k % len(keys)]]
-        p = g[int(rng.integers(len(g)))]
-        env = QCSortSim(part_ids=[p["id"], None, None, None, None, None])
-        s = ScriptedSorter(env)
-        target, frame, width = s.plan_grasp(p["id"])
-        look, look_frame = env.look_pose(target, frame)
-        s.move_joints(np.r_[s.ik.solve(look, look_frame, q0=s.q[:5]).q, s.jaw_angle(width + 0.012)])
-        s.hold(0.4)
-        truth = {"type": p["type"], "variant": p["variant"],
-                 "missing_hole": p["defect"] == "missing_hole", "broken": p["defect"] == "broken_corner"}
-        yield p["id"], env.render("wrist"), truth
-
-
-def camera_frame(index):
-    import cv2
-
-    cap = cv2.VideoCapture(index, cv2.CAP_AVFOUNDATION)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-    for _ in range(15):  # let exposure settle
-        ok, f = cap.read()
-    cap.release()
-    if not ok:
-        sys.exit(f"camera {index} gave no frame")
-    yield f"camera{index}", f[..., ::-1].copy(), None
+        g = [p["id"] for p in groups[keys[k % len(keys)]] if p["id"] not in ids]
+        ids.append(g[int(rng.integers(len(g)))])
+    for start in range(0, n, 6):
+        tray = ids[start : start + 6]
+        frame = QCSortSim(part_ids=tray + [None] * (6 - len(tray)), seed=seed + start).tray_frame()
+        for (k, crop), pid in zip(pocket_crops(frame, tray_homography(find_tags(frame))), tray):
+            yield f"pocket{k}_{pid}", crop, truth_for(pid)
 
 
 def image_frames(paths):
@@ -174,17 +147,15 @@ def run(args):
         sys.exit("ANTHROPIC_API_KEY is not set. In this terminal: export ANTHROPIC_API_KEY=... (console.anthropic.com)")
     client = anthropic.Anthropic()
     models = args.model or ["claude-sonnet-5-5"]
-    frames = (sim_frames(args.sim, args.seed) if args.sim else camera_frame(args.camera) if args.camera is not None
-              else image_frames(args.image))
+    frames = sim_frames(args.sim, args.seed) if args.sim else image_frames(args.image)
     out = OUT_DIR / datetime.now().strftime("%Y%m%d-%H%M%S")
     out.mkdir(parents=True, exist_ok=True)
     rows = []
     print(f"{B}work order {args.order}{RST} {DIM}({'white' if args.order == 'W' else 'orange'} is the product) · "
           f"{', '.join(models)} · effort {args.effort or 'default'} · {out}{RST}\n")
     print(f"   {'part':<9}{'model':<20}{'bin':<8}{'truth':<8}{'seconds':>8}  seen")
-    for name, frame, truth in frames:
+    for name, crop, truth in frames:
         name = name[:20]
-        crop = center_crop(frame)
         cv2.imwrite(str(out / f"{name}.jpg"), crop[..., ::-1])
         for model in models:
             try:
@@ -219,11 +190,10 @@ def run(args):
 
 
 def live(args):
-    """Teleop with inspection on demand: bring the arm above a part, → sends the wrist frame to Claude, the answer
-    (bin and seconds) is printed and spoken while the arm keeps following the leader; the operator puts the part in
-    that bin. Nothing is recorded to a dataset; frames and answers go to outputs/inspect/<time>/."""
-    import anthropic
-    import cv2
+    """Teleop with tray inspection on demand: lay out the tray, park the arm out of the top camera's way, → inspects
+    the 6 pockets from the top camera frame and prints a bin for each while the arm keeps following the leader; the
+    operator then puts each part in its bin. Nothing is recorded to a dataset; frames and answers go to
+    outputs/inspect/<time>/."""
     from concurrent.futures import ThreadPoolExecutor
 
     from lerobot.utils.robot_utils import precise_sleep
@@ -233,7 +203,6 @@ def live(args):
 
     if not os.environ.get("ANTHROPIC_API_KEY"):
         sys.exit("ANTHROPIC_API_KEY is not set. In this terminal: export ANTHROPIC_API_KEY=... (console.anthropic.com)")
-    client = anthropic.Anthropic()
     model = (args.model or ["claude-sonnet-5-5"])[0]
     out = OUT_DIR / datetime.now().strftime("%Y%m%d-%H%M%S")
     out.mkdir(parents=True, exist_ok=True)
@@ -244,19 +213,19 @@ def live(args):
     try:
         connect_robot(robot)
     except (TimeoutError, ConnectionError) as e:
-        sys.exit(f"{ORANGE}{e}{RST}\nCheck the cameras (--top/--camera) and the follower's 12 V adapter.")
+        sys.exit(f"{ORANGE}{e}{RST}\nCheck the cameras (--top/--wrist) and the follower's 12 V adapter.")
     teleop.connect()
     wd = Watchdog(out / "loop.log")
     print(f"\n{B}live inspection{RST} · work order {args.order} ({'white' if args.order == 'W' else 'orange'} is the "
           f"product) · {model} · effort {args.effort or 'default'}\n"
-          f"   bring the arm ~6 cm above a part, part centred in the wrist camera (Rerun), hold still, then\n"
+          f"   lay out the tray, bring the arm back to start (out of the top camera's view), then\n"
           f"   {B}→{RST} (works in any window, Rerun too) or ENTER (only while this terminal has focus)\n"
-          f"   Claude names the bin; put the part there yourself · Esc / q to quit · {DIM}{out}{RST}\n"
+          f"   a bin for each pocket is printed; put the parts there yourself · Esc / q to quit · {DIM}{out}{RST}\n"
           f"   {DIM}loop log: {wd.path} (pid {os.getpid()}){RST}\n")
     hz = args.fps * CONTROL_MULT
-    pending, n, rows = None, 0, []
+    pending, n, done = None, 0, 0
     try:
-        with Keys("→ / ENTER inspect · Esc / q quit") as keys:
+        with Keys("→ / ENTER inspect the tray · Esc / q quit") as keys:
             tick, worst, beat = 0, 0.0, time.perf_counter()
             while True:
                 t0 = time.perf_counter()
@@ -264,7 +233,7 @@ def live(args):
                 tick += 1
                 if t0 - beat >= 1:  # once a second: how fast the arm is really being driven
                     wd.f.write(f"{datetime.now():%H:%M:%S} {tick / (t0 - beat):5.1f} Hz · slowest step "
-                               f"{worst * 1000:.0f} ms{' · waiting for Claude' if pending else ''}\n")
+                               f"{worst * 1000:.0f} ms{' · inspecting' if pending else ''}\n")
                     wd.f.flush()
                     tick, worst, beat = 0, 0.0, t0
                 obs = robot.get_observation()
@@ -280,31 +249,23 @@ def live(args):
                     break
                 if key == "go":
                     if pending is not None:
-                        print(f"   {DIM}still waiting for the previous answer{RST}")
+                        print(f"   {DIM}still inspecting the previous tray{RST}")
                     else:
                         n += 1
-                        crop = center_crop(obs["wrist"])
-                        cv2.imwrite(str(out / f"{n:03d}.jpg"), crop[..., ::-1])
-                        pending = (n, pool.submit(ask, client, model, crop, args.effort))
-                        print(f"   #{n} sent to Claude …", flush=True)
+                        frame = np.asarray(obs["top"]).copy()
+                        pending = (n, pool.submit(inspect_tray, frame, args.parts or ["?"] * 6, args, out / f"tray{n:02d}"))
+                        print(f"   tray #{n}: measuring and asking Claude …", flush=True)
 
                 if pending is not None and pending[1].done():
                     k, fut = pending
                     pending = None
                     try:
-                        attrs, sec, usage = fut.result()
-                    except Exception as e:  # API error or unreadable answer: tell, keep driving
-                        print(f"   #{k} {ORANGE}{type(e).__name__}: {e}{RST}")
+                        rows = fut.result()
+                    except Exception as e:  # tags not found, API error: tell, keep driving
+                        print(f"   tray #{k} {ORANGE}{type(e).__name__}: {e}{RST}")
                     else:
-                        bin_ = decide(attrs, args.order)
-                        color = GREEN if bin_ == "ok" else ORANGE
-                        seen = f"{attrs['type']} {'white' if attrs['variant'] == 'W' else 'orange'}" \
-                               f"{' · missing hole' if attrs['missing_hole'] else ''}{' · broken' if attrs['broken'] else ''}"
-                        print(f"   #{k} {color}{B}{bin_.upper()} bin{RST}  {sec:.2f} s  {seen}  {DIM}{attrs['note']}{RST}")
-                        say(f"{bin_.upper()} bin", args.voice)
-                        rows.append({"n": k, "model": model, "bin": bin_, "attributes": attrs,
-                                     "seconds": round(sec, 3), "usage": usage})
-                        (out / "results.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows))
+                        done += 1
+                        say(", ".join(f"{r['pocket']} {r['bin']}" for r in rows), args.voice)
                 worst = max(worst, time.perf_counter() - t0)
                 precise_sleep(max(1 / hz - (time.perf_counter() - t0), 0.0))
     except KeyboardInterrupt:
@@ -316,11 +277,7 @@ def live(args):
                 dev.disconnect()
         if args.display:
             shutdown_visualization("rerun")
-    if rows:
-        secs = np.array([r["seconds"] for r in rows])
-        print(f"\n   {len(rows)} parts · median {np.median(secs):.2f} s · max {secs.max():.2f} s · {out}")
-    else:
-        print(f"\n   no part was inspected: press → with the arm above a part")
+    print(f"\n   {done} trays inspected · {out}" if done else "\n   no tray was inspected: press → with the tray laid out")
 
 
 def _cell(attrs):
@@ -332,15 +289,10 @@ def _cell(attrs):
 
 
 def tray_run(args):
-    """One top-camera frame of the tray -> 6 pocket crops -> measured attributes and Claude's, side by side.
-
-    The bin uses the measurement where it has one (holes, rim spokes, gear teeth, broken corners, colour) and Claude
-    for the rest (the part type, and anything the measurement could not read). With --parts the crops are named after the part IDs, so the
-    catalog gives the truth and `inspect --image` can score them again later."""
+    """One top-camera frame of the tray (--top now, or a saved frame with --image) -> inspect_tray()."""
     import cv2
-    from concurrent.futures import ThreadPoolExecutor
 
-    from .tray import capture, find_tags, overlay, pocket_crops, measure, tray_homography, truth_for
+    from .tray import capture
 
     parts = args.parts or ["?"] * 6
     if len(parts) != 6:
@@ -356,13 +308,28 @@ def tray_run(args):
         except RuntimeError as e:
             sys.exit(str(e))
     out = OUT_DIR / "tray" / datetime.now().strftime("%Y%m%d-%H%M%S")
+    try:
+        inspect_tray(frame, parts, args, out)
+    except RuntimeError as e:
+        sys.exit(f"{ORANGE}{e}{RST}  frame: {out / 'frame.png'}")
+
+
+def inspect_tray(frame, parts, args, out):
+    """Tray frame -> 6 pocket crops -> measured attributes and Claude's, side by side; prints the table, returns the rows.
+
+    The bin uses the measurement where it has one (holes, rim spokes, gear teeth, broken corners, colour) and Claude
+    for the rest (the part type, and anything the measurement could not read). parts: 6 IDs in pocket order, '?' when
+    unknown, '-' for an empty pocket; with IDs the crops are named after them, so the catalog gives the truth and
+    `inspect --image` can score them again later. Raises RuntimeError when the tags are not found."""
+    import cv2
+    from concurrent.futures import ThreadPoolExecutor
+
+    from .tray import find_tags, overlay, pocket_crops, measure, tray_homography, truth_for
+
     out.mkdir(parents=True, exist_ok=True)
     cv2.imwrite(str(out / "frame.png"), frame[..., ::-1])
     tags = find_tags(frame)
-    try:
-        H = tray_homography(tags)
-    except RuntimeError as e:
-        sys.exit(f"{ORANGE}{e}{RST}  frame: {out / 'frame.png'}")
+    H = tray_homography(tags)
     cv2.imwrite(str(out / "overlay.jpg"), overlay(frame, H, tags))
 
     crops = []
@@ -426,3 +393,4 @@ def tray_run(args):
         print("\n   " + " · ".join(f"{key} {r}/{n}" for key, (r, n) in score.items() if n) +
               f"  {DIM}(attributes: colour, hole, broken where each one gave an answer){RST}")
     print(f"\n   overlay (are the orange squares on the pockets?): {out / 'overlay.jpg'}")
+    return rows

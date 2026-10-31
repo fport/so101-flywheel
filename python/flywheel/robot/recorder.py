@@ -1,16 +1,16 @@
-"""Plan-driven teleop recording: two-phase task text, ACT command channel, private Hub push at the end of a session.
+"""Plan-driven teleop recording: task text and ACT command channel per episode, private Hub push at the end of a session.
 
 Three levels; numbers are positions in the plan and match the tracking site:
-  episode (1–120)  one part: look at it from above (wrist camera), pick it, drop it into the bin
+  episode (1–120)  one part: pick it from its pocket, drop it into the commanded bin
   tray (1–20)      6 parts laid in the tray; after 6 episodes the tray is empty, move on to the next tray
   session (1–4)    one `record --session N` run: 5 trays, 30 episodes, Hub push at the end
 
-lerobot-record takes one task text per episode; here each frame's task is written by phase:
-phase 1 "look at the part from above" + environment_state [0, 0], phase 2 "put the part in the <OK|REJECT> bin" +
-one-hot command. Phase 1 ends with the open jaws ~6 cm straight above the part, so the wrist camera sees it in the
-middle of its image: that frame is what inspection decides on. The operator advances with one key (→, ENTER or
-space): start → above the part → dropped. Which plan row is which episode is kept in <root>/flywheel/episodes.jsonl; an interrupted session
-resumes where it left off with the same command.
+Inspection is not part of an episode. When a tray is laid out, the top camera's frame of it (arm at start, out of the
+way) is kept in <root>/flywheel/trays/: that is what `inspect --tray` reads. Each episode then has one task text,
+"put the part from pocket N in the <OK|REJECT> bin", and the same thing as environment_state (pocket one-hot +
+[ok, reject]). The operator advances with one key (→, ENTER or space): tray laid out → start → dropped. Which plan row
+is which episode is kept in <root>/flywheel/episodes.jsonl; an interrupted session resumes where it left off with the
+same command.
 
 If the process dies before the LeRobot dataset is finalize()d, a half-written parquet makes all of it unreadable. So
 at the end of each tray the dataset is closed and copied incrementally to <root>.snapshot; on startup a broken
@@ -40,7 +40,8 @@ import numpy as np
 
 from ..sim.params import REPO_ROOT
 from ..sim.parts import TYPE_NAMES, VARIANTS
-from .session import PHASE1_TASK, command_onehot, phase2_task, picks, sessions, tray_layout
+from ..sim.plan import task
+from .session import COMMAND_NAMES, command_vector, picks, sessions, tray_layout
 
 os.environ.setdefault("SVT_LOG", "1")  # keep the AV1 encoder from flooding the terminal every episode
 os.environ.setdefault("HF_DATASETS_DISABLE_PROGRESS_BARS", "1")
@@ -64,6 +65,10 @@ def episode_log(root):
 
 def snapshot_dir(root):
     return Path(str(root) + ".snapshot")
+
+
+def tray_frame_path(root, plan, tray):
+    return Path(root) / "flywheel" / "trays" / f"{plan}-tray{tray:02d}.png"
 
 
 def writing_marker(root):
@@ -194,7 +199,7 @@ class Watchdog:
 
 
 class AutoKeys:
-    """For --fake --auto: mimics the operator (tray ready, start, phase 2 after 1 s, drop after 1 s)."""
+    """For --fake --auto: mimics the operator (tray ready, start, drop after 1 s)."""
 
     def __init__(self, fps):
         self.fps, self.n = fps, 0
@@ -346,7 +351,7 @@ def dataset_features(robot):
         aggregate_pipeline_dataset_features(pipeline=procs[2], use_videos=True,
                                             initial_features=create_initial_features(observation=robot.observation_features)),
     )
-    features[ENV_STATE] = {"dtype": "float32", "shape": (2,), "names": ["ok", "reject"]}
+    features[ENV_STATE] = {"dtype": "float32", "shape": (len(COMMAND_NAMES),), "names": COMMAND_NAMES}
     return features, procs
 
 
@@ -392,6 +397,10 @@ def open_dataset(repo_id, root, robot, fps):
     if writing_marker(root).exists():
         restore(root)
     if (root / "meta" / "info.json").exists():
+        old = json.loads((root / "meta" / "info.json").read_text())["features"].get(ENV_STATE, {}).get("names")
+        if old != COMMAND_NAMES:
+            sys.exit(f"{root} was made with the command channel {old}; this recorder writes {COMMAND_NAMES}.\n"
+                     "Pass a different --root (or move the old folder aside if it has nothing worth keeping).")
         try:
             return resume(repo_id, root), procs
         except Exception:  # corruption without a marker: roll back to the checkpoint anyway
@@ -432,15 +441,27 @@ def checkpoint(dataset, repo_id, root):
     return resume(repo_id, root)
 
 
-def log_episode(root, p, session, episode_index, frames, switch_frame):
+def log_episode(root, p, session, episode_index, frames):
     f = episode_log(root)
     f.parent.mkdir(parents=True, exist_ok=True)
     row = {"episode_index": episode_index, "plan": p.plan, "order": p.order, "index": p.index, "session": session,
            "tray": p.tray, "slot": p.slot, "pocket": p.pocket, "part": p.part, "command": p.command,
-           "probe": p.probe, "frames": frames, "phase_switch_frame": switch_frame,
+           "probe": p.probe, "frames": frames,
            "recorded_at": datetime.now().isoformat(timespec="seconds")}
     with f.open("a") as fh:
         fh.write(json.dumps(row, ensure_ascii=False) + "\n")
+
+
+def save_tray_frame(root, p, obs):
+    """Keeps the top camera's frame of a freshly laid tray (once: a resumed tray already has some pockets empty)."""
+    import cv2
+
+    path = tray_frame_path(root, p.plan, p.tray)
+    if "top" not in obs or path.exists():
+        return None
+    path.parent.mkdir(parents=True, exist_ok=True)
+    cv2.imwrite(str(path), np.asarray(obs["top"])[..., ::-1])  # lerobot gives RGB
+    return path
 
 
 def push(repo_id, root):
@@ -524,7 +545,7 @@ def run(args):
         print(f"{DIM}loop log: {wd.path} (pid {os.getpid()}){RST}")
         with AutoKeys(hz) if args.auto else Keys() as keys:
             i, tray_shown, card_shown = 0, None, None
-            frames = switch_frame = tick = late = 0
+            frames = tick = late = 0
             quit_at = go_at = -1e9
             while i < len(todo):
                 t0 = time.perf_counter()
@@ -543,25 +564,24 @@ def run(args):
 
                 if state == "tray" and tray_shown != p.tray:
                     done_pockets = {q.pocket for q in plan_picks if q.tray == p.tray and q.index in done}
-                    print(f"\n{B}TRAY {p.tray}{RST}{DIM}/{n_trays} · lay these 6 parts in the tray, then →{RST}\n"
+                    print(f"\n{B}TRAY {p.tray}{RST}{DIM}/{n_trays} · lay these 6 parts in the tray, arm at start, then → "
+                          f"(the top camera keeps a frame of the tray){RST}\n"
                           + tray_box(args.plan, p.tray, done_pockets, catalog))
                     say(f"Tray {p.tray}. Lay out the tray.", args.voice)
                     tray_shown = p.tray
 
-                if state in ("phase1", "phase2") and sample:
-                    phase2 = state == "phase2"
+                if state == "rec" and sample:
                     dataset.add_frame({
                         **build_dataset_frame(hw_features, obs_p, prefix=OBS_STR),
                         **build_dataset_frame(hw_features, act_p, prefix=ACTION),
-                        ENV_STATE: np.array(command_onehot(p.command) if phase2 else [0.0, 0.0], dtype=np.float32),
-                        "task": phase2_task(p.command) if phase2 else PHASE1_TASK,
+                        ENV_STATE: np.array(command_vector(p.pocket, p.command), dtype=np.float32),
+                        "task": task(p.pocket, p.command),
                     })
                     frames += 1
                     if frames % max(args.fps // 3, 1) == 0:
-                        label = f"{ORANGE}phase 2 · pick, put in bin{RST}" if phase2 else f"{BLUE}phase 1 · go above the part{RST}"
                         slow = f"  {ORANGE}loop is late {late}x (CPU busy?){RST}" if late > hz // 10 else ""
-                        status(f"   {REJECT}●{RST} rec {frames / args.fps:5.1f} s  {label}{slow}  "
-                               f"{DIM}→ {'dropped, save' if phase2 else 'above it, part centred in wrist cam'} · ← redo · Esc×2 quit{RST}", end="")
+                        status(f"   {REJECT}●{RST} rec {frames / args.fps:5.1f} s  pocket {p.pocket} → "
+                               f"{p.command.upper()} bin{slow}  {DIM}→ dropped, save · ← redo · Esc×2 quit{RST}", end="")
                     if frames / args.fps >= args.episode_time:
                         status(f"   {REJECT}time is up ({args.episode_time:.0f} s){RST}: → save · ← redo")
                         state = "timeout"
@@ -582,23 +602,22 @@ def run(args):
                     else:
                         status(f"   {DIM}quit (Esc/q){RST}")
                         break
-                if key == "r" and state in ("phase1", "phase2", "timeout"):
+                if key == "r" and state in ("rec", "timeout"):
                     dataset.clear_episode_buffer()
                     status(f"   {DIM}discarded; return the arm to start, → to restart{RST}")
                     state = "ready"
                 elif key == "go":
                     if state == "tray":
+                        saved_frame = save_tray_frame(root, p, obs)
+                        if saved_frame:
+                            status(f"   {DIM}top camera frame of the tray: {saved_frame}{RST}")
                         state = "ready"
                     elif state == "ready":
-                        state, frames, switch_frame, late = "phase1", 0, 0, 0
+                        state, frames, late = "rec", 0, 0
                         say("Start", args.voice)
-                    elif state == "phase1":
-                        state, switch_frame = "phase2", frames
-                        say(f"{p.command.upper()} bin", args.voice)
-                    elif state in ("phase2", "timeout"):
-                        switch_frame = switch_frame or frames  # if phase 2 was never entered, there is no switch
+                    elif state in ("rec", "timeout"):
                         dataset.save_episode()
-                        log_episode(root, p, args.session, dataset.meta.total_episodes - 1, frames, switch_frame)
+                        log_episode(root, p, args.session, dataset.meta.total_episodes - 1, frames)
                         done.add(p.index)
                         saved += 1
                         status(f"   {GREEN}✓ episode {p.index + 1} saved{RST} {DIM}dataset #{dataset.meta.total_episodes - 1} · "
@@ -614,8 +633,8 @@ def run(args):
 
                 if state == "ready" and card_shown != p.index:
                     print(pick_card(p, len(plan_picks), n_trays, args.session, catalog)
-                          + f"   {DIM}arm at start · → record · go ~6 cm above pocket {p.pocket}, part centred in the wrist cam, "
-                            f"hold still · → · pick it, {p.command.upper()} bin, back to start · → save{RST}")
+                          + f"   {DIM}arm at start · → record · pick it from pocket {p.pocket}, {p.command.upper()} bin, "
+                            f"back to start · → save{RST}")
                     say(f"Pocket {p.pocket}. {p.command.upper()} bin.", args.voice)
                     card_shown = p.index
 

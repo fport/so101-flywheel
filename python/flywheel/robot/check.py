@@ -12,7 +12,8 @@ from pathlib import Path
 
 import numpy as np
 
-from .session import PHASE1_TASK, command_onehot, phase2_task
+from ..sim.plan import task as task_of
+from .session import command_vector
 
 B, DIM, GREEN, ORANGE, RST = "\033[1m", "\033[2m", "\033[38;5;78m", "\033[38;5;208m", "\033[0m"
 TRACK_LIMIT = 15.0  # mean |action - state| per joint (degrees / gripper %); above this the follower is not following
@@ -67,12 +68,10 @@ def check(repo_id, root):
             continue
         if r["frames"] != m.sum():
             problems.append(f"episode {e}: log says {r['frames']} frames, dataset has {m.sum()}")
-        sw = r["phase_switch_frame"]
-        want_env = np.array([[0.0, 0.0]] * sw + [command_onehot(r["command"])] * (m.sum() - sw))
-        want_task = [PHASE1_TASK] * sw + [phase2_task(r["command"])] * (m.sum() - sw)
-        if len(want_env) != m.sum() or not np.array_equal(env[m], want_env) or list(task[m]) != want_task:
-            problems.append(f"episode {e} (plan #{r['index'] + 1}, {r['command']}): command channel or task text "
-                            "does not match the plan")
+        want_env = np.array([command_vector(r["pocket"], r["command"])] * m.sum())
+        if not np.array_equal(env[m], want_env) or set(task[m]) != {task_of(r["pocket"], r["command"])}:
+            problems.append(f"episode {e} (plan #{r['index'] + 1}, pocket {r['pocket']}, {r['command']}): command "
+                            "channel or task text does not match the plan")
     commands = [r["command"] for r in rows.values()]
     print(f"\n   command channel: {commands.count('ok')} OK · {commands.count('reject')} REJECT · "
           f"task texts {len(tasks)}")

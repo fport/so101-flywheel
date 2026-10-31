@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-29",
+  "updated": "2026-10-31",
   "now": "tags",
   "status": {
     "cell": "active",
@@ -65,6 +65,13 @@
     ]
   },
   "log": [
+    {
+      "date": "2026-10-31",
+      "text": {
+        "en": "Inspection moved to the top camera: one frame of the tray, 6 pockets cut out by the tags, holes, spokes, teeth and broken corners measured, Claude for the rest. Episodes are now \"put the part from pocket N in the X bin\"; the wrist-camera look step is gone. The 10 broken pads and brackets were reprinted with the corner cut through the outline.",
+        "tr": "Muayene üst kameraya taşındı: tepsiden tek kare, tag'lerle 6 cep kesilir, delik, kol, diş ve kırık köşe ölçülür, gerisi Claude. Bölümler artık \"N numaralı cepteki parçayı X kasasına koy\"; bilek kamerasıyla bakma adımı kalktı. 10 kırık balata ve braket, köşesi dış hattı kesecek şekilde yeniden basıldı."
+      }
+    },
     {
       "date": "2026-10-29",
       "text": {

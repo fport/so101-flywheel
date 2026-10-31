@@ -9,8 +9,12 @@ import numpy as np
 
 from .parts import TYPE_NAMES, VARIANTS
 
-TASK = {"ok": "put the part in the OK bin", "reject": "put the part in the REJECT bin"}
 POCKETS = 6
+
+
+def task(pocket, command):
+    """Task text of an episode. The top camera has already inspected the tray; the policy is told where and to which bin."""
+    return f"put the part from pocket {pocket} in the {command.upper()} bin"
 
 
 def build_plan(catalog, order="W", seed=0, heldout=False):
@@ -66,6 +70,6 @@ def to_markdown(trays, catalog, order, title):
         lines += ["", "| Episode | Pocket | Part | Command | Probe |", "| --- | --- | --- | --- | --- |"]
         for pick in t["picks"]:
             no += 1
-            lines.append(f"| {no} | {pick['pocket']} | `{pick['part']}` | {TASK[pick['command']]} | {'yes' if pick['probe'] else ''} |")
+            lines.append(f"| {no} | {pick['pocket']} | `{pick['part']}` | {task(pick['pocket'], pick['command'])} | {'yes' if pick['probe'] else ''} |")
         lines.append("")
     return "\n".join(lines)

@@ -379,8 +379,8 @@ const STILL = new URLSearchParams(location.search).has("still"); // test: frame 
 const CHAPTERS = [
   {
     id: "project", title: L("Quality control that learns from its own mistakes", "Kendi hatasından öğrenen kalite kontrol"), rail: L("Project", "Proje"),
-    line: L("A desktop model of end-of-line inspection at an automotive supplier. The robot looks at the part with its wrist camera, picks it, puts it in its bin; every round it learns from its own mistakes.",
-      "Otomotiv yan sanayinde hat sonu kontrolünün masaüstü modeli. Robot parçaya bilek kamerasıyla bakar, alır, kasasına koyar; her turda kendi hatalarından öğrenir."),
+    line: L("A desktop model of end-of-line inspection at an automotive supplier. The top camera inspects the whole tray once; the robot then picks each part and puts it in the bin it is told. Every round it learns from its own mistakes.",
+      "Otomotiv yan sanayinde hat sonu kontrolünün masaüstü modeli. Üst kamera tepsinin tamamını bir kez muayene eder; robot sonra her parçayı alır, söylenen kasaya koyar. Her turda kendi hatalarından öğrenir."),
     pos: W(-1.0, -0.95, 0.9), target: W(0.12, 0.02, -0.07), drift: 0.02, shift: 0.06, play: true, intro: true,
   },
   {
@@ -399,8 +399,8 @@ const CHAPTERS = [
   },
   {
     id: "simulation", title: L("One tray, six episodes", "Bir dizilim, altı bölüm"), rail: L("Simulation", "Simülasyon"),
-    line: L("Scripted expert in MuJoCo: look at the part from above, pick it, put it in the bin. On the right, the arm's two cameras.",
-      "MuJoCo'da scripted uzman: parçaya üstten bak, al, kasaya koy. Sağda kolun gördüğü iki kamera."),
+    line: L("Scripted expert in MuJoCo: the top camera reads the tray once, then each episode is \"put the part from pocket N in the X bin\". On the right, the two cameras.",
+      "MuJoCo'da scripted uzman: üst kamera tepsiyi bir kez okur, sonra her bölüm \"N numaralı cepteki parçayı X kasasına koy\". Sağda iki kamera."),
     pos: W(-0.6, -0.42, 0.66), target: W(0.13, 0.02, -0.02), drift: 0, play: true, hud: true, pip: true, shift: 0.07,
   },
   {
@@ -411,8 +411,8 @@ const CHAPTERS = [
   },
   {
     id: "recording", title: L("Recording", "Kayıt"), rail: L("Recording", "Kayıt"),
-    line: L("Session: 30 episodes with one command. Tray: 6 parts laid in the tray. Episode: one part, look, pick, drop.",
-      "Seans: bir komutla 30 bölüm. Dizilim: tepsiye 6 parça dizmek. Bölüm: tek parça, bak, al, bırak."),
+    line: L("Session: 30 episodes with one command. Tray: 6 parts laid in the tray, one top-camera frame. Episode: one part, pick, drop.",
+      "Seans: bir komutla 30 bölüm. Dizilim: tepsiye 6 parça dizmek, üst kameradan bir kare. Bölüm: tek parça, al, bırak."),
     pos: W(-0.3, 0, 0.78), target: W(0.12, 0, -0.02), drift: 0, op: true, shift: 0.14,
   },
   {
@@ -494,7 +494,7 @@ function partHots() {
 
 /* ---------------------------------------------------------------- simulation HUD + small cameras */
 const hud = $("#hud");
-hud.innerHTML = `<div class="simhud"><div class="task"><b id="task">pick the part and show it to the camera</b><em id="oh">[0, 0]</em></div>
+hud.innerHTML = `<div class="simhud"><div class="task"><b id="task">top camera inspects the tray</b><em id="oh">—</em></div>
   <div class="tl" id="tl" style="grid-template-columns:${S.episodes.map((e) => e.end - e.start + 1).join("fr ")}fr">${S.episodes.map(() => `<div class="tl-seg"><span></span></div>`).join("")}</div>
   <div class="tl-lbl" style="grid-template-columns:${S.episodes.map((e) => e.end - e.start + 1).join("fr ")}fr">${S.episodes.map((e) => `<span>${e.part} → <b class="${e.command}">${BIN(e.command)}</b></span>`).join("")}</div></div>
   <div class="op" id="op"></div><div class="op loop" id="loop"></div><div class="op intro" id="intro"></div>`;
@@ -506,11 +506,12 @@ $("#pip").innerHTML = simCams.map((c) => `<div class="pipf" data-c="${c.userData
 let lastEp = -1, lastPh = "";
 function updateSimHud() {
   const f = Math.floor(st.t) % NF, ep = episodeAt(f), ph = phaseAt(f), e = S.episodes[ep];
-  const p2 = ph === "place" || ph === "home";
+  const p2 = ph !== "inspect" && ph !== "idle";
   if (ph !== lastPh || ep !== lastEp) {
-    $("#task").textContent = p2 ? `put the part in the ${e.command.toUpperCase()} bin` : "pick the part and show it to the camera";
+    // the task text and the command channel (pocket one-hot | ok, reject) say the same thing for the whole episode
+    $("#task").textContent = p2 ? `put the part from pocket ${e.pocket} in the ${e.command.toUpperCase()} bin` : "top camera inspects the tray";
     $("#task").classList.toggle("p2", p2);
-    $("#oh").textContent = p2 ? (e.command === "ok" ? "[1, 0]" : "[0, 1]") : "[0, 0]";
+    $("#oh").textContent = p2 ? `[${[1, 2, 3, 4, 5, 6].map((k) => +(k === e.pocket)).join("")} | ${e.command === "ok" ? "10" : "01"}]` : "—";
     $$(".tl-lbl span").forEach((s, i) => s.classList.toggle("on", i === ep));
     lastPh = ph; lastEp = ep;
   }
@@ -518,10 +519,9 @@ function updateSimHud() {
     const E = S.episodes[i];
     s.style.width = (f > E.end ? 100 : f < E.start ? 0 : ((f - E.start) / (E.end - E.start)) * 100) + "%";
   });
-  // warm light lights up the part during inspection
+  // warm light lights up the tray while the top camera inspects it
   warm.intensity = THREE.MathUtils.lerp(warm.intensity, ph === "inspect" ? 0.9 : 0, 0.08);
-  const g = bodies[S.bodies.indexOf("gripper")];
-  if (g) warm.position.copy(g.getWorldPosition(tmpV)).add(new THREE.Vector3(-0.1, 0.12, 0));
+  warm.position.copy(W(0.168, 0.05, 0.2));
 }
 function pipRects() {
   const small = innerWidth < 900;
@@ -544,27 +544,24 @@ const REC = (() => {
   });
   return { R, picks, done, sess, order: D.plans[PLAN].order };
 })();
-// same as the terminal flow: one → per tray, three per episode (start, above the part, dropped)
+// same as the terminal flow: one → per tray (the top camera keeps a frame of it), two per episode (start, dropped)
 function sessionSteps(s) {
   const out = [{ k: "prep" }];
   for (const tray of s.trays) {
     out.push({ k: "tray", tray });
-    for (const p of s.picks.filter((q) => q.tray === tray)) for (const sub of [0, 1, 2]) out.push({ k: "ep", p, sub });
+    for (const p of s.picks.filter((q) => q.tray === tray)) for (const sub of [0, 1]) out.push({ k: "ep", p, sub });
   }
   out.push({ k: "end" });
   return out;
 }
-const GEN = { 1: "'in", 2: "'nin", 3: "'ün", 4: "'ün", 5: "'in", 6: "'nın" }; // TR genitive suffix: "Cep 6'nın"
 const SUBS = [
   { t: () => L("Return the arm to start", "Kolu başa al"), k: L("recording starts", "kayıt başlar"), btn: L("Started", "Başlattım") },
-  { t: (p) => L(`Go ~6 cm above pocket ${p.pocket}, part centred in the wrist camera, hold still`, `Cep ${p.pocket}${GEN[p.pocket]} ~6 cm üstüne git, parça bilek kamerasının ortasında, sabit tut`), k: L("inspection frame · command arrives", "muayene karesi · komut gelir"), btn: L("Above it", "Üstündeyim") },
   { t: (p) => L(`Pick it, drop into the ${BIN(p.command)} bin, return the arm to start`, `Al, ${BIN(p.command)} kasasına bırak, kolu başa al`), k: L("episode is saved", "bölüm kaydedilir"), btn: L("Dropped", "Bıraktım") },
 ];
-const LOOK_H = D.geom.inspection.look_height / 1000; // params.yaml: the wrist camera looks from this high above the part
 const N_EP = REC.picks.length;
 const N_TRAY = D.plans[PLAN].trays.length;
 const firstOpen = (REC.sess.find((s) => s.done < s.picks.length) || REC.sess[0]).n;
-const op = store.get("op4", { sess: firstOpen, at: 0 });
+const op = store.get("op5", { sess: firstOpen, at: 0 });
 if (new URLSearchParams(location.search).has("at")) op.at = +new URLSearchParams(location.search).get("at"); // test: ?at=7
 let fly = null;
 function opCur() {
@@ -604,7 +601,7 @@ function opScene(step, s) {
   const gone = trayPicks.filter((q) => q.slot < slot);
   if (step.k !== "prep") pockets.forEach((id, k) => {
     if (gone.some((q) => q.pocket === k + 1)) return;
-    if (step.k === "ep" && step.sub > 1 && step.p.pocket === k + 1) return; // in the air, see below
+    if (step.k === "ep" && step.sub > 0 && step.p.pocket === k + 1) return; // in the air, see below
     opGroup.add(placeGeneric(id, pocketPos[k], typeQuat[partById[id].type]));
   });
   const inBin = { ok: 0, reject: 0 };
@@ -613,7 +610,8 @@ function opScene(step, s) {
   if (step.k === "prep") {
     setHots([{ label: L("Tray · 6 pockets", "Tepsi · 6 cep"), pos: [0.168, 0, 0.04] }, { label: L("OK bin", "OK kasası"), pos: [0.063, -0.147, 0.06] }, { label: L("REJECT bin", "RET kasası"), pos: [0.063, 0.147, 0.06] }]);
   } else if (step.k === "tray") {
-    setHots(pockets.map((id, k) => ({ label: `${k + 1} · ${id}`, pos: [pocketPos[k][0], pocketPos[k][1], 0.07], cls: "lbl" })));
+    setHots([...pockets.map((id, k) => ({ label: `${k + 1} · ${id}`, pos: [pocketPos[k][0], pocketPos[k][1], 0.07], cls: "lbl" })),
+      { label: L("Top camera · one frame of the tray", "Üst kamera · tepsiden bir kare"), pos: [0.3, 0, 0.67] }]);
   } else if (step.k === "end") {
     setHots([]);
   } else {
@@ -624,11 +622,6 @@ function opScene(step, s) {
     if (step.sub === 0) {
       ring.visible = true;
       setHots([{ label: no, pos: [pp[0], pp[1], 0.075], cls: "lbl" }]);
-    } else if (step.sub === 1) {
-      // the wrist camera looks straight down at the part from LOOK_H; the part stays in its pocket
-      ring.visible = true;
-      drawArrow(new THREE.LineCurve3(V([pp[0], pp[1], pp[2] + LOOK_H]), V([pp[0], pp[1], pp[2] + 0.008])));
-      setHots([{ label: L("Wrist camera looks · inspection", "Bilek kamerası bakar · muayene"), pos: [pp[0], pp[1], pp[2] + LOOK_H + 0.02], cls: "lbl" }]);
     } else {
       const curve = flight(pp, dest, 0.09);
       drawArrow(curve);
@@ -651,7 +644,7 @@ function opCtx() {
   const cmd = `uv run flywheel-robot record --session ${op.sess}`;
   const next = REC.sess[op.sess];
   const now = step.k === "ep" ? { n: step.sub, t: SUBS[step.sub].t(p), k: SUBS[step.sub].k, go: SUBS[step.sub].btn }
-    : step.k === "tray" ? { t: L("Empty the tray, lay the 6 parts in the pockets", "Tepsiyi boşalt, 6 parçayı ceplere diz"), k: L("tray ready", "dizilim hazır"), go: L("Laid out", "Dizdim") }
+    : step.k === "tray" ? { t: L("Empty the tray, lay the 6 parts in the pockets, arm at start", "Tepsiyi boşalt, 6 parçayı ceplere diz, kol başta"), k: L("top camera keeps a frame of the tray", "üst kamera tepsinin karesini saklar"), go: L("Laid out", "Dizdim") }
     : step.k === "prep" ? { go: L("Start", "Başla") }
     : { go: next ? `${L("Session", "Seans")} ${next.n}` : L("Go to training", "Eğitime geç") };
   // last episode counted as "passed" in the matrix: everything before the current step in this session
@@ -674,7 +667,7 @@ const ui = {
       <div class="tm-grid">${[4, 5, 6, 1, 2, 3].map((n) => `<div class="tm-c${c.p && c.p.pocket === n ? " hl" : ""}${c.gone.has(n) ? " gone" : ""}"><b>${n}</b>${codes ? `<code>${ids[n - 1]}</code>` : ""}</div>`).join("")}</div>
       <div class="tm-bin ok${c.p && c.p.command === "ok" ? " on" : ""}">OK</div></div>`;
   },
-  stepper: (c) => `<div class="stepper">${L(["Start", "Show", "Drop"], ["Başlat", "Göster", "Bırak"]).map((t, i) => `<div class="${i < c.now.n ? "d" : i === c.now.n ? "c" : ""}"><i></i><span>${t}</span></div>`).join("")}</div>`,
+  stepper: (c) => `<div class="stepper">${L(["Start", "Drop"], ["Başlat", "Bırak"]).map((t, i) => `<div class="${i < c.now.n ? "d" : i === c.now.n ? "c" : ""}"><i></i><span>${t}</span></div>`).join("")}</div>`,
   now: (c) => `<div class="a-now"><span class="lbl">${L("Now", "Şimdi")}</span><b>${c.now.t}</b><span class="k"><kbd>→</kbd> ${c.now.k}</span></div>`,
   chips: (c) => `<div class="chips">${c.ps.map((q) => {
     const cls = REC.done.has(q.index) ? "rec" : c.p && q.index === c.p.index ? "c" : c.gone.has(q.pocket) ? "d" : "";
@@ -728,7 +721,7 @@ function panelHTML(c) {
 let lastKey = "";
 function opRender() {
   const c = opCtx();
-  store.set("op4", op);
+  store.set("op5", op);
   opScene(c.step, c.s);
   const el = $("#op");
   const key = `${op.sess}:${op.at}`;
@@ -771,8 +764,8 @@ function loopSteps(v) {
   if (v === 0) return [
     { t: L("Episodes", "Bölümler"), who: you, d: L(`${N_EP} episodes via teleop: ${REC.sess.length} sessions × 5 trays × 6 parts. Each part once into the correct bin, once into the opposite one.`,
       `Teleop ile ${N_EP} bölüm: ${REC.sess.length} seans × 5 dizilim × 6 parça. Her parça bir kez doğru, bir kez ters kasaya.`), prog: `${n}/${N_EP}`, state: rec ? "done" : "cur", mx: true, act: [L("Go to the recording screen", "Kayıt ekranına git"), "recording"] },
-    { t: "Dataset", who: auto, d: L(`Uploaded as private at the end of each session: ${REC.R.repo}. LeRobot v3, 30 fps, top + wrist camera, joint angles and the [ok, reject] command.`,
-      `Her seans sonunda private yüklenir: ${REC.R.repo}. LeRobot v3, 30 fps, üst + bilek kamera, eklem açıları ve [ok, reject] komutu.`), prog: `${n}/${N_EP}`, state: rec ? "done" : n ? "cur" : "todo", link: `https://huggingface.co/datasets/${REC.R.repo}` },
+    { t: "Dataset", who: auto, d: L(`Uploaded as private at the end of each session: ${REC.R.repo}. LeRobot v3, 30 fps, top + wrist camera, joint angles and the command: pocket + [ok, reject]. The top camera's tray frames go along for inspection.`,
+      `Her seans sonunda private yüklenir: ${REC.R.repo}. LeRobot v3, 30 fps, üst + bilek kamera, eklem açıları ve komut: cep + [ok, reject]. Üst kameranın tepsi kareleri muayene için yanında.`), prog: `${n}/${N_EP}`, state: rec ? "done" : n ? "cur" : "todo", link: `https://huggingface.co/datasets/${REC.R.repo}` },
     { t: train, who: one, d: L("ACT policy. Image + joints + command → a 100-step action chunk. The model is private too: ", "ACT policy. Görüntü + eklemler + komut → 100 adımlık hareket parçası. Model de private: ") + `${REC.R.repo}-act-v0.`, state: rec ? "cur" : "todo", cmd: trainCmd("v0") },
     { t: evalT, who: auto, d: L("16 never-seen parts × 2 commands = 32 trials. Same plan every round; success, command following and grasping are counted separately.",
       "Hiç görmediği 16 parça × 2 komut = 32 deneme. Her turda aynı plan; başarı, komuta uyma ve kavrama ayrı sayılır."), state: "todo", note: L("no eval script yet", "eval betiği henüz yok") },
@@ -824,7 +817,7 @@ const INTRO = [
       ["Work order: white / orange", "Variant from the MES: finish, color, customer"],
       ["OK bin", "Shipping bin"],
       ["REJECT bin", "Scrap or rework"],
-      ["Wrist camera, looks before it picks", "Eye-in-hand inspection camera"],
+      ["Top camera, inspects the whole tray at once", "Fixed inspection camera over the station"],
       ["SO-101 + leader arm", "Cobot and the operator showing it the motion"],
     ], [
       ["Tepsi, 6 cep", "Hat sonu fikstürü ya da konveyör çıkışı"],
@@ -833,7 +826,7 @@ const INTRO = [
       ["İş emri: beyaz / turuncu", "MES'ten gelen varyant: kaplama, renk, müşteri"],
       ["OK kasası", "Sevkiyat kasası"],
       ["RET kasası", "Hurda ya da yeniden işleme (rework)"],
-      ["Bilek kamerası, almadan önce bakar", "Kolun üstündeki muayene kamerası (eye-in-hand)"],
+      ["Üst kamera, tepsinin tamamını bir kerede muayene eder", "İstasyonun üstündeki sabit muayene kamerası"],
       ["SO-101 + leader kol", "Cobot ve ona hareketi gösteren operatör"],
     ]).map(([a, b]) => `<div><span>${a}</span><i></i><b>${b}</b></div>`).join("")}</div>`,
     pos: W(-0.62, -0.62, 0.66), target: W(0.12, 0.02, -0.02),
@@ -856,7 +849,7 @@ const INTRO = [
       ["Varyant değişince istasyon yeniden ayarlanır.", "OK/RET kararı iş emrine bağlı bir kuraldır; renk değişince model yeniden eğitilmez."],
       ["Model bir kez eğitilir, hataları birikir.", "Başarısız denemeler yeni veriye dönüşür; her tur aynı testle ölçülür."],
     ]).map(([a, b]) => `<div><span>${a}</span><b>${b}</b></div>`).join("")}</div>`,
-    pos: W(-0.46, -0.52, 0.44), target: W(0.13, 0.02, 0.05), hots: [{ label: L("The wrist camera looks at the part before picking it", "Bilek kamerası parçaya almadan önce bakar"), pos: [0.168, 0, 0.1], cls: "lbl" }] },
+    pos: W(-0.46, -0.52, 0.44), target: W(0.13, 0.02, 0.05), hots: [{ label: L("The top camera inspects the tray before the first pick", "Üst kamera ilk parçadan önce tepsiyi muayene eder"), pos: [0.168, 0, 0.1], cls: "lbl" }] },
   { k: L("How it loops", "Nasıl dönüyor"), h: L("A loop that learns from its own mistakes", "Kendi hatasından öğrenen döngü"),
     body: `<div class="in-loop">${L([["Show", "operator records 120 episodes"], ["Record", "dataset to Hugging Face as private"], ["Train", "ACT policy"], ["Measure", "32 trials on never-seen parts"], ["Fix", "failures become new episodes"]],
       [["Göster", "operatör 120 bölüm kaydeder"], ["Kaydet", "dataset private olarak Hugging Face'e"], ["Eğit", "ACT policy"], ["Ölç", "hiç görmediği 32 deneme"], ["Düzelt", "hatalar yeni bölüm olur"]])

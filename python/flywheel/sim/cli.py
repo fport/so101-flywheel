@@ -11,7 +11,7 @@ import numpy as np
 from .env import FPS, QCSortSim
 from .params import CATALOG_JSON, REPO_ROOT, SCENE_XML
 from .parts import TYPE_NAMES, VARIANTS, load_catalog
-from .plan import TASK, build_plan, to_markdown
+from .plan import build_plan, task, to_markdown
 from .scene import DEFAULT_PARTS, JOINTS, build_scene
 from .scripted import ScriptedSorter
 
@@ -60,12 +60,14 @@ class Recorder:
 
 def run_episode(env, pid, commanded_bin, out, run_id, video, probe=False, name=None):
     rec = Recorder(video=video)
+    pocket = env.pocket_of(pid)
     env.frame = 0
     outcome = ScriptedSorter(env, on_frame=rec).run(pid, commanded_bin, probe=probe)
     meta = {
         "run_id": run_id,
         "policy_version": POLICY_VERSION,
-        "task": TASK[outcome["commanded_bin"]],
+        "task": task(pocket, outcome["commanded_bin"]),
+        "pocket": pocket,
         "frames": len(rec.states),
         "fps": FPS,
         **outcome,
@@ -189,7 +191,7 @@ def main(argv=None):
     add("view", cmd_view, "interactive MuJoCo viewer")
     sp = add("render", cmd_render, "save a single frame from the top + wrist camera")
     sp.add_argument("--out", default=str(Path(default_out) / "scene.png"))
-    sp = add("episode", cmd_episode, "scripted look -> pick -> drop episode for one part")
+    sp = add("episode", cmd_episode, "scripted pick -> drop episode for one part")
     sp.add_argument("--part", help="part ID (default: first part in the tray)")
     sp.add_argument("--bin", choices=["ok", "reject"], help="target bin (default: correct bin per the work order)")
     sp.add_argument("--order", choices=list(VARIANTS), default="W", help="variant in the work order")

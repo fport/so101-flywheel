@@ -23,7 +23,7 @@ HEAD_TINT = {"cad_mast_head": [0.42, 0.43, 0.46, 1], "cad_cam_cradle": [0.68, 0.
 # (file, title, camera): camera is either the name of a scene camera or (lookat, distance, azimuth, elevation)
 VIEWS = [
     ("overview", "Overview", ([0.15, 0.0, 0.27], 1.30, 52, -17)),
-    ("workspace", "Workspace: the arm shows the part to the top camera", ([0.12, 0.0, 0.06], 0.66, 48, -34)),
+    ("workspace", "Workspace: the arm lifts a part out of its pocket", ([0.12, 0.0, 0.06], 0.66, 48, -34)),
     ("side", "Side: 66 cm mast, camera above the tray", ([0.15, 0.0, 0.31], 1.30, 90, -3)),
     ("head-closeup", "Camera head (light colored for visibility; blue: camera)", ([0.27, 0.0, 0.645], 0.36, 235, -6)),
     ("top-camera", "Top camera view", "top"),
@@ -86,18 +86,16 @@ def render_showcase(out_dir, tray=("J-W-01", "D-T-04", "L-W-07", "B-T-01", "J-T-
     out_dir.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory() as tmp:
         env = QCSortSim(list(tray), params=p, seed=3, decorate=cad_visuals(build_all(p), tmp))
-    # two parts go to the bins, the third is caught in the inspection pose
+    # two parts go to the bins, the third is caught lifted above the tray
     for pid in tray[:2]:
         ScriptedSorter(env).run(pid)
     snap = {}
 
     def grab(e, phase, action):
-        if phase == "inspect":
-            snap["n"] = snap.get("n", 0) + 1
-            if snap["n"] == 45:  # after reaching the pose and settling
-                snap["state"] = (e.data.qpos.copy(), e.data.qvel.copy(), e.data.ctrl.copy())
+        if phase == "lift":  # the last lift frame: part held clear of its pocket
+            snap["state"] = (e.data.qpos.copy(), e.data.qvel.copy(), e.data.ctrl.copy())
 
-    ScriptedSorter(env, on_frame=grab, ).run(tray[2], inspect_seconds=2.0)
+    ScriptedSorter(env, on_frame=grab).run(tray[2])
     env.data.qpos[:], env.data.qvel[:], env.data.ctrl[:] = snap["state"]
     mujoco.mj_forward(env.model, env.data)
 

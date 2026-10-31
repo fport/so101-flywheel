@@ -17,12 +17,12 @@ There is one tray; a tray means laying 6 parts in it and picking them in order. 
 
 | Episode | Pocket | Part | Command | Probe |
 | --- | --- | --- | --- | --- |
-| 1 | 6 | `D-W-06` | put the part in the REJECT bin |  |
-| 2 | 2 | `B-W-07` | put the part in the REJECT bin |  |
-| 3 | 5 | `D-W-02` | put the part in the REJECT bin | yes |
-| 4 | 1 | `L-T-02` | put the part in the OK bin | yes |
-| 5 | 4 | `J-W-06` | put the part in the REJECT bin |  |
-| 6 | 3 | `J-W-08` | put the part in the REJECT bin |  |
+| 1 | 6 | `D-W-06` | put the part from pocket 6 in the REJECT bin |  |
+| 2 | 2 | `B-W-07` | put the part from pocket 2 in the REJECT bin |  |
+| 3 | 5 | `D-W-02` | put the part from pocket 5 in the REJECT bin | yes |
+| 4 | 1 | `L-T-02` | put the part from pocket 1 in the OK bin | yes |
+| 5 | 4 | `J-W-06` | put the part from pocket 4 in the REJECT bin |  |
+| 6 | 3 | `J-W-08` | put the part from pocket 3 in the REJECT bin |  |
 
 ## Tray 2
 
@@ -37,12 +37,12 @@ There is one tray; a tray means laying 6 parts in it and picking them in order. 
 
 | Episode | Pocket | Part | Command | Probe |
 | --- | --- | --- | --- | --- |
-| 7 | 1 | `L-T-06` | put the part in the OK bin | yes |
-| 8 | 3 | `B-T-03` | put the part in the REJECT bin |  |
-| 9 | 2 | `J-T-06` | put the part in the OK bin | yes |
-| 10 | 5 | `B-W-02` | put the part in the OK bin |  |
-| 11 | 4 | `D-T-07` | put the part in the OK bin | yes |
-| 12 | 6 | `L-W-08` | put the part in the REJECT bin |  |
+| 7 | 1 | `L-T-06` | put the part from pocket 1 in the OK bin | yes |
+| 8 | 3 | `B-T-03` | put the part from pocket 3 in the REJECT bin |  |
+| 9 | 2 | `J-T-06` | put the part from pocket 2 in the OK bin | yes |
+| 10 | 5 | `B-W-02` | put the part from pocket 5 in the OK bin |  |
+| 11 | 4 | `D-T-07` | put the part from pocket 4 in the OK bin | yes |
+| 12 | 6 | `L-W-08` | put the part from pocket 6 in the REJECT bin |  |
 
 ## Tray 3
 
@@ -57,12 +57,12 @@ There is one tray; a tray means laying 6 parts in it and picking them in order. 
 
 | Episode | Pocket | Part | Command | Probe |
 | --- | --- | --- | --- | --- |
-| 13 | 6 | `J-T-03` | put the part in the OK bin | yes |
-| 14 | 5 | `J-T-04` | put the part in the OK bin | yes |
-| 15 | 2 | `B-W-03` | put the part in the OK bin |  |
-| 16 | 1 | `B-W-08` | put the part in the REJECT bin |  |
-| 17 | 4 | `B-T-01` | put the part in the REJECT bin |  |
-| 18 | 3 | `J-T-01` | put the part in the REJECT bin |  |
+| 13 | 6 | `J-T-03` | put the part from pocket 6 in the OK bin | yes |
+| 14 | 5 | `J-T-04` | put the part from pocket 5 in the OK bin | yes |
+| 15 | 2 | `B-W-03` | put the part from pocket 2 in the OK bin |  |
+| 16 | 1 | `B-W-08` | put the part from pocket 1 in the REJECT bin |  |
+| 17 | 4 | `B-T-01` | put the part from pocket 4 in the REJECT bin |  |
+| 18 | 3 | `J-T-01` | put the part from pocket 3 in the REJECT bin |  |
 
 ## Tray 4
 
@@ -77,12 +77,12 @@ There is one tray; a tray means laying 6 parts in it and picking them in order. 
 
 | Episode | Pocket | Part | Command | Probe |
 | --- | --- | --- | --- | --- |
-| 19 | 3 | `D-T-05` | put the part in the REJECT bin |  |
-| 20 | 5 | `J-T-02` | put the part in the OK bin | yes |
-| 21 | 2 | `D-W-08` | put the part in the OK bin | yes |
-| 22 | 4 | `D-W-05` | put the part in the OK bin | yes |
-| 23 | 1 | `B-W-04` | put the part in the REJECT bin | yes |
-| 24 | 6 | `D-T-01` | put the part in the REJECT bin |  |
+| 19 | 3 | `D-T-05` | put the part from pocket 3 in the REJECT bin |  |
+| 20 | 5 | `J-T-02` | put the part from pocket 5 in the OK bin | yes |
+| 21 | 2 | `D-W-08` | put the part from pocket 2 in the OK bin | yes |
+| 22 | 4 | `D-W-05` | put the part from pocket 4 in the OK bin | yes |
+| 23 | 1 | `B-W-04` | put the part from pocket 1 in the REJECT bin | yes |
+| 24 | 6 | `D-T-01` | put the part from pocket 6 in the REJECT bin |  |
 
 ## Tray 5
 
@@ -97,12 +97,12 @@ There is one tray; a tray means laying 6 parts in it and picking them in order. 
 
 | Episode | Pocket | Part | Command | Probe |
 | --- | --- | --- | --- | --- |
-| 25 | 1 | `J-T-07` | put the part in the OK bin | yes |
-| 26 | 2 | `L-W-04` | put the part in the OK bin |  |
-| 27 | 5 | `B-T-04` | put the part in the REJECT bin |  |
-| 28 | 3 | `J-W-05` | put the part in the REJECT bin |  |
-| 29 | 6 | `L-W-06` | put the part in the OK bin | yes |
-| 30 | 4 | `B-T-07` | put the part in the REJECT bin |  |
+| 25 | 1 | `J-T-07` | put the part from pocket 1 in the OK bin | yes |
+| 26 | 2 | `L-W-04` | put the part from pocket 2 in the OK bin |  |
+| 27 | 5 | `B-T-04` | put the part from pocket 5 in the REJECT bin |  |
+| 28 | 3 | `J-W-05` | put the part from pocket 3 in the REJECT bin |  |
+| 29 | 6 | `L-W-06` | put the part from pocket 6 in the OK bin | yes |
+| 30 | 4 | `B-T-07` | put the part from pocket 4 in the REJECT bin |  |
 
 ## Tray 6
 
@@ -117,12 +117,12 @@ There is one tray; a tray means laying 6 parts in it and picking them in order. 
 
 | Episode | Pocket | Part | Command | Probe |
 | --- | --- | --- | --- | --- |
-| 31 | 4 | `L-W-01` | put the part in the REJECT bin | yes |
-| 32 | 6 | `L-T-07` | put the part in the OK bin | yes |
-| 33 | 5 | `L-T-05` | put the part in the OK bin | yes |
-| 34 | 1 | `D-T-03` | put the part in the OK bin | yes |
-| 35 | 3 | `B-W-05` | put the part in the REJECT bin |  |
-| 36 | 2 | `B-T-02` | put the part in the REJECT bin |  |
+| 31 | 4 | `L-W-01` | put the part from pocket 4 in the REJECT bin | yes |
+| 32 | 6 | `L-T-07` | put the part from pocket 6 in the OK bin | yes |
+| 33 | 5 | `L-T-05` | put the part from pocket 5 in the OK bin | yes |
+| 34 | 1 | `D-T-03` | put the part from pocket 1 in the OK bin | yes |
+| 35 | 3 | `B-W-05` | put the part from pocket 3 in the REJECT bin |  |
+| 36 | 2 | `B-T-02` | put the part from pocket 2 in the REJECT bin |  |
 
 ## Tray 7
 
@@ -137,12 +137,12 @@ There is one tray; a tray means laying 6 parts in it and picking them in order. 
 
 | Episode | Pocket | Part | Command | Probe |
 | --- | --- | --- | --- | --- |
-| 37 | 3 | `D-T-04` | put the part in the OK bin | yes |
-| 38 | 2 | `J-W-03` | put the part in the REJECT bin | yes |
-| 39 | 6 | `B-W-01` | put the part in the REJECT bin | yes |
-| 40 | 5 | `B-T-05` | put the part in the REJECT bin |  |
-| 41 | 1 | `L-W-07` | put the part in the REJECT bin |  |
-| 42 | 4 | `D-W-01` | put the part in the REJECT bin | yes |
+| 37 | 3 | `D-T-04` | put the part from pocket 3 in the OK bin | yes |
+| 38 | 2 | `J-W-03` | put the part from pocket 2 in the REJECT bin | yes |
+| 39 | 6 | `B-W-01` | put the part from pocket 6 in the REJECT bin | yes |
+| 40 | 5 | `B-T-05` | put the part from pocket 5 in the REJECT bin |  |
+| 41 | 1 | `L-W-07` | put the part from pocket 1 in the REJECT bin |  |
+| 42 | 4 | `D-W-01` | put the part from pocket 4 in the REJECT bin | yes |
 
 ## Tray 8
 
@@ -157,12 +157,12 @@ There is one tray; a tray means laying 6 parts in it and picking them in order. 
 
 | Episode | Pocket | Part | Command | Probe |
 | --- | --- | --- | --- | --- |
-| 43 | 3 | `B-W-06` | put the part in the OK bin | yes |
-| 44 | 5 | `J-T-05` | put the part in the OK bin | yes |
-| 45 | 2 | `L-W-02` | put the part in the REJECT bin | yes |
-| 46 | 4 | `D-T-06` | put the part in the OK bin | yes |
-| 47 | 1 | `B-T-06` | put the part in the REJECT bin |  |
-| 48 | 6 | `D-W-03` | put the part in the REJECT bin | yes |
+| 43 | 3 | `B-W-06` | put the part from pocket 3 in the OK bin | yes |
+| 44 | 5 | `J-T-05` | put the part from pocket 5 in the OK bin | yes |
+| 45 | 2 | `L-W-02` | put the part from pocket 2 in the REJECT bin | yes |
+| 46 | 4 | `D-T-06` | put the part from pocket 4 in the OK bin | yes |
+| 47 | 1 | `B-T-06` | put the part from pocket 1 in the REJECT bin |  |
+| 48 | 6 | `D-W-03` | put the part from pocket 6 in the REJECT bin | yes |
 
 ## Tray 9
 
@@ -177,12 +177,12 @@ There is one tray; a tray means laying 6 parts in it and picking them in order. 
 
 | Episode | Pocket | Part | Command | Probe |
 | --- | --- | --- | --- | --- |
-| 49 | 1 | `L-T-04` | put the part in the REJECT bin |  |
-| 50 | 6 | `J-W-02` | put the part in the REJECT bin | yes |
-| 51 | 3 | `J-W-04` | put the part in the OK bin |  |
-| 52 | 4 | `L-T-03` | put the part in the OK bin | yes |
-| 53 | 2 | `D-W-04` | put the part in the REJECT bin | yes |
-| 54 | 5 | `J-W-07` | put the part in the REJECT bin |  |
+| 49 | 1 | `L-T-04` | put the part from pocket 1 in the REJECT bin |  |
+| 50 | 6 | `J-W-02` | put the part from pocket 6 in the REJECT bin | yes |
+| 51 | 3 | `J-W-04` | put the part from pocket 3 in the OK bin |  |
+| 52 | 4 | `L-T-03` | put the part from pocket 4 in the OK bin | yes |
+| 53 | 2 | `D-W-04` | put the part from pocket 2 in the REJECT bin | yes |
+| 54 | 5 | `J-W-07` | put the part from pocket 5 in the REJECT bin |  |
 
 ## Tray 10
 
@@ -197,12 +197,12 @@ There is one tray; a tray means laying 6 parts in it and picking them in order. 
 
 | Episode | Pocket | Part | Command | Probe |
 | --- | --- | --- | --- | --- |
-| 55 | 2 | `D-T-02` | put the part in the REJECT bin |  |
-| 56 | 3 | `J-W-01` | put the part in the REJECT bin | yes |
-| 57 | 6 | `L-W-03` | put the part in the REJECT bin | yes |
-| 58 | 1 | `L-W-05` | put the part in the OK bin | yes |
-| 59 | 4 | `D-W-07` | put the part in the OK bin | yes |
-| 60 | 5 | `L-T-01` | put the part in the OK bin | yes |
+| 55 | 2 | `D-T-02` | put the part from pocket 2 in the REJECT bin |  |
+| 56 | 3 | `J-W-01` | put the part from pocket 3 in the REJECT bin | yes |
+| 57 | 6 | `L-W-03` | put the part from pocket 6 in the REJECT bin | yes |
+| 58 | 1 | `L-W-05` | put the part from pocket 1 in the OK bin | yes |
+| 59 | 4 | `D-W-07` | put the part from pocket 4 in the OK bin | yes |
+| 60 | 5 | `L-T-01` | put the part from pocket 5 in the OK bin | yes |
 
 ## Tray 11
 
@@ -217,12 +217,12 @@ There is one tray; a tray means laying 6 parts in it and picking them in order. 
 
 | Episode | Pocket | Part | Command | Probe |
 | --- | --- | --- | --- | --- |
-| 61 | 1 | `L-W-03` | put the part in the OK bin |  |
-| 62 | 6 | `D-W-05` | put the part in the REJECT bin |  |
-| 63 | 5 | `B-T-06` | put the part in the OK bin | yes |
-| 64 | 3 | `L-W-02` | put the part in the OK bin |  |
-| 65 | 2 | `D-T-05` | put the part in the OK bin | yes |
-| 66 | 4 | `D-W-02` | put the part in the OK bin |  |
+| 61 | 1 | `L-W-03` | put the part from pocket 1 in the OK bin |  |
+| 62 | 6 | `D-W-05` | put the part from pocket 6 in the REJECT bin |  |
+| 63 | 5 | `B-T-06` | put the part from pocket 5 in the OK bin | yes |
+| 64 | 3 | `L-W-02` | put the part from pocket 3 in the OK bin |  |
+| 65 | 2 | `D-T-05` | put the part from pocket 2 in the OK bin | yes |
+| 66 | 4 | `D-W-02` | put the part from pocket 4 in the OK bin |  |
 
 ## Tray 12
 
@@ -237,12 +237,12 @@ There is one tray; a tray means laying 6 parts in it and picking them in order. 
 
 | Episode | Pocket | Part | Command | Probe |
 | --- | --- | --- | --- | --- |
-| 67 | 5 | `J-W-01` | put the part in the OK bin |  |
-| 68 | 2 | `D-T-03` | put the part in the REJECT bin |  |
-| 69 | 6 | `J-T-07` | put the part in the REJECT bin |  |
-| 70 | 4 | `D-W-08` | put the part in the REJECT bin |  |
-| 71 | 3 | `L-T-06` | put the part in the REJECT bin |  |
-| 72 | 1 | `B-T-05` | put the part in the OK bin | yes |
+| 67 | 5 | `J-W-01` | put the part from pocket 5 in the OK bin |  |
+| 68 | 2 | `D-T-03` | put the part from pocket 2 in the REJECT bin |  |
+| 69 | 6 | `J-T-07` | put the part from pocket 6 in the REJECT bin |  |
+| 70 | 4 | `D-W-08` | put the part from pocket 4 in the REJECT bin |  |
+| 71 | 3 | `L-T-06` | put the part from pocket 3 in the REJECT bin |  |
+| 72 | 1 | `B-T-05` | put the part from pocket 1 in the OK bin | yes |
 
 ## Tray 13
 
@@ -257,12 +257,12 @@ There is one tray; a tray means laying 6 parts in it and picking them in order. 
 
 | Episode | Pocket | Part | Command | Probe |
 | --- | --- | --- | --- | --- |
-| 73 | 2 | `B-T-01` | put the part in the OK bin | yes |
-| 74 | 1 | `B-T-07` | put the part in the OK bin | yes |
-| 75 | 3 | `J-W-02` | put the part in the OK bin |  |
-| 76 | 5 | `D-W-06` | put the part in the OK bin | yes |
-| 77 | 4 | `J-T-03` | put the part in the REJECT bin |  |
-| 78 | 6 | `L-W-01` | put the part in the OK bin |  |
+| 73 | 2 | `B-T-01` | put the part from pocket 2 in the OK bin | yes |
+| 74 | 1 | `B-T-07` | put the part from pocket 1 in the OK bin | yes |
+| 75 | 3 | `J-W-02` | put the part from pocket 3 in the OK bin |  |
+| 76 | 5 | `D-W-06` | put the part from pocket 5 in the OK bin | yes |
+| 77 | 4 | `J-T-03` | put the part from pocket 4 in the REJECT bin |  |
+| 78 | 6 | `L-W-01` | put the part from pocket 6 in the OK bin |  |
 
 ## Tray 14
 
@@ -277,12 +277,12 @@ There is one tray; a tray means laying 6 parts in it and picking them in order. 
 
 | Episode | Pocket | Part | Command | Probe |
 | --- | --- | --- | --- | --- |
-| 79 | 1 | `J-W-08` | put the part in the OK bin | yes |
-| 80 | 5 | `D-W-01` | put the part in the OK bin |  |
-| 81 | 2 | `D-W-03` | put the part in the OK bin |  |
-| 82 | 4 | `J-W-07` | put the part in the OK bin | yes |
-| 83 | 6 | `D-T-04` | put the part in the REJECT bin |  |
-| 84 | 3 | `L-T-04` | put the part in the OK bin | yes |
+| 79 | 1 | `J-W-08` | put the part from pocket 1 in the OK bin | yes |
+| 80 | 5 | `D-W-01` | put the part from pocket 5 in the OK bin |  |
+| 81 | 2 | `D-W-03` | put the part from pocket 2 in the OK bin |  |
+| 82 | 4 | `J-W-07` | put the part from pocket 4 in the OK bin | yes |
+| 83 | 6 | `D-T-04` | put the part from pocket 6 in the REJECT bin |  |
+| 84 | 3 | `L-T-04` | put the part from pocket 3 in the OK bin | yes |
 
 ## Tray 15
 
@@ -297,12 +297,12 @@ There is one tray; a tray means laying 6 parts in it and picking them in order. 
 
 | Episode | Pocket | Part | Command | Probe |
 | --- | --- | --- | --- | --- |
-| 85 | 5 | `B-T-02` | put the part in the OK bin | yes |
-| 86 | 2 | `J-T-04` | put the part in the REJECT bin |  |
-| 87 | 1 | `L-T-07` | put the part in the REJECT bin |  |
-| 88 | 4 | `D-W-04` | put the part in the OK bin |  |
-| 89 | 6 | `L-T-01` | put the part in the REJECT bin |  |
-| 90 | 3 | `D-T-01` | put the part in the OK bin | yes |
+| 85 | 5 | `B-T-02` | put the part from pocket 5 in the OK bin | yes |
+| 86 | 2 | `J-T-04` | put the part from pocket 2 in the REJECT bin |  |
+| 87 | 1 | `L-T-07` | put the part from pocket 1 in the REJECT bin |  |
+| 88 | 4 | `D-W-04` | put the part from pocket 4 in the OK bin |  |
+| 89 | 6 | `L-T-01` | put the part from pocket 6 in the REJECT bin |  |
+| 90 | 3 | `D-T-01` | put the part from pocket 3 in the OK bin | yes |
 
 ## Tray 16
 
@@ -317,12 +317,12 @@ There is one tray; a tray means laying 6 parts in it and picking them in order. 
 
 | Episode | Pocket | Part | Command | Probe |
 | --- | --- | --- | --- | --- |
-| 91 | 3 | `B-W-04` | put the part in the OK bin |  |
-| 92 | 5 | `D-T-07` | put the part in the REJECT bin |  |
-| 93 | 4 | `B-T-03` | put the part in the OK bin | yes |
-| 94 | 2 | `B-T-04` | put the part in the OK bin | yes |
-| 95 | 1 | `B-W-07` | put the part in the OK bin | yes |
-| 96 | 6 | `L-W-05` | put the part in the REJECT bin |  |
+| 91 | 3 | `B-W-04` | put the part from pocket 3 in the OK bin |  |
+| 92 | 5 | `D-T-07` | put the part from pocket 5 in the REJECT bin |  |
+| 93 | 4 | `B-T-03` | put the part from pocket 4 in the OK bin | yes |
+| 94 | 2 | `B-T-04` | put the part from pocket 2 in the OK bin | yes |
+| 95 | 1 | `B-W-07` | put the part from pocket 1 in the OK bin | yes |
+| 96 | 6 | `L-W-05` | put the part from pocket 6 in the REJECT bin |  |
 
 ## Tray 17
 
@@ -337,12 +337,12 @@ There is one tray; a tray means laying 6 parts in it and picking them in order. 
 
 | Episode | Pocket | Part | Command | Probe |
 | --- | --- | --- | --- | --- |
-| 97 | 6 | `L-T-02` | put the part in the REJECT bin |  |
-| 98 | 2 | `L-T-03` | put the part in the REJECT bin |  |
-| 99 | 5 | `B-W-01` | put the part in the OK bin |  |
-| 100 | 1 | `J-W-06` | put the part in the OK bin | yes |
-| 101 | 3 | `D-T-02` | put the part in the OK bin | yes |
-| 102 | 4 | `L-W-06` | put the part in the REJECT bin |  |
+| 97 | 6 | `L-T-02` | put the part from pocket 6 in the REJECT bin |  |
+| 98 | 2 | `L-T-03` | put the part from pocket 2 in the REJECT bin |  |
+| 99 | 5 | `B-W-01` | put the part from pocket 5 in the OK bin |  |
+| 100 | 1 | `J-W-06` | put the part from pocket 1 in the OK bin | yes |
+| 101 | 3 | `D-T-02` | put the part from pocket 3 in the OK bin | yes |
+| 102 | 4 | `L-W-06` | put the part from pocket 4 in the REJECT bin |  |
 
 ## Tray 18
 
@@ -357,12 +357,12 @@ There is one tray; a tray means laying 6 parts in it and picking them in order. 
 
 | Episode | Pocket | Part | Command | Probe |
 | --- | --- | --- | --- | --- |
-| 103 | 5 | `J-T-01` | put the part in the OK bin | yes |
-| 104 | 1 | `J-W-04` | put the part in the REJECT bin | yes |
-| 105 | 3 | `J-T-05` | put the part in the REJECT bin |  |
-| 106 | 2 | `B-W-08` | put the part in the OK bin | yes |
-| 107 | 4 | `B-W-05` | put the part in the OK bin | yes |
-| 108 | 6 | `B-W-03` | put the part in the REJECT bin | yes |
+| 103 | 5 | `J-T-01` | put the part from pocket 5 in the OK bin | yes |
+| 104 | 1 | `J-W-04` | put the part from pocket 1 in the REJECT bin | yes |
+| 105 | 3 | `J-T-05` | put the part from pocket 3 in the REJECT bin |  |
+| 106 | 2 | `B-W-08` | put the part from pocket 2 in the OK bin | yes |
+| 107 | 4 | `B-W-05` | put the part from pocket 4 in the OK bin | yes |
+| 108 | 6 | `B-W-03` | put the part from pocket 6 in the REJECT bin | yes |
 
 ## Tray 19
 
@@ -377,12 +377,12 @@ There is one tray; a tray means laying 6 parts in it and picking them in order. 
 
 | Episode | Pocket | Part | Command | Probe |
 | --- | --- | --- | --- | --- |
-| 109 | 4 | `B-W-02` | put the part in the REJECT bin | yes |
-| 110 | 6 | `L-W-07` | put the part in the OK bin | yes |
-| 111 | 2 | `D-T-06` | put the part in the REJECT bin |  |
-| 112 | 1 | `J-T-02` | put the part in the REJECT bin |  |
-| 113 | 5 | `J-T-06` | put the part in the REJECT bin |  |
-| 114 | 3 | `D-W-07` | put the part in the REJECT bin |  |
+| 109 | 4 | `B-W-02` | put the part from pocket 4 in the REJECT bin | yes |
+| 110 | 6 | `L-W-07` | put the part from pocket 6 in the OK bin | yes |
+| 111 | 2 | `D-T-06` | put the part from pocket 2 in the REJECT bin |  |
+| 112 | 1 | `J-T-02` | put the part from pocket 1 in the REJECT bin |  |
+| 113 | 5 | `J-T-06` | put the part from pocket 5 in the REJECT bin |  |
+| 114 | 3 | `D-W-07` | put the part from pocket 3 in the REJECT bin |  |
 
 ## Tray 20
 
@@ -397,9 +397,9 @@ There is one tray; a tray means laying 6 parts in it and picking them in order. 
 
 | Episode | Pocket | Part | Command | Probe |
 | --- | --- | --- | --- | --- |
-| 115 | 6 | `L-T-05` | put the part in the REJECT bin |  |
-| 116 | 5 | `L-W-04` | put the part in the REJECT bin | yes |
-| 117 | 1 | `J-W-03` | put the part in the OK bin |  |
-| 118 | 4 | `B-W-06` | put the part in the REJECT bin |  |
-| 119 | 2 | `J-W-05` | put the part in the OK bin | yes |
-| 120 | 3 | `L-W-08` | put the part in the OK bin | yes |
+| 115 | 6 | `L-T-05` | put the part from pocket 6 in the REJECT bin |  |
+| 116 | 5 | `L-W-04` | put the part from pocket 5 in the REJECT bin | yes |
+| 117 | 1 | `J-W-03` | put the part from pocket 1 in the OK bin |  |
+| 118 | 4 | `B-W-06` | put the part from pocket 4 in the REJECT bin |  |
+| 119 | 2 | `J-W-05` | put the part from pocket 2 in the OK bin | yes |
+| 120 | 3 | `L-W-08` | put the part from pocket 3 in the OK bin | yes |

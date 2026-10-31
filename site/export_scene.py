@@ -125,6 +125,9 @@ def main():
             phases.append([len(frames) - 1, phase])
 
     on_frame(env, "idle", None)
+    looker = ScriptedSorter(env, on_frame=on_frame)
+    looker.phase = "inspect"  # the top camera reads the whole tray before the first pick; the arm stays at home
+    looker.hold(1.5)
     for k, pick in enumerate(tray["picks"]):
         start = len(frames)
         env.frame = 0  # timeout counter per episode (same as run_episode)

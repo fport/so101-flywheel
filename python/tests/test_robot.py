@@ -3,7 +3,8 @@ import json
 import pytest
 
 from flywheel.robot.recorder import connect_robot, episode_log, reconcile, recorded, restore, snapshot_dir, writing_marker
-from flywheel.robot.session import command_onehot, phase2_task, picks, session_parts, sessions, tray_layout
+from flywheel.robot.session import COMMAND_NAMES, command_vector, picks, session_parts, sessions, tray_layout
+from flywheel.sim.plan import task
 
 
 def test_sessions_cover_plan_once():
@@ -31,9 +32,12 @@ def test_picks_follow_plan_order():
         assert tray_layout(p.plan, p.tray)[p.pocket - 1] == p.part
 
 
-def test_phase_two_command():
-    assert phase2_task("ok") == "put the part in the OK bin"
-    assert command_onehot("ok") == [1.0, 0.0] and command_onehot("reject") == [0.0, 1.0]
+def test_command_names_pocket_and_bin():
+    # the task text and the ACT command channel say the same thing: which pocket, which bin
+    assert task(3, "reject") == "put the part from pocket 3 in the REJECT bin"
+    v = command_vector(3, "reject")
+    assert len(v) == len(COMMAND_NAMES) == 8
+    assert [COMMAND_NAMES[k] for k, x in enumerate(v) if x] == ["pocket_3", "reject"]
 
 
 def _write_log(root, n):
@@ -103,7 +107,9 @@ def test_tray_crops_and_measures_sim_frame():
     from flywheel.sim.env import QCSortSim
 
     ids = ["D-W-01", "D-T-07", "L-W-05", "L-T-07", "B-W-01", "B-W-07"]
-    frame = QCSortSim(part_ids=ids).render("top", 1280, 960)
+    env = QCSortSim(part_ids=ids)
+    assert [env.pocket_of(pid) for pid in ids] == [1, 2, 3, 4, 5, 6]
+    frame = env.tray_frame()
     tags = find_tags(frame)
     assert sorted(tags) == [0, 1, 2, 3]
     for (_, crop), pid in zip(pocket_crops(frame, tray_homography(tags)), ids):

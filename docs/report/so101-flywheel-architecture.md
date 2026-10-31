@@ -20,8 +20,9 @@ explicitly stated.
 
 ## Executive summary
 
-**What we are building.** The arm picks up a part, shows it to the top camera, a classifier reads the part's
-attributes, a rule decides OK or REJECT, and the policy places the part in that bin. Every trial is recorded. Success is
+**What we are building.** Before the first pick, the top camera takes one frame of the whole tray; the part
+attributes in each pocket are measured, a rule decides OK or REJECT per pocket, and the policy picks each part by
+pocket and places it in that bin. Every trial is recorded. Success is
 decided by a **geometric check**: is the part, in the top camera, inside the bin region located via AprilTags? A VLM
 only writes the failure type and the rationale. Disagreements or low confidence go to a human. Labeled data becomes a
 new dataset version, the policy is retrained on HF Jobs, measured paired on the same held-out plan, and deployed only if
@@ -51,9 +52,9 @@ parallel meanwhile.
 
 **Three blockers found during verification.** (1) LeRobot 0.6.1 requires `opencv-python-headless<4.14`
 ([pyproject.toml@v0.6.1](https://github.com/huggingface/lerobot/blob/v0.6.1/pyproject.toml)), the repo has `>=5.0.0.93`;
-since we only use `cv2.aruco`, the pin drops to 4.13. (2) In v0.6.1, `lerobot-record` and `lerobot-rollout` take a single
-task text per episode, while the dataset format stores a task per frame. We write the recording and rollout loop
-ourselves on top of the LeRobot APIs ([§2.1](#21-runner-and-recorder)). (3) ACT takes the command from the
+since we only use `cv2.aruco`, the pin drops to 4.13. (2) In v0.6.1, `lerobot-record` takes one task text for the
+whole run, while every episode here has its own (pocket and bin), and neither it nor `lerobot-rollout` inspects the tray
+between episodes. We write the recording and rollout loop ourselves on top of the LeRobot APIs ([§2.1](#21-runner-and-recorder)). (3) ACT takes the command from the
 `observation.environment_state` channel, unnormalized; SmolVLA and π0.5 do not read this field.
 
 **Budget.** v0 + 3 iterations, including sim trials and the π0.5 arm, total cloud cost **~$230 (range $150–335)**.
@@ -69,8 +70,8 @@ Owner Furkan; valid as of 15 October 2026.
 
 | # | Decision | Where it lands in this document |
 | --- | --- | --- |
-| C1 | Two-stage task text per episode: "pick the part and show it to the camera" → "put the part in the OK/REJECT bin". The command is only known after inspection | Per-frame task; custom Recorder and Runner ([§2.1](#21-runner-and-recorder)) |
-| C2 | ACT takes the bin command as an extra one-hot input; SmolVLA takes text; π0.5 is the third policy, via LeRobot | `observation.environment_state` ([§1.3](#13-data-contracts)), [§3](#3-models) |
+| C1 | One task text per episode: "put the part from pocket N in the OK/REJECT bin" (`flywheel.sim.plan.task`). Inspection is not part of an episode: the top camera inspects the whole tray once, before the first pick, so the command is known when the episode starts | Per-tray inspection ([§2.3](#23-inspection)); custom Recorder and Runner ([§2.1](#21-runner-and-recorder)) |
+| C2 | ACT takes the pocket and bin command as an extra 8-dim input (pocket one-hot, then [ok, reject]); SmolVLA takes text; π0.5 is the third policy, via LeRobot | `observation.environment_state` ([§1.3](#13-data-contracts)), [§3](#3-models) |
 | C3 | Mac M5: recording, inference client, sim, local verifier and UI. Training on HF Jobs (automatic), Colab as manual fallback. A remote inference server on a cloud GPU for any policy that cannot run on the Mac | [§2.7](#27-training-launcher), [§2.8](#28-policyclient-and-remote-inference) |
 | C4 | Verifier: the geometric signal is authoritative, the VLM writes failure_type and rationale, disagreement or low confidence goes to a human, agreement is always reported against a majority-class baseline, blind audit every iteration | [§2.4](#24-verifier) |
 | C5 | Gate: paired comparison on the same held-out plan; promotion with a conservative bound (Clopper–Pearson lower bound / paired test), Wilson CI for display; if no decision, eval is extended | [§4](#4-evaluation-protocol) |
@@ -87,7 +88,7 @@ All: proposal, Furkan to approve.
 | R4 | Fixed-step training recipes: ACT 100k steps / BS 8; SmolVLA 20k / BS 64; π0.5 10k / BS 32, full fine-tune | Cost and comparison stay the same every iteration | 25 Oct |
 | R5 | Review UI and dashboard in Next.js (`web/`), from the phone via Tailscale | PRD default; Furkan's web stack | 1 Nov |
 | R6 | Dataset tags `ds-NNN`, model tags `pv-NNN`; the DB always stores the commit SHA | LeRobot mistakes version-looking revisions like "v1.0" for a format version ([§1.5](#15-storage-and-versioning)) | 25 Oct |
-| R7 | No DAgger takeover in v1; correction = teleop demo starting from the failure state | v0.6.1 rollout cannot switch tasks and does not produce ACT's command input | 1 Nov |
+| R7 | No DAgger takeover in v1; correction = teleop demo starting from the failure state | v0.6.1 rollout does not produce ACT's command input | 1 Nov |
 | R8 | Condition for moving to the real arm: 3 iterations run in sim without manual commands (M6) | Catch bugs where they are cheap | 8 Nov |
 | R9 | Project license Apache-2.0 | The copied strands code is Apache-2.0; LeRobot is Apache-2.0 too | 18 Oct |
 
@@ -182,10 +183,10 @@ Three principles shape the design:
 | Component | Responsibility | Input | Output | Where |
 | --- | --- | --- | --- | --- |
 | Safety layer | Clips every action before it reaches the robot; e-stop, consecutive-failure and temperature monitoring; approval gate for autonomous runs | Action, joint state, temperature | Safe action or stop | Mac |
-| Episode controller (Runner) | Runs the two-phase episode: at the end of phase 1 triggers inspection, gets the decision, switches the task text and one-hot command | Plan row, active policy, work order | Frames, actions, phase boundary | Mac (real) or MuJoCo |
-| Inspection | Predicts 4 attributes from the top-camera crop; gives OK/REJECT via the `decide()` rule | Crop, work order | Attributes, decision, confidence | Mac |
+| Episode controller (Runner) | Per tray: triggers inspection once, before the first pick, arm at home. Per pick: one episode with a fixed task text and command (pocket + bin); `policy.reset()` at episode start | Plan row, active policy, work order, per-pocket decisions | Frames, actions | Mac (real) or MuJoCo |
+| Inspection | One top-camera frame of the tray → AprilTag homography → 6 pocket crops rectified at 4 px/mm (`robot/tray.py`); holes, rim spokes, gear teeth, broken corners and colour measured from the silhouette, Claude covers the rest (e.g. type); OK/REJECT per pocket via the `decide()` rule (`flywheel-robot inspect --tray`) | Tray frame, work order | Attributes, decision, confidence per pocket | Mac + Claude API |
 | PolicyClient | Calls the policy independent of backend (local, remote, proxy) | Observation, instruction | Action chunk | Mac (+ GPU server) |
-| Recorder | Writes the episode in LeRobot v3 format with per-frame task text; produces a sidecar metadata file | Frames, metadata | Dataset episode + `episode.json` | Mac |
+| Recorder | Writes the episode in LeRobot v3 format with its task text and command; produces a sidecar metadata file; keeps the top-camera frame of each laid-out tray | Frames, metadata | Dataset episode + `episode.json`; `<root>/flywheel/trays/<plan>-trayNN.png` | Mac |
 | Verifier | L0 integrity, L1 geometry (authoritative success), L2 VLM (failure_type, rationale) | Episode frames, bin ROIs | `labels` rows | Mac + VLM API |
 | Routing | Auto-accept, human queue or blind audit decision | Labels | Queue state | Mac |
 | Review UI + dashboard | Human labels, correction requests, metric dashboards | Queue, videos | `review_events`, human label | Mac, from the phone |
@@ -210,15 +211,14 @@ robot: {type: so101_follower, semantics: so101-degrees-gripper-percent-v1}
 cameras:
   top:   {width: 640, height: 480}
   wrist: {width: 640, height: 480}
-phases:                       # C1: two-stage task text
-  - id: pick_show
-    task: "pick the part and show it to the camera"
-    command: [0, 0]           # observation.environment_state for ACT
-    ends_when: {inspection_pose: true, still_s: 0.5, max_s: 15}
-  - id: place
-    task: "put the part in the {bin} bin"      # {bin} ∈ OK, REJECT
-    command: {OK: [1, 0], REJECT: [0, 1]}
-    max_s: 15
+inspection:                   # once per tray, before the first pick, arm at home; not part of an episode
+  camera: top                 # one frame; works at 640x480 and 1280x960
+  px_per_mm: 4                # rectified pocket crops (robot/tray.py)
+episode:                      # C1: one task text per episode
+  task: "put the part from pocket {pocket} in the {bin} bin"   # {bin} ∈ OK, REJECT
+  command: [pocket_1, pocket_2, pocket_3, pocket_4, pocket_5, pocket_6, ok, reject]
+                              # observation.environment_state for ACT, constant over the episode
+  max_s: 60                   # recorder --episode-time
 decision:
   rule: flywheel.sim.parts.decide             # attributes + work order → OK/REJECT
   orders: [G, T]
@@ -233,7 +233,7 @@ failure_types: [grasp_fail, drop, wrong_bin, out_of_bin, misclassification,
                 timeout, infra, invalid]
 verifier:
   prompt: tasks/qc-sort/prompts/verifier-v1.md
-  frames: [inspect, release, final]
+  frames: [start, release, final]
   crops: [ok_bin, reject_bin]
   vlm: {primary: claude-sonnet-5-5, second_opinion: gemini-robotics-er-2-preview}
   audit_rate: 0.10
@@ -255,7 +255,7 @@ family: act
 backend: lerobot-local        # lerobot-local | lerobot-remote | proxy
 model_repo: fport/act-qc
 conditioning: onehot          # onehot (observation.environment_state) | text
-inputs: {cameras: [top, wrist], state_dim: 6, env_state_dim: 2}
+inputs: {cameras: [top, wrist], state_dim: 6, env_state_dim: 8}
 action: {semantics: so101-degrees-gripper-percent-v1, chunk: 100, n_action_steps: 100, fps: 30}
 train:
   flavor: l4x1
@@ -265,8 +265,8 @@ serve: null                   # remote: {flavor: l4x1, transport: grpc, tunnel: 
 license: apache-2.0
 ```
 
-**Episode metadata** (`episode.json`, same content in the `episodes` table). The LeRobot dataset carries the frames and
-the per-frame task text; this file carries the rest of the experiment.
+**Episode metadata** (`episode.json`, same content in the `episodes` table). The LeRobot dataset carries the frames,
+the task text and the command; this file carries the rest of the experiment.
 
 ```json
 {
@@ -280,8 +280,10 @@ the per-frame task text; this file carries the rest of the experiment.
   "order": "G",
   "decision": {"rule_bin": "REJECT", "commanded_bin": "REJECT", "congruent": true,
                "inspection": {"pred": {"type": "J", "variant": "T", "missing_hole": false,
-                                       "broken": true}, "conf": 0.97}},
-  "phases": [{"id": "pick_show", "from_frame": 0}, {"id": "place", "from_frame": 312}],
+                                       "broken": true}, "conf": 0.97,
+                              "tray_frame": "trays/eval-heldout-G-seed0-tray03.png"}},
+  "task": "put the part from pocket 2 in the REJECT bin",
+  "command": [0, 1, 0, 0, 0, 0, 0, 1],
   "policy": {"id": "act-qc", "revision": "<sha>", "backend": "lerobot-local"},
   "versions": {"git": "<sha>", "lerobot": "0.6.1", "task_yaml": "<hash>",
                "params_yaml": "<hash>", "calibration": "<hash>"},
@@ -444,11 +446,11 @@ the "Ready" row the reference for LeRobot is **v0.6.1** ([release history](https
 
 | | |
 | --- | --- |
-| **Choice** | **Our own two-phase loop** on top of LeRobot 0.6.1's robot, teleop, policy and dataset APIs (`robot/runner.py`, `robot/recorder.py`, `sim/runner.py` in sim) |
-| **Why** | C1 needs per-frame task text. The dataset format supports it: `add_frame` takes a `task` on every frame and `save_episode` writes a per-frame `task_index` ([dataset_writer.py@v0.6.1](https://github.com/huggingface/lerobot/blob/v0.6.1/src/lerobot/datasets/dataset_writer.py)). But `lerobot-record` takes a single `--dataset.single_task` per episode ([lerobot_record.py@v0.6.1](https://github.com/huggingface/lerobot/blob/v0.6.1/src/lerobot/scripts/lerobot_record.py)) and `lerobot-rollout` stores the task once at the start of the episode ([rollout/inference/sync.py@v0.6.1](https://github.com/huggingface/lerobot/blob/v0.6.1/src/lerobot/rollout/inference/sync.py)). Also, the robot does not produce ACT's command input (`observation.environment_state`); we have to add it to the loop |
-| **Alternatives** | (a) `lerobot-record` + `modify_tasks` afterwards: only changes per episode, does not know the phase boundary. (b) The `/subtask` command in LeRobot `main` ([inference.mdx, main](https://github.com/huggingface/lerobot/blob/main/docs/source/inference.mdx)): not in a release. (c) Two separate episodes (pick-and-show, place): robot state breaks at the episode boundary, the policy cannot learn the phase transition |
-| **Ready** | LeRobot: `so101_follower`, leader teleop, camera reading, the `LeRobotDataset` writer, hardware encoding with VideoToolbox ([v0.6.0 notes](https://huggingface.co/blog/lerobot-release-v060)). Repo: `QCSortSim`, scripted expert, `inspection_crop`, `decide()`, balanced plans |
-| **We will write** | Phase transition: 0.5 s stillness in the inspection pose → crop → `decide()` → task text and one-hot switch → on VLAs `policy.reset()` flushes the action queue (otherwise the transition lags by up to 50 frames, ~1.7 s; [modeling_smolvla.py@v0.6.1](https://github.com/huggingface/lerobot/blob/v0.6.1/src/lerobot/policies/smolvla/modeling_smolvla.py)). During teleop recording the command is announced to the operator on screen and by voice. Same interface in sim: `run_episode(plan_row, policy) -> episode` |
+| **Choice** | **Our own loop: per-tray inspection, then one episode per pick** on top of LeRobot 0.6.1's robot, teleop, policy and dataset APIs (`robot/runner.py`, `robot/recorder.py`, `sim/runner.py` in sim) |
+| **Why** | C1: every episode has its own task text (pocket and bin) and ACT command, and inspection runs between episodes, once per tray. The dataset format takes a `task` on every frame ([dataset_writer.py@v0.6.1](https://github.com/huggingface/lerobot/blob/v0.6.1/src/lerobot/datasets/dataset_writer.py)). But `lerobot-record` takes a single `--dataset.single_task` for the whole run ([lerobot_record.py@v0.6.1](https://github.com/huggingface/lerobot/blob/v0.6.1/src/lerobot/scripts/lerobot_record.py)), and neither it nor `lerobot-rollout` ([rollout/inference/sync.py@v0.6.1](https://github.com/huggingface/lerobot/blob/v0.6.1/src/lerobot/rollout/inference/sync.py)) knows the plan or the tray inspection. Also, the robot does not produce ACT's command input (`observation.environment_state`); we have to add it to the loop |
+| **Alternatives** | (a) `lerobot-record` + `modify_tasks` afterwards: fixes the text but not the command input, and does not know the plan. (b) The `/subtask` command in LeRobot `main` ([inference.mdx, main](https://github.com/huggingface/lerobot/blob/main/docs/source/inference.mdx)): not in a release. (c) Inspection inside the episode (pick, show to a camera, then place; the earlier design): needs a phase-transition trigger and a task switch mid-episode, and zero-shot Claude on ~90 px wrist/look crops was inconsistent ([§2.3](#23-inspection)) |
+| **Ready** | LeRobot: `so101_follower`, leader teleop, camera reading, the `LeRobotDataset` writer, hardware encoding with VideoToolbox ([v0.6.0 notes](https://huggingface.co/blog/lerobot-release-v060)). Repo: `QCSortSim`, scripted expert, tray inspection (`robot/tray.py`, `inspect --tray`), `decide()`, balanced plans |
+| **We will write** | Per tray: arm at home → one top-camera frame → inspection → bin per pocket. Per pick: task text and command (`flywheel.robot.session.command_vector`) fixed for the episode; `policy.reset()` at episode start flushes the action queue left from the previous pick ([modeling_smolvla.py@v0.6.1](https://github.com/huggingface/lerobot/blob/v0.6.1/src/lerobot/policies/smolvla/modeling_smolvla.py)). During teleop recording the command is announced to the operator on screen and by voice; operator keys: one → per tray when it is laid out (the frame is kept), two per episode (start, dropped). Same interface in sim: `run_episode(plan_row, policy) -> episode` |
 
 ### 2.2 Simulation (MuJoCo twin)
 
@@ -457,18 +459,18 @@ the "Ready" row the reference for LeRobot is **v0.6.1** ([release history](https
 | **Choice** | The existing `flywheel.sim` (MuJoCo 3.12, official SO-101 MJCF); the loop's first customer |
 | **Why** | Exact labels (`outcome()`), scripted expert (120/120 per plan; 360/360 across two work orders and three runs; held-out 64/64, [sim.md](../sim.md)), zero arm time. Logic bugs in the loop (idempotency, gate, queue) are found cheaply in sim |
 | **Alternatives** | Isaac Lab / LeIsaac (does not run on the Mac), ManiSkill3 (GPU parallelism needs NVIDIA), strands-robots sim (does not have our QC scene) |
-| **Ready** | Scene, 76-part catalog, plans, scripted expert, `inspection_crop` |
+| **Ready** | Scene, 76-part catalog, plans, scripted expert, `tray.pocket_crops` (also on sim renders) |
 | **We will write** | `SimRecorder` (LeRobot v3 instead of npz+mp4; "Phase 1 work" in sim.md), fault injection (grasp offset → `grasp_fail`, early release → `drop`, bin offset → `out_of_bin`, wrong bin → `wrong_bin`, classifier noise → `misclassification`), a "bot reviewer" (answers the review queue with oracle labels), scripted correction demo. Upgrading to MuJoCo 3.16 is optional ([PyPI](https://pypi.org/project/mujoco/)) |
 
 ### 2.3 Inspection
 
 | | |
 | --- | --- |
-| **Choice** | Small CNN (ResNet-18 or similar), 4 heads: type, variant, missing hole, broken; the decision comes from the `decide()` rule |
-| **Why** | No retraining when the work order changes; on a wrong decision you can see which attribute was misread ([experiment-design.md](../experiment-design.md)) |
-| **Alternatives** | End-to-end OK/REJECT classifier (open to shortcuts); zero-shot VLM attribute prediction (slow, must be measured: E6) |
-| **Ready** | `inspection_crop`, `Part.attributes()`, `decide()` |
-| **We will write** | Training script (Mac MPS is enough; small model), validation on held-out parts, below the confidence threshold "inspection uncertain" → episode goes to a human |
+| **Choice** | Once per tray, before the first pick, arm at home: one top-camera frame → AprilTag homography → 6 pocket crops rectified at 4 px/mm (`robot/tray.py`). Holes, rim spokes, gear teeth, broken corners and colour are measured from the silhouette; Claude covers the rest (e.g. type). Attributes → `decide()` rule → bin per pocket (`flywheel-robot inspect --tray`) |
+| **Why** | No retraining when the work order changes; on a wrong decision you can see which attribute was misread ([experiment-design.md](../experiment-design.md)). Zero-shot Claude on ~90 px wrist/look crops was inconsistent; the silhouette measurement on top-camera crops got 16/16 attributes right on the first labeled real tray. Works at the recording resolution 640x480 as well as 1280x960 |
+| **Alternatives** | Small CNN (ResNet-18 or similar) with 4 heads (needs labeled training data); end-to-end OK/REJECT classifier (open to shortcuts); inspecting inside the episode with the wrist camera in a look pose (small crops, needs a phase transition) |
+| **Ready** | `robot/tray.py` (`pocket_crops`, `measure`), `robot/inspection.py`, `Part.attributes()`, `decide()`; the recorder keeps each tray's frame in `<root>/flywheel/trays/<plan>-trayNN.png` |
+| **We will write** | Validation on held-out parts and more labeled trays; below the confidence threshold or on measurement/Claude disagreement "inspection uncertain" → tray goes to a human |
 
 ### 2.4 Verifier
 
@@ -478,7 +480,7 @@ the "Ready" row the reference for LeRobot is **v0.6.1** ([release history](https
 | **Why** | VLM judges tend to say "success" under uncertainty; the best detector stays at 0.77 balanced accuracy ([FailBench, arXiv 2609.03611](https://arxiv.org/abs/2609.03611)). In a language-conditioned policy, false positives poison the data ([SOAR, arXiv 2407.20635](https://arxiv.org/abs/2407.20635)). Our success criterion is the question "which bin is the part in"; in a fixed scene geometry answers it cheaply and with high precision. A gray part in the gray bin is the hardest case (Q1) |
 | **Alternatives** | A single VLM judge (FP risk); the Robometer-4B reward model ([LeRobot docs](https://huggingface.co/docs/lerobot/en/robometer); GPU recommended, could not verify that it runs on MPS); k=3 self-consistency (triples the cost, unnecessary when geometry exists); local Qwen-VL + `mlx-vlm` ([repo](https://github.com/Blaizzy/mlx-vlm)) if privacy is needed |
 | **Ready** | The priority and `disputes_verdict` pattern in strands-robots `episode_labels.py`, `measure_agreement` ([repo](https://github.com/strands-labs/robots)); OpenCV `cv2.aruco` 36h11 (already used in the repo). Prices: Sonnet 5.5 $2 / $10, Haiku 5.5 $0.10 / $0.50 (per 1M tokens; batch 50% off) ([Anthropic pricing](https://platform.claude.com/docs/en/about-claude/pricing)); ER 2 $1 / $5, from 1 January 2027 $2 / $10 ([Gemini pricing](https://ai.google.dev/gemini-api/docs/pricing)) |
-| **We will write** | `verify/geometry.py` (homography, mask, polygon test, edge distance), `verify/vlm.py` (structured output, prompt version, frame selection: inspection, release, final frame + two bin crops), `verify/route.py`, `verify/agreement.py` (agreement, majority baseline, Cohen κ, Clopper–Pearson upper bound on FPR). Two lessons for the prompt: the quality note is independent of the outcome; the final frame is the state before the action (strands `JUDGE_SYSTEM_PROMPT`) |
+| **We will write** | `verify/geometry.py` (homography, mask, polygon test, edge distance), `verify/vlm.py` (structured output, prompt version, frame selection: start, release, final frame + two bin crops), `verify/route.py`, `verify/agreement.py` (agreement, majority baseline, Cohen κ, Clopper–Pearson upper bound on FPR). Two lessons for the prompt: the quality note is independent of the outcome; the final frame is the state before the action (strands `JUDGE_SYSTEM_PROMPT`) |
 
 **Routing rule.**
 
@@ -513,7 +515,7 @@ about half an hour.
 | **Why** | Hub revisions make a separate versioning tool unnecessary; training is reproducible by SHA |
 | **Alternatives** | DVC (separate tool, no gain); a separate repo per version (needless copies) |
 | **Ready** | `lerobot-edit-dataset`: `delete_episodes`, `split`, `merge`, `remove_feature`, `modify_tasks`, `recompute_stats`, `info` ([lerobot_edit_dataset.py@v0.6.1](https://github.com/huggingface/lerobot/blob/v0.6.1/src/lerobot/scripts/lerobot_edit_dataset.py)); `merge` requires identical features. strands `verify_dataset` checks (pattern 4) |
-| **We will write** | Checks: episode count in parquet = expected (the "mega-episode" trap), video frame count = parquet frame count, `action`/`observation.state` columns are not dead, per-frame task text consistent with the two phases, `observation.environment_state` consistent with the phase, no held-out part in any training episode. Card: source distribution (demo / autonomous / correction), failure_type counts, prompt version, audit result. For π0.5, `q01/q99` via `recompute_stats` ([pi05.mdx](https://github.com/huggingface/lerobot/blob/main/docs/source/pi05.mdx)) |
+| **We will write** | Checks: episode count in parquet = expected (the "mega-episode" trap), video frame count = parquet frame count, `action`/`observation.state` columns are not dead, task text constant over the episode and matching the plan row, `observation.environment_state` constant and matching the task text, no held-out part in any training episode. Card: source distribution (demo / autonomous / correction), failure_type counts, prompt version, audit result. For π0.5, `q01/q99` via `recompute_stats` ([pi05.mdx](https://github.com/huggingface/lerobot/blob/main/docs/source/pi05.mdx)) |
 
 ### 2.7 Training launcher
 
@@ -536,7 +538,7 @@ billing (the difference is negligible).
 | **Why** | The v0.6.1 async server supports the `act`, `smolvla`, `pi0`, `pi05`, `groot` policies and `so101_follower` ([constants.py@v0.6.1](https://github.com/huggingface/lerobot/blob/v0.6.1/src/lerobot/async_inference/constants.py)) and receives the task with every observation. HF Jobs documents SSH and `-L` port forwarding; `--expose` is documented only for HTTP(S) ([jobs-configuration](https://huggingface.co/docs/hub/jobs-configuration)) |
 | **Alternatives** | The Zenoh `lerobot-policy-server` in `main` ([PR #4937](https://github.com/huggingface/lerobot/pull/4937)): supports instruction changes, has schema checks and stale-action rejection; but it is not in a release and has no hardware sign-off for π0.5 ([remote_inference README](https://github.com/huggingface/lerobot/blob/main/src/lerobot/remote_inference/README.md)). A RunPod pod (open TCP port, closer region): fallback. HF Inference Endpoints: use as a LeRobot server could not be verified |
 | **Ready** | `python -m lerobot.async_inference.policy_server` and `robot_client` ([async.mdx@v0.6.1](https://github.com/huggingface/lerobot/blob/v0.6.1/docs/source/async.mdx)) |
-| **We will write** | Server lifecycle (`run_job(ssh=True, timeout=...)`, health check, warm-up, `cancel_job` at the end of the session); our own gRPC client: when the task changes the observation must be flagged `must_go`, otherwise the server compares only the joints and skips it as "same observation" ([policy_server.py@v0.6.1](https://github.com/huggingface/lerobot/blob/v0.6.1/src/lerobot/async_inference/policy_server.py)); latency measurement (p50/p95) into the episode metadata; a dropped connection is `failure_type=infra` |
+| **We will write** | Server lifecycle (`run_job(ssh=True, timeout=...)`, health check, warm-up, `cancel_job` at the end of the session); our own gRPC client: when the task changes (each new episode) the observation must be flagged `must_go`, otherwise the server compares only the joints and skips it as "same observation" ([policy_server.py@v0.6.1](https://github.com/huggingface/lerobot/blob/v0.6.1/src/lerobot/async_inference/policy_server.py)); latency measurement (p50/p95) into the episode metadata; a dropped connection is `failure_type=infra` |
 
 ### 2.9 Eval runner and gate
 
@@ -546,7 +548,7 @@ billing (the difference is negligible).
 | **Why** | With two independent samples of 32 we often cannot see even a true +20-point difference; pairing and sequential extension increase power ([STEP, arXiv 2503.10966](https://arxiv.org/abs/2503.10966); [Beyond Binary Success, arXiv 2603.13616](https://arxiv.org/abs/2603.13616)) |
 | **Alternatives** | Fixed 30 trials + Wilson CI (the PRD's first version; insufficient power); STEP's full sequential test (fewer trials, but more complex to implement; v2) |
 | **Ready** | `plans/eval-heldout-{G,T}-seed0.json`; `wilson()`; strands `success_interval` (Wilson + Clopper–Pearson) |
-| **We will write** | `evals/stats.py` (Wilson, Clopper–Pearson, exact McNemar, paired bootstrap), `evals/gate.py` (pure function, with Monte Carlo tests), `evals/runner.py` (shuffles the policy order, hides the policy name during labeling), a third plan `eval-heldout-G-seed1` (`flywheel-sim plan --heldout --seed 1`) |
+| **We will write** | `evals/stats.py` (Wilson, Clopper–Pearson, exact McNemar, paired bootstrap), `evals/gate.py` (pure function, with Monte Carlo tests), `evals/runner.py` (inspects each tray once, then runs the policy per pocket with that pocket's command; shuffles the policy order, hides the policy name during labeling), a third plan `eval-heldout-G-seed1` (`flywheel-sim plan --heldout --seed 1`) |
 
 ### 2.10 Orchestrator
 
@@ -595,7 +597,7 @@ rule "stop verbs do not pass through the gate" (`_command_gate.py`).
 
 | Model | Role | Status (15 October 2026) | Where it runs | Source |
 | --- | --- | --- | --- | --- |
-| **ACT** | Baseline policy; command as `observation.environment_state` one-hot | The policy LeRobot recommends first. ~52M parameters in the default configuration (1 decoder layer); the original paper has ~80M with 7 decoder layers | Training `l4x1`; inference Mac | [act.mdx](https://github.com/huggingface/lerobot/blob/v0.6.1/docs/source/act.mdx), [configuration_act.py@v0.6.1](https://github.com/huggingface/lerobot/blob/v0.6.1/src/lerobot/policies/act/configuration_act.py), [arXiv 2304.13705](https://arxiv.org/abs/2304.13705) |
+| **ACT** | Baseline policy; pocket + bin command as `observation.environment_state` (8-dim) | The policy LeRobot recommends first. ~52M parameters in the default configuration (1 decoder layer); the original paper has ~80M with 7 decoder layers | Training `l4x1`; inference Mac | [act.mdx](https://github.com/huggingface/lerobot/blob/v0.6.1/docs/source/act.mdx), [configuration_act.py@v0.6.1](https://github.com/huggingface/lerobot/blob/v0.6.1/src/lerobot/policies/act/configuration_act.py), [arXiv 2304.13705](https://arxiv.org/abs/2304.13705) |
 | **SmolVLA** | Language-conditioned policy; command in the task text | 450M, Apache-2.0; no new model release. A freezing bug was fixed in v0.6.1; results trained with older versions may be affected | Training `a100-large`; inference Mac | [smolvla.mdx](https://huggingface.co/docs/lerobot/smolvla), [arXiv 2506.01844](https://arxiv.org/abs/2506.01844) |
 | **π0.5** | Third policy (C2) | PI's newest open-weight model; `pi05` in LeRobot. The weight license is bound by the Gemma terms; the PaliGemma tokenizer is gated. 56% average on an independent SO-101 benchmark (ACT 34%, SmolVLA 33%); 10% on color sorting | Training `a100-large`; inference GPU server | [pi05.mdx](https://github.com/huggingface/lerobot/blob/main/docs/source/pi05.mdx), [openpi](https://github.com/Physical-Intelligence/openpi), [arXiv 2606.08881](https://arxiv.org/abs/2606.08881) |
 | **MolmoAct2** | Zero-shot baseline ("without seeing a single demo") | Apache-2.0, 5.4B; ready SO-100/101 checkpoint, in LeRobot since v0.6.0; not in the v0.6.1 gRPC list | A100-80GB-class GPU (**assumption**) | [molmoact2.mdx](https://github.com/huggingface/lerobot/blob/main/docs/source/molmoact2.mdx), [arXiv 2605.02881](https://arxiv.org/abs/2605.02881) |
@@ -615,12 +617,13 @@ attached to the arm.
 - **ACT and the command.** ACT takes `observation.environment_state` as a separate encoder token; since ENV is not in the
   configuration's normalization table, this input is not normalized (IDENTITY)
   ([modeling_act.py@v0.6.1](https://github.com/huggingface/lerobot/blob/v0.6.1/src/lerobot/policies/act/modeling_act.py)).
-  `[0, 0]` in phase 1, `[1, 0]` (OK) or `[0, 1]` (REJECT) in phase 2. The same dataset is also read by SmolVLA and
+  8-dim and constant over the episode: pocket one-hot (`pocket_1`..`pocket_6`), then `[ok, reject]`
+  (`flywheel.robot.session.command_vector`, names `COMMAND_NAMES`). The same dataset is also read by SmolVLA and
   π0.5; these models use only the images and `observation.state` (inferred from the source code, to be verified in the
   first training run). The alternative, "append the one-hot to `observation.state`", normalizes the command together
   with the joint statistics; not preferred.
-- **ACT chunk.** Default `chunk_size = n_action_steps = 100` (3.3 s). `policy.reset()` is called at the phase
-  transition so that ACT produces a new chunk on the first frame of phase 2.
+- **ACT chunk.** Default `chunk_size = n_action_steps = 100` (3.3 s). `policy.reset()` is called at each episode
+  start so that no chunk from the previous pick carries over.
 - **SmolVLA.** Fine-tuned from `lerobot/smolvla_base`; the docs recommend starting with ~50 episodes, 25 episodes were
   not enough ([smolvla.mdx](https://huggingface.co/docs/lerobot/smolvla)). Our v0 dataset has 120 episodes.
 - **π0.5.** Requires STATE/ACTION quantile normalization: if `meta/stats.json` lacks `q01/q99`, run `recompute_stats`
@@ -701,16 +704,16 @@ The Runner and the eval runner see only this interface.
 class PolicyClient(Protocol):
     def describe(self) -> PolicySpec: ...      # entry + revision SHA + input/output schema
     def start(self) -> None: ...               # local: load; remote: server + tunnel + warm-up
-    def reset(self, instruction: str, command: list[int]) -> None: ...  # episode start, phase transition
+    def reset(self, instruction: str, command: list[int]) -> None: ...  # episode start
     def predict_chunk(self, obs: Observation) -> ActionChunk: ...  # cameras + state (+ env_state)
     def health(self) -> Health: ...            # latency p50/p95, queue, connection
     def close(self) -> None: ...               # remote: cancel_job, minutes → cost ledger
 ```
 
-| Backend | Policies | How | Phase transition |
+| Backend | Policies | How | Episode start |
 | --- | --- | --- | --- |
-| `LeRobotLocal` | ACT, SmolVLA | `from_pretrained(repo, revision=sha)`, MPS or CPU on the Mac | `reset()` flushes the action queue; the new task text or one-hot is read on the next call |
-| `LeRobotRemote` | π0.5 (GR00T optional) | v0.6.1 gRPC server on HF Jobs (`ssh=True`), `ssh -L` from the Mac | When the task changes the observation is flagged `must_go`; queued actions are dropped |
+| `LeRobotLocal` | ACT, SmolVLA | `from_pretrained(repo, revision=sha)`, MPS or CPU on the Mac | `reset()` flushes the action queue; the episode's task text or command is read on the next call |
+| `LeRobotRemote` | π0.5 (GR00T optional) | v0.6.1 gRPC server on HF Jobs (`ssh=True`), `ssh -L` from the Mac | The first observation of an episode (new task) is flagged `must_go`; queued actions are dropped |
 | `Proxy` | Non-LeRobot (Pi API, openpi websocket, Isaac-GR00T ZMQ) | A thin wrapper like LeRobot's out-of-tree policy plugin ([bring_your_own_policies.mdx](https://github.com/huggingface/lerobot/blob/main/docs/source/bring_your_own_policies.mdx)) | Depends on the backend |
 
 **Latency budget (remote).** A chunk of 50 at 30 fps lasts 1.67 s. Round trip = RTT + encoding + inference. An industry
@@ -739,7 +742,7 @@ gate and the headline claim.
 | Pairing | Candidate and active policy run the same row, with the same tray layout, back to back. Which one runs first is random per row (blind order); the policy name stays hidden until labeling is done |
 | Success | L1 geometric success for the commanded bin ([§2.4](#24-verifier)); in eval **every label is human-confirmed** (a single tap on the phone). In a counterfactual-command trial, success = following the command |
 | End-to-end success | When the inspection decision is also correct. The policy gate decides on manipulation + command following; inspection is measured with its own metric |
-| `failure_type` | `grasp_fail` (could not grasp), `drop` (dropped while carrying), `wrong_bin` (the other bin), `out_of_bin` (on the rim or outside), `misclassification` (wrong inspection decision; only in the end-to-end metric), `timeout` (phase time exceeded), `infra` (server, network, camera dropout) |
+| `failure_type` | `grasp_fail` (could not grasp), `drop` (dropped while carrying), `wrong_bin` (the other bin), `out_of_bin` (on the rim or outside), `misclassification` (wrong inspection decision; only in the end-to-end metric), `timeout` (episode time exceeded), `infra` (server, network, camera dropout) |
 | `invalid` | Setup error: part in the wrong pocket, tray incomplete, calibration drift. Does not count as a trial; the same row is rerun; the count is reported |
 | `infra` | Counts as a failure but is reported separately; if there are more than 3 in a session, the eval stops and is repeated |
 
@@ -825,8 +828,8 @@ arm. Every milestone has a done criterion; we do not move on until it is met.
 | # | Milestone | Content | Effort | Done criterion |
 | --- | --- | --- | --- | --- |
 | M0 | Skeleton | `core/` (task.yaml and policy schemas, SQLite + migration, IDs, logging), `evals/stats.py`, LeRobot 0.6.1 + opencv pin, `NOTICE` | 1 day | `uv sync` works with LeRobot; `flywheel db init`; statistics tests match scipy/statsmodels exactly |
-| M1 | Sim → LeRobot | `SimRecorder`: two-phase task text, `environment_state` one-hot, `episode.json`; fault injection; `fport/so101-qc-sim` `ds-000` (private) | 2 days | 120 episodes on the Hub; the phase transition is visible in the visualizer; `data/checks.py` passes |
-| M1b | Real teleop recording | `robot/recorder.py`: leader → follower, command on screen and by voice at the phase transition; written in the same format | 1 day | 5 trial episodes recorded on the real arm, same schema as the sim episodes |
+| M1 | Sim → LeRobot | `SimRecorder`: one task text per episode (pocket + bin), 8-dim `environment_state` command, `episode.json`; fault injection; `fport/so101-qc-sim` `ds-000` (private) | 2 days | 120 episodes on the Hub; task text and command match the plan row in the visualizer; `data/checks.py` passes |
+| M1b | Real teleop recording | `robot/recorder.py`: leader → follower; top-camera frame kept per tray; command on screen and by voice at episode start; operator keys: one → per tray when it is laid out, two per episode (start, dropped); written in the same format | 1 day | 5 trial episodes recorded on the real arm, same schema as the sim episodes |
 | M2 | Training launcher | `train/launcher.py` (`run_uv_job`, preflight, monitoring, model card, cost row); 200-step smoke test on the Mac | 1.5 days | One command → `fport/act-qc` `pv-000` (sim) → `costs` row |
 | M3 | Sim eval + gate | `SimRunner`, `PolicyClient(LeRobotLocal)`, `evals/runner.py`, `evals/gate.py` | 1.5 days | ACT sim v0 measured with 32 → 96; the gate's Monte Carlo test reproduces the §4.2 table |
 | M4 | Verifier v0 | Geometry (same AprilTags in the sim renders), VLM annotation, routing, agreement report; sim gold set of 300 episodes | 2 days | Agreement report: baseline, κ, FPR upper bound, failure_type confusion matrix |
@@ -836,7 +839,7 @@ arm. Every milestone has a done criterion; we do not move on until it is met.
 | M8 | π0.5 arm | `LeRobotRemote` (gRPC + SSH tunnel), server lifecycle, π0.5 v0 training | 1.5 days | A 32-trial session; round-trip p95 measured |
 | M9 | Dashboard + report | Dashboards, static snapshot, headline eval | 1.5 days | v0 → v3 curve, 96 paired trials, Wilson CI |
 
-Total ~19 developer days (M1b, M8 and the two-phase task were added to the 13–16 days in v1).
+Total ~19 developer days (M1b, M8 and the command-conditioned task were added to the 13–16 days in v1).
 
 ### 5.2 Weekly plan (from 15 October 2026)
 
@@ -852,7 +855,7 @@ Total ~19 developer days (M1b, M8 and the two-phase task were added to the 13–
 | W7 | 30 Nov–4 Dec | Writing | — | If Q2 is yes, RSS 2027 Stage 1 (4 Dec AoE) |
 
 **Where printing and recording fit.** Printing finishes in W0–W1; the only blocker is Q1 (gray/white). Recording starts
-in W2 and depends on three things: the two-phase recording tool (M1b), the fixed camera and AprilTags, and the ACT
+in W2 and depends on three things: the recording tool (M1b), the fixed camera and AprilTags, and the ACT
 command-channel decision (C2, made). The recording plan files already exist; if white is chosen in Q1, they are
 regenerated with `flywheel-sim plan`. The arm does not sit idle while the software advances in sim: the recording and
 gold-set work in W2–W3 runs in parallel with the sim work.
@@ -893,9 +896,10 @@ failure_type found by the verifier in one arm, random from the plan in the other
 enough (~0.4 at 32–64 trials); in sim it is noise-free ([DISEIL, arXiv 2609.08123](https://arxiv.org/abs/2609.08123) is
 close work).
 
-**E6. Inspection: attributes + rule, and resolution (sim W1, real W2).** A grid from 320×240 to 1280×720, 16 held-out
-parts, top and wrist cameras. A 3 mm hole is ~4 px across 480 rows (rough estimate). The result determines the
-recording resolution, so it runs before recording.
+**E6. Inspection: attributes + rule, and resolution (sim W1, real W2).** A grid from 320×240 to 1280×960, 16 held-out
+parts, top camera only (the wrist camera no longer inspects). Pocket crops are rectified to 4 px/mm; the silhouette
+measurement already works at the recording resolution 640x480 as well as 1280x960, and got 16/16 attributes right on
+the first labeled real tray. The grid measures the margin on held-out parts.
 
 **E7. Can sim eval be a proxy (W5).** Sim and real success of ≥6 checkpoints; Pearson r and rank agreement. If strong,
 the gate's first screening is done in sim ([SIMPLER, arXiv 2405.05941](https://arxiv.org/abs/2405.05941)).
@@ -910,10 +914,10 @@ it is skipped if it fails.
 | --- | --- | --- | --- |
 | The geometric check misses a gray part in the gray bin | Medium | False success → dirty data | White in Q1; margin threshold; this case is measured separately in the gold set |
 | VLM false positive | Medium | Dirty data | The VLM does not decide success; disagreement goes to a human; blind audit |
-| The phase transition does not trigger or triggers early | Medium | Wrong task text, corrupt episode | Stillness + pose region + time limit; the L0 check validates the phase boundary |
+| The phase transition does not trigger or triggers early | No longer applies | — | Inspection runs once per tray, outside the episode; each episode has one task text, so there is no transition. The L0 check validates that task text and command are constant and match the plan row |
 | Our own loop breaks with a LeRobot update | Medium | Recording stops | 0.6.1 pinned; upgrades are tested in the sim loop first |
 | π0.5 remote latency (RTT) | Medium | Stuttering motion, `infra` | Measured in the first session; RunPod fallback in a nearby region; the arm stops via the safety layer on the Mac |
-| The gRPC server skips the task change | High (known) | Phase 2 runs with the old task | `must_go` on task change; unit test in sim |
+| The gRPC server skips the task change | Low (known; the task changes only between episodes now) | A new episode runs with the previous episode's task | `must_go` on the first observation of each episode; unit test in sim |
 | Eval noise, drift | Medium | Wrong promotion | Paired design, blind order, AprilTag drift check, eval order is logged |
 | Plateau (no improvement) | Medium | The main claim weakens | Corrections targeted at failure_type; a plateau is reported too |
 | Not enough arm time | Medium | Iteration slips | The sequential gate lowers the average trial count; P1 experiments are postponed |
@@ -942,7 +946,7 @@ round; if it doesn't work, I'll show that too."
 | S0 | I'm Teaching My Robot to Learn from Its Own Mistakes | Project start (trailer) |
 | S1 | I Didn't Draw a Single Part by Hand: I Designed the Robot Cell in Code | Printing and assembly |
 | S2 | I Printed 76 Parts So the AI Wouldn't Memorize | Experiment design, E1 |
-| S3 | I Taught the Robot by Hand: 120 Demos, 2 Phases, 2 Cameras | Teleop recording |
+| S3 | I Taught the Robot by Hand: 120 Demos, 6 Pockets, 2 Cameras | Teleop recording |
 | S4 | Simulation First: The Loop Ran on Its Own | M6 (sim loop) |
 | S5 | Can AI Be the Referee? | E2 (verifier) |
 | S6 | I Fix My Robot's Mistakes from My Phone | Review UI |
@@ -962,7 +966,7 @@ dates.
 | Week | To film | Publish |
 | --- | --- | --- |
 | W0–W1 | Print timelapses, assembly, calibration, sim screens | S0; shorts 1, 2 |
-| W2 | Teleop recording, phase transition, staged failures | S1; shorts 3, 4 |
+| W2 | Teleop recording, top-camera tray inspection, staged failures | S1; shorts 3, 4 |
 | W3 | Sim loop dashboard, bot reviewer | S2; short 5 |
 | W4 | Real v0 eval, verifier examples, phone review | S3, S4; shorts 6, 7 |
 | W5 | Iterations 1–2, π0.5 session | S5, S6; short 8 |
@@ -1003,12 +1007,12 @@ labeled on screen; every number in a video is generated from an eval file in the
 | --- | --- |
 | Policy | The decision function from observation (camera + joints) to action |
 | Episode | The recording of one trial from start to finish |
-| Phase | The part of an episode in which the task text stays fixed; here "pick and show" and "put in the bin" |
+| Phase | Not used any more: each episode has one task text, "put the part from pocket N in the OK/REJECT bin"; inspection runs once per tray, outside the episode |
 | Teleop (leader/follower) | A human moving the leader arm and driving the follower in sync |
 | Behaviour cloning | Copying the expert with supervised learning on demo pairs |
 | DAgger / intervention | Collecting expert corrections in the states the policy visits |
 | Action chunk | k consecutive actions predicted in one go |
-| Environment state | An extra input field in LeRobot; here ACT's one-hot command |
+| Environment state | An extra input field in LeRobot; here ACT's 8-dim command (pocket one-hot + [ok, reject]) |
 | VLM / VLA | Vision + language model / a robot model with an action head added to one |
 | Verifier | The component that labels an episode's success and failure type |
 | Geometric check | Measuring from the image whether the part is inside the bin polygon |

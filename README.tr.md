@@ -33,8 +33,9 @@ Kaydet, doğrula, düzelt, yeniden eğit. Simülasyon MuJoCo'da, baskılar Bambu
 
 Kol bir görevi her denemede kaydeder, bir VLM verifier başarıyı değerlendirir, başarısız denemeler insan düzeltmesiyle
 yeni veriye dönüşür ve policy retrain → eval → deploy döngüsünden geçer. İlk referans görev otomotiv yan sanayi hat
-sonu kalite kontrolü: kol jant, dişli, balata ve braketlere almadan önce bilek kamerasıyla bakar; iş emrine uyan sağlam parçalar OK
-kasasına, kusurlular ve yanlış varyantlar ret kasasına gider.
+sonu kalite kontrolü: üst kamera jant, dişli, balata ve braketlerle dolu tepsiyi bir kez muayene eder, sonra kola
+"N numaralı cepteki parçayı X kasasına koy" denir; iş emrine uyan sağlam parçalar OK kasasına, kusurlular ve yanlış
+varyantlar ret kasasına gider.
 
 | | |
 | --- | --- |
@@ -79,14 +80,16 @@ Kayıt planı (`plans/record-W-seed0`) üç seviyedir; numaralar terminalde, pla
 
 | Seviye | Ne | Sayı |
 | --- | --- | --- |
-| Bölüm | Tek parça: üstten bak (bilek kamerası), al, kasaya bırak | 1–120 |
-| Tepsi | Tepsiye dizilmiş 6 parça; 6 bölümde tepsi boşalır | 1–20 |
+| Bölüm | Tek parça: cebinden al, söylenen kasaya bırak | 1–120 |
+| Tepsi | Tepsiye dizilmiş 6 parça, üst kameradan bir karesi; 6 bölümde tepsi boşalır | 1–20 |
 | Seans | Tek `record --session N` çalıştırması: 5 tepsi, 30 bölüm, 30 farklı parça | 1–4 |
 
-Kaydedici sıradaki tepsiyi, cebi ve kasayı ekranda gösterip sesle söyler; operatör → ya da ENTER ile ilerler (başlat →
-üstündeyim, parça bilek kamerasının ortasında → bıraktım); ← bölümü yeniden çeker, iki kez Esc çıkar. `lerobot-record`'daki gibi oklar ve Esc globaldir,
-Rerun penceresi öndeyken de çalışır; ENTER, `r` ve `q` sadece kaydın terminalinde sayılır. Her karenin görev metni fazına göre yazılır, ACT'nin komutu
-`observation.environment_state` kanalına gider. Kol `lerobot-teleoperate` gibi 60 Hz'de sürülür, her ikinci adım
+Kaydedici sıradaki tepsiyi, cebi ve kasayı ekranda gösterip sesle söyler; operatör → ya da ENTER ile ilerler (tepsi
+dizildi → başlat → bıraktım); ← bölümü yeniden çeker, iki kez Esc çıkar. `lerobot-record`'daki gibi oklar ve Esc globaldir,
+Rerun penceresi öndeyken de çalışır; ENTER, `r` ve `q` sadece kaydın terminalinde sayılır. Tepsi dizilince üst
+kameranın karesi dataset'in yanında `flywheel/trays/` altına saklanır; muayene bunu okur. Bir bölümün tek görev metni
+vardır, "put the part from pocket N in the OK bin"; ACT aynı şeyi `observation.environment_state` kanalından alır
+(cep one-hot + [ok, reject]). Kol `lerobot-teleoperate` gibi 60 Hz'de sürülür, her ikinci adım
 30 fps dataset'e yazılır. Seans bitince `check` çalışır (eklem aralıkları, follower'ın leader'ı izlemesi, komut
 kanalının planla eşleşmesi, videolar), ancak ondan sonra dataset private olarak Hugging Face Hub'a yüklenir
 (`--no-push` ile atlanır). Sesli yönlendirmeler İngilizcedir.
@@ -110,9 +113,9 @@ cd python
 export ANTHROPIC_API_KEY=...
 uv run flywheel-robot inspect --tray --parts J-W-03 B-W-07 - L-T-01 D-W-02 J-T-04   # üst kamera, 6 cebin hepsi
 uv run flywheel-robot inspect --image ../outputs/inspect/tray/*/pocket*_*.png         # kaydedilen kırpmaları yeniden puanla
-uv run flywheel-robot inspect --sim 24                      # bakma pozunda sim parçaları, gerçek etiketle puanlanır
-uv run flywheel-robot inspect --camera 0                    # gerçek bilek kamerası, kol parçanın üstünde
-uv run flywheel-robot inspect --live                        # teleop; → Claude'a sorar, kasayı söyler, parçayı sen koyarsın
+uv run flywheel-robot inspect --tray --image ../outputs/datasets/so101-qc/flywheel/trays/record-W-seed0-tray01.png
+uv run flywheel-robot inspect --sim 24                      # sim cep kırpmalarında Claude, gerçek etiketle puanlanır
+uv run flywheel-robot inspect --live                        # teleop; → tepsiyi muayene eder, her cebe bir kasa, sen dağıtırsın
 uv run flywheel-robot inspect --sim 8 --model claude-haiku-5-5 --model claude-sonnet-5-5
 uv run flywheel-robot inspect --sim 8 --effort low                # daha az düşünür, daha kısa bekler
 ```
@@ -120,7 +123,8 @@ uv run flywheel-robot inspect --sim 8 --effort low                # daha az dü�
 Claude gördüğünü söyler (tip, renk, eksik delik, kırık); kasayı iş emri kuralı verir, her sınıflandırıcıda olduğu
 gibi. Her isteğin süresi yazılır; kareler ve cevaplar `outputs/inspect/` altına gider.
 
-`--tray` üst kameradan 1280×960 tek kare alır, dört tag'i bulur ve altı cebi sabit 4 px/mm ölçekle keser. Claude'un
+Muayene tepsi başına bir kez, ilk parçadan önce, kol yoldan çekilmişken yapılır. `--tray` üst kameradan 1280×960 tek
+kare alır (kaydedicinin 640×480 kareleri de çalışır), dört tag'i bulur ve altı cebi sabit 4 px/mm ölçekle keser. Claude'un
 cevabının yanında, siyah tepsideki açık renkli parçanın silüetinden ölçülebilenleri ölçer: delik (tepsi içinden
 görünür), renk, jant kolları, dişlideki eksik diş boşluğu ve kırık balata ya da braketin kesik köşesi. Kasa kararında
 ölçüm olan yerde ölçüm, kalanında (parça tipi) Claude kullanılır. `--parts` verilirse (cep sırasıyla, boş cep için `-`) kırpmalar parça

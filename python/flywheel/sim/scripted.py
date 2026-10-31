@@ -1,4 +1,7 @@
-"""Scripted expert: look at the part from above (wrist camera) -> pick it from the tray -> drop into the commanded bin.
+"""Scripted expert: pick the part from its pocket -> drop it into the commanded bin.
+
+Inspection is not part of the episode: the top camera reads the whole tray once before the first pick
+(QCSortSim.tray_frame), and each episode is then told "put the part from pocket N in the X bin".
 
 Reads part poses from the sim state (privileged information); meant for generating demo data in sim and validating
 the scene. On the real arm this role is played by teleop demos and the trained policy.
@@ -131,7 +134,7 @@ class ScriptedSorter:
         return best[0], best[1], g["width"]
 
     # --- episode -----------------------------------------------------------------------------------
-    def run(self, pid, commanded_bin=None, inspect_seconds=1.0, probe=False):
+    def run(self, pid, commanded_bin=None, probe=False):
         """Full episode for one part. If commanded_bin is not given, the correct bin per the work order (perfect inspection)."""
         env, p = self.env, self.env.p
         commanded_bin = commanded_bin or env.catalog[pid].expected_bin(env.order)
@@ -141,14 +144,9 @@ class ScriptedSorter:
             target, frame, width = self.plan_grasp(pid)
             above = target + np.array([0, 0, 0.045])
 
-            # inspection happens here: the wrist camera sees the part in its pocket (env.inspection_crop)
-            self.phase = "inspect"
-            look, look_frame = env.look_pose(target, frame)
-            self.move_joints(np.r_[self.ik.solve(look, look_frame, q0=self.q[:5]).q, self.jaw_angle(width + OPEN_MARGIN)])
-            self.hold(inspect_seconds)
-
             self.phase = "reach"
-            self.move_line(target, frame, 0.9)
+            self.move_joints(np.r_[self.ik.solve(above, frame, q0=self.q[:5]).q, self.jaw_angle(width + OPEN_MARGIN)])
+            self.move_line(target, frame, 0.7)
 
             self.phase = "grasp"
             self.set_gripper(max(self.jaw_angle(width) - 0.16, env.model.jnt_range[5, 0]), 0.6)

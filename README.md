@@ -31,8 +31,9 @@ Record, verify, correct, retrain. Simulated in MuJoCo, printed on a Bambu X2D, t
 
 The arm records every attempt at a task, a VLM verifier judges success, failed attempts become new data through
 human correction, and the policy goes through retrain → eval → deploy. The first reference task is end-of-line
-quality control at an automotive supplier: the arm looks at wheel rims, gears, brake pads and brackets with its wrist
-camera before picking them; sound parts that match the work order go to the OK bin, defective parts and wrong variants go to the reject bin.
+quality control at an automotive supplier: the top camera inspects a tray of wheel rims, gears, brake pads and brackets
+once, then the arm is told "put the part from pocket N in the X bin"; sound parts that match the work order go to the OK
+bin, defective parts and wrong variants go to the reject bin.
 
 | | |
 | --- | --- |
@@ -78,15 +79,16 @@ file and the site:
 
 | Level | What | Count |
 | --- | --- | --- |
-| Episode | One part: look at it from above (wrist camera), pick it, drop it into a bin | 1–120 |
-| Tray | Six parts laid out on the tray; the tray is empty after 6 episodes | 1–20 |
+| Episode | One part: pick it from its pocket, drop it into the commanded bin | 1–120 |
+| Tray | Six parts laid out on the tray, one top-camera frame of it; the tray is empty after 6 episodes | 1–20 |
 | Session | One `record --session N` run: 5 trays, 30 episodes, 30 different parts | 1–4 |
 
 The recorder shows the next tray, pocket and bin on screen and says them out loud; the operator steps through with
-→ or Enter (start → above the part, centred in the wrist camera → dropped); ← redoes the episode, Esc twice quits. As in `lerobot-record`
+→ or Enter (tray laid out → start → dropped); ← redoes the episode, Esc twice quits. As in `lerobot-record`
 the arrows and Esc are global, so they work while the Rerun window has focus; Enter, `r` and `q` count only in the
-recorder's terminal. Each frame's task text follows its phase, and ACT's command goes into
-`observation.environment_state`. The arm is driven at 60 Hz like `lerobot-teleoperate`; every second tick goes into
+recorder's terminal. When a tray is laid out, the top camera's frame of it is kept in `flywheel/trays/` next to the
+dataset; that is what inspection reads. An episode has one task text, "put the part from pocket N in the OK bin", and
+ACT gets the same thing in `observation.environment_state` (pocket one-hot + [ok, reject]). The arm is driven at 60 Hz like `lerobot-teleoperate`; every second tick goes into
 the 30 fps dataset. When a session ends `check` runs (joint ranges, follower tracking, command channel against the
 plan, videos) and only then is the dataset pushed privately to the Hugging Face Hub (`--no-push` skips it).
 
@@ -109,9 +111,9 @@ cd python
 export ANTHROPIC_API_KEY=...
 uv run flywheel-robot inspect --tray --parts J-W-03 B-W-07 - L-T-01 D-W-02 J-T-04   # top camera, all 6 pockets
 uv run flywheel-robot inspect --image ../outputs/inspect/tray/*/pocket*_*.png         # score saved crops again
-uv run flywheel-robot inspect --sim 24                      # sim parts in the look pose, scored against ground truth
-uv run flywheel-robot inspect --camera 0                    # real wrist camera, arm above the part
-uv run flywheel-robot inspect --live                        # teleop; → asks Claude, it names the bin, you put the part there
+uv run flywheel-robot inspect --tray --image ../outputs/datasets/so101-qc/flywheel/trays/record-W-seed0-tray01.png
+uv run flywheel-robot inspect --sim 24                      # Claude on sim pocket crops, scored against ground truth
+uv run flywheel-robot inspect --live                        # teleop; → inspects the tray, a bin per pocket, you sort
 uv run flywheel-robot inspect --sim 8 --model claude-haiku-5-5 --model claude-sonnet-5-5
 uv run flywheel-robot inspect --sim 8 --effort low                # less thinking, shorter wait
 ```
@@ -119,7 +121,8 @@ uv run flywheel-robot inspect --sim 8 --effort low                # less thinkin
 Claude reports what it sees (type, colour, missing hole, broken); the bin comes from the work order rule, as with any
 classifier. Each request's time is printed; frames and answers go to `outputs/inspect/`.
 
-`--tray` takes one 1280×960 frame from the top camera, finds the four tags and cuts the six pockets out at a fixed
+Inspection happens once per tray, before the first pick, with the arm out of the way. `--tray` takes one 1280×960 frame
+from the top camera (the recorder's 640×480 frames work too), finds the four tags and cuts the six pockets out at a fixed
 4 px/mm. Next to Claude's answer it measures what the silhouette of a light part on the black tray shows: holes (the
 tray shows through), colour, rim spokes, the gap of missing gear teeth and the corner cut off a broken pad or bracket.
 The bin uses the measurement where there is one and Claude for the rest (the part type). With `--parts` (pocket order, `-` for empty) the

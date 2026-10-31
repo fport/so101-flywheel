@@ -59,12 +59,12 @@ The primary user is the developer-operator who builds and runs the system. Secon
 
 ## Reference task: quality control
 
-The arm looks at a part in the tray with its wrist camera, picks it, and drops it into the **OK** bin if it is sound or the **REJECT** bin if it is defective. Because the success criterion is clear, the verifier is easy to test: is the part in the correct bin, and inside the bin?
+The top camera inspects the whole tray once; the arm then picks each part from its pocket and drops it into the **OK** bin if it is sound or the **REJECT** bin if it is defective ("put the part from pocket N in the X bin"). Because the success criterion is clear, the verifier is easy to test: is the part in the correct bin, and inside the bin?
 
 **Physical setup**
 
 - Marked positions on the table: input tray, OK bin, reject bin. All are printed on the X2D and fixed to the table.
-- 2 cameras: top (scene) and wrist. The camera mounts are printed too; a fixed position is essential for eval repeatability.
+- 2 cameras: top (scene and inspection) and wrist. The camera mounts are printed too; a fixed position is essential for eval repeatability.
 - Fixed lighting: a desk lamp. Natural light changes are flagged as a separate failure source.
 
 **Part set**

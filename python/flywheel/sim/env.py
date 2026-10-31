@@ -95,11 +95,6 @@ class QCSortSim:
         f = height / 2 / np.tan(np.radians(self.model.cam_fovy[cam]) / 2)
         return width / 2 + f * local[0] / -local[2], height / 2 - f * local[1] / -local[2]
 
-    def look_pose(self, target, frame):
-        """Inspection pose: open jaws straight above the grasp point (target, frame), inspection.look_height higher.
-        The wrist camera sees the part in the tray from ~16 cm, near the image centre."""
-        return target + np.array([0, 0, mm(self.p["inspection"]["look_height"])]), frame
-
     def inspection_pose(self):
         """Earlier design, only drawn by the hardware diagram: the part held between the top camera and the backdrop.
 
@@ -112,17 +107,16 @@ class QCSortSim:
         tilt = np.radians(ins["pose_tilt"])
         return show, grasp_frame([np.sin(tilt), 0, -np.cos(tilt)], [0, 1, 0])
 
-    def inspection_crop(self, pid, size=224, scale=1):
-        """Input to the inspection classifier: a square crop around the part from the wrist camera image. Called in
-        the look pose, before the grasp; at the default size the whole part and a margin of its pocket fit in."""
-        w, h = self.p["cameras"]["resolution"]
-        image = self.render("wrist", w * scale, h * scale)
-        u, v = self.project(self.part_pos(pid), "wrist", w * scale, h * scale)
-        u0 = int(np.clip(u - size / 2, 0, w * scale - size))
-        v0 = int(np.clip(v - size / 2, 0, h * scale - size))
-        return image[v0 : v0 + size, u0 : u0 + size]
+    def tray_frame(self, width=1280, height=960):
+        """What inspection reads: one top-camera frame of the whole tray, taken with the arm at home before the first
+        pick. robot.tray finds the tags and cuts out the 6 pockets."""
+        return self.render("top", width, height)
 
     # --- parts and ground truth ------------------------------------------------------------------
+    def pocket_of(self, pid):
+        """Pocket the part was laid in, from 1 (left of the row nearest the arm), as in the plan and the task text."""
+        return self._slots[self.part_ids.index(pid)] + 1
+
     def part_pos(self, pid):
         return self.data.xpos[self._body[pid]].copy()
 

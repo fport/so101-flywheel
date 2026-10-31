@@ -10,19 +10,20 @@ import math
 from dataclasses import dataclass
 
 from ..sim.params import REPO_ROOT
+from ..sim.plan import POCKETS
 
 PLANS_DIR = REPO_ROOT / "plans"
 TRAYS_PER_SESSION = 5  # 5 trays = 30 episodes, about 40 minutes
-PHASE1_TASK = "look at the part from above"  # inspection: the wrist camera sees the part in its pocket
+COMMAND_NAMES = [f"pocket_{k}" for k in range(1, POCKETS + 1)] + ["ok", "reject"]
 
 
-def phase2_task(command):
-    return f"put the part in the {command.upper()} bin"
-
-
-def command_onehot(command):
-    """ACT command input (observation.environment_state): [ok, reject]. [0, 0] in phase 1."""
-    return [1.0, 0.0] if command == "ok" else [0.0, 1.0]
+def command_vector(pocket, command):
+    """ACT command input (observation.environment_state), the same thing the task text says: pocket one-hot, then
+    [ok, reject]. Constant over the episode."""
+    v = [0.0] * len(COMMAND_NAMES)
+    v[pocket - 1] = 1.0
+    v[POCKETS + (command != "ok")] = 1.0
+    return v
 
 
 @dataclass(frozen=True)
