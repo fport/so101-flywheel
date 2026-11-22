@@ -15,13 +15,13 @@ if [[ ! "$pocket" =~ ^[1-6]$ || ! "$bin" =~ ^(ok|reject)$ ]]; then
 fi
 task="put the part from pocket $pocket in the $(echo "$bin" | tr '[:lower:]' '[:upper:]') bin"
 
-resume=()
-[[ -f "$DATASET_ROOT/meta/info.json" ]] && resume=(--resume=true)
-
-run lerobot-record "${ROBOT_ARGS[@]}" "--robot.cameras=$CAMERAS" "${TELEOP_ARGS[@]}" \
+cmd=(lerobot-record "${ROBOT_ARGS[@]}" "--robot.cameras=$CAMERAS" "${TELEOP_ARGS[@]}" \
   "--dataset.repo_id=$HF_USER/$DATASET" "--dataset.root=$DATASET_ROOT" --dataset.no_stamp=true \
   "--dataset.single_task=$task" "--dataset.num_episodes=$episodes" "--dataset.fps=$FPS" \
   "--dataset.episode_time_s=${EPISODE_TIME_S:-30}" "--dataset.reset_time_s=${RESET_TIME_S:-15}" \
   --dataset.streaming_encoding=true --dataset.encoder_threads=2 \
   --dataset.push_to_hub=true --dataset.private=true \
-  --display_data=false "${resume[@]}"
+  --display_data=false)
+# the first block creates the dataset, every later one appends to it
+[[ -f "$DATASET_ROOT/meta/info.json" ]] && cmd+=(--resume=true)
+run "${cmd[@]}"

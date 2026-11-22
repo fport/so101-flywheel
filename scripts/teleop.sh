@@ -5,8 +5,8 @@
 set -euo pipefail
 source "$(dirname "$0")/env.sh"
 
-extra=()
+cmd=(lerobot-teleoperate "${ROBOT_ARGS[@]}" "${TELEOP_ARGS[@]}" --fps=60)
 if [[ "${1:-}" == "--cams" ]]; then
-  extra=("--robot.cameras=$CAMERAS" --display_data=true --display_compressed_images=true)
+  cmd+=("--robot.cameras=$CAMERAS" --display_data=true --display_compressed_images=true)
 fi
-run lerobot-teleoperate "${ROBOT_ARGS[@]}" "${TELEOP_ARGS[@]}" --fps=60 "${extra[@]}"
+run "${cmd[@]}"

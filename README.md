@@ -6,151 +6,69 @@
 
 <h1 align="center">so101-flywheel</h1>
 
-<p align="center"><b>A self-improving data flywheel for the SO-101 arm, on an end-of-line quality control task.</b><br>
-Record, verify, correct, retrain. Simulated in MuJoCo, printed on a Bambu X2D, trained with <a href="https://github.com/huggingface/lerobot">LeRobot</a>.</p>
+<p align="center"><b>SO-101 zero to hero: build a cell, record demonstrations, train a VLA, run it, improve it.</b><br>
+Plain <a href="https://github.com/huggingface/lerobot">LeRobot</a> commands on an end-of-line quality control task, with a step-by-step guide in English and Turkish.</p>
 
 <p align="center">
   <a href="https://github.com/TheRobotStudio/SO-ARM100"><img src="https://img.shields.io/badge/robot-SO--101-ff7a1a?labelColor=1c1c1c" alt="SO-101"></a>
   <a href="https://github.com/huggingface/lerobot"><img src="https://img.shields.io/badge/LeRobot-0.6.1-ff7a1a?labelColor=1c1c1c" alt="LeRobot 0.6.1"></a>
+  <a href="https://huggingface.co/docs/lerobot/smolvla"><img src="https://img.shields.io/badge/policy-SmolVLA-ff7a1a?labelColor=1c1c1c" alt="SmolVLA"></a>
   <a href="https://github.com/google-deepmind/mujoco"><img src="https://img.shields.io/badge/MuJoCo-3.12-ededed?labelColor=1c1c1c" alt="MuJoCo 3.12"></a>
   <a href="https://www.python.org/"><img src="https://img.shields.io/badge/python-3.12-ededed?labelColor=1c1c1c" alt="Python 3.12"></a>
-  <a href="https://flywheel.getporti.com"><img src="https://img.shields.io/badge/progress-live-ff7a1a?labelColor=1c1c1c" alt="Live progress tracker"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-ededed?labelColor=1c1c1c" alt="MIT license"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-ededed?labelColor=1c1c1c" alt="MIT"></a>
 </p>
 
 <p align="center">
-  <a href="docs/PRD.md">PRD</a> ·
-  <a href="docs/experiment-design.md">Experiment design</a> ·
-  <a href="docs/sim.md">Simulation</a> ·
+  <a href="https://zero2hero.getporti.com"><b>Guide</b></a> ·
+  <a href="docs/guide/en/record.md">Recording</a> ·
+  <a href="docs/guide/en/data-quality.md">Data quality</a> ·
+  <a href="docs/guide/en/train.md">Training</a> ·
   <a href="hardware/README.md">Print files</a> ·
-  <a href="docs/report/so101-flywheel-architecture.md">Architecture</a> ·
-  <a href="https://flywheel.getporti.com">Progress</a>
+  <a href="docs/sim.md">Simulation</a>
 </p>
-
-## What
-
-The arm records every attempt at a task, a VLM verifier judges success, failed attempts become new data through
-human correction, and the policy goes through retrain → eval → deploy. The first reference task is end-of-line
-quality control at an automotive supplier: the top camera inspects a tray of wheel rims, gears, brake pads and brackets
-once, then the arm is told "put the part from pocket N in the X bin"; sound parts that match the work order go to the OK
-bin, defective parts and wrong variants go to the reject bin.
-
-| | |
-| --- | --- |
-| 🧪 **Simulation** | MuJoCo scene of the cell, scripted expert, balanced recording and held-out eval plans |
-| 🖨️ **Hardware** | one `params.yaml` drives the sim and the parametric CAD; 18 numbered print plates |
-| 🦾 **Real arm** | leader → follower teleop, plan-driven recorder with spoken prompts, crash recovery |
-| 📈 **Training** | ACT on the recorded dataset, pushed privately to the Hugging Face Hub |
-
-## Status
-
-Phase 0. The repo has the MuJoCo scene of the reference task, a scripted episode that validates it, the print files
-built from the same dimensions, teleop and the recorder. The verifier, review UI and training loop are not here yet.
 
 ## Start
 
 ```bash
-cd python
-uv sync
-uv run flywheel-sim view
+cd python && uv sync --extra robot && cd ..
+scripts/teleop.sh --cams                    # leader drives follower, both cameras in Rerun
+(cd python && uv run flywheel-inspect)      # top camera reads the tray: a bin per pocket
+scripts/record.sh 1 ok                      # 10 episodes of "put the part from pocket 1 in the OK bin"
+scripts/status.sh                           # what is recorded, which block is next
+scripts/train.sh                            # fine-tune SmolVLA on a rented GPU
+scripts/rollout.sh 1 ok                     # the policy moves the arm
 ```
 
-### Real arm: teleop
+Ports and camera indices live in [`scripts/env.sh`](scripts/env.sh). Each script prints the `lerobot-*` command it runs.
 
-The robot dependencies live in the `robot` extra (not part of the sim install):
+## Why
 
-```bash
-cd python
-uv sync --extra robot
-uv run flywheel-robot teleop                     # Ctrl+C to quit
-uv run flywheel-robot teleop --top 1 --wrist 0   # with cameras, opens Rerun
-```
+A tray holds six 3D-printed parts: rims, gears, brake pads and brackets, some with a missing hole or a broken
+corner. The top camera looks once and decides OK or REJECT per pocket; the arm is then told, one part at a time,
+"put the part from pocket 3 in the REJECT bin". Deciding and moving are separate, so each can be tested and fixed
+alone. The policy only has to follow a sentence, and the sentence is the only thing in the data that predicts the
+target.
 
-Calibration lives in `hardware/calibration/{follower,leader}.json`. To recalibrate:
-`uv run flywheel-robot calibrate follower|leader|both`; answer the first prompt with `c` + Enter. The previous file
-is backed up under `hardware/calibration/old/`. Ports are fixed in the command; pass `--follower-port` /
-`--leader-port` if yours differ. Before starting, plug in the follower's 12 V adapter and hold the leader near the
-follower's pose: on connect the follower moves straight to the leader's pose.
+## What is here
 
-### Real arm: recording
+| | |
+| --- | --- |
+| 📖 **Guide** | Eight steps from an empty desk to a scored policy, in [English](docs/guide/en/index.md) and [Turkish](docs/guide/tr/index.md) |
+| 🦾 **Scripts** | Thin wrappers around `lerobot-teleoperate`, `-record`, `-train`, `-rollout`; no custom recorder |
+| 🔎 **Inspection** | `flywheel-inspect`: AprilTags → six pocket crops → measured holes, spokes, teeth, corners → a bin per pocket |
+| 🖨️ **Hardware** | One `params.yaml` drives the parametric CAD and the sim; numbered print plates for a Bambu X2D |
+| 🧪 **Simulation** | MuJoCo copy of the cell with a scripted expert, for sim-to-real experiments |
 
-A recording plan (`plans/record-W-seed0`) has three levels; the numbers are the same in the terminal, the plan
-file and the site:
-
-| Level | What | Count |
-| --- | --- | --- |
-| Episode | One part: pick it from its pocket, drop it into the commanded bin | 1–120 |
-| Tray | Six parts laid out on the tray, one top-camera frame of it; the tray is empty after 6 episodes | 1–20 |
-| Session | One `record --session N` run: 5 trays, 30 episodes, 30 different parts | 1–4 |
-
-The recorder shows the next tray, pocket and bin on screen and says them out loud; the operator steps through with
-→ or Enter (tray laid out → start → dropped); ← redoes the episode, Esc twice quits. As in `lerobot-record`
-the arrows and Esc are global, so they work while the Rerun window has focus; Enter, `r` and `q` count only in the
-recorder's terminal. When a tray is laid out, the top camera's frame of it is kept in `flywheel/trays/` next to the
-dataset; that is what inspection reads. An episode has one task text, "put the part from pocket N in the OK bin", and
-ACT gets the same thing in `observation.environment_state` (pocket one-hot + [ok, reject]). The arm is driven at 60 Hz like `lerobot-teleoperate`; every second tick goes into
-the 30 fps dataset. When a session ends `check` runs (joint ranges, follower tracking, command channel against the
-plan, videos) and only then is the dataset pushed privately to the Hugging Face Hub (`--no-push` skips it).
-
-```bash
-cd python
-uv run flywheel-robot sessions                    # session status, part list of the next one
-uv run flywheel-robot record --session 1          # top camera 1, wrist 0; opens the Rerun panel (--no-display to skip)
-uv run flywheel-robot record --session 1 --fake   # dry run without hardware
-uv run flywheel-robot check                       # check the dataset by hand (--repo-id fport/so101-qc-test)
-```
-
-The dataset is written to `outputs/datasets/so101-qc` and backed up to `so101-qc.snapshot` after every tray. If a
-recording does not close cleanly (crash, power loss), the next run rolls back to the last tray backup and carries on.
-`so101-qc/flywheel/episodes.jsonl` maps each episode to its plan row.
-
-### Inspection test with Claude
-
-```bash
-cd python
-export ANTHROPIC_API_KEY=...
-uv run flywheel-robot inspect --tray --parts J-W-03 B-W-07 - L-T-01 D-W-02 J-T-04   # top camera, all 6 pockets
-uv run flywheel-robot inspect --image ../outputs/inspect/tray/*/pocket*_*.png         # score saved crops again
-uv run flywheel-robot inspect --tray --image ../outputs/datasets/so101-qc/flywheel/trays/record-W-seed0-tray01.png
-uv run flywheel-robot inspect --sim 24                      # Claude on sim pocket crops, scored against ground truth
-uv run flywheel-robot inspect --live                        # teleop; → inspects the tray, a bin per pocket, you sort
-uv run flywheel-robot inspect --sim 8 --model claude-haiku-5-5 --model claude-sonnet-5-5
-uv run flywheel-robot inspect --sim 8 --effort low                # less thinking, shorter wait
-```
-
-Claude reports what it sees (type, colour, missing hole, broken); the bin comes from the work order rule, as with any
-classifier. Each request's time is printed; frames and answers go to `outputs/inspect/`.
-
-Inspection happens once per tray, before the first pick, with the arm out of the way. `--tray` takes one 1280×960 frame
-from the top camera (the recorder's 640×480 frames work too), finds the four tags and cuts the six pockets out at a fixed
-4 px/mm. Next to Claude's answer it measures what the silhouette of a light part on the black tray shows: holes (the
-tray shows through), colour, rim spokes, the gap of missing gear teeth and the corner cut off a broken pad or bracket.
-The bin uses the measurement where there is one and Claude for the rest (the part type). With `--parts` (pocket order, `-` for empty) the
-crops are named after the part IDs and every column is scored against the catalog.
-
-### Training (ACT v0)
-
-```bash
-cd python
-uv run lerobot-train \
-  --dataset.repo_id=fport/so101-qc --dataset.video_backend=pyav \
-  --policy.type=act --policy.device=mps \
-  --policy.repo_id=fport/so101-qc-act-v0 --policy.private=true \
-  --output_dir=outputs/train/act-v0 --job_name=act-v0 \
-  --wandb.enable=false
-```
-
-`pyav`: Homebrew's FFmpeg 9 does not load with torchcodec. On a GPU machine use `--policy.device=cuda`.
-
-## Layout
+## More
 
 ```
-docs/        PRD, print plan, experiment design, sim notes, architecture report
-plans/       balanced recording and eval plans
-hardware/    params.yaml (single source of dimensions), print/ (numbered print plates), calibration/
-python/      flywheel.sim (MuJoCo), flywheel.hardware (parametric CAD), flywheel.robot (teleop, recording)
-site/        progress tracker (flywheel.getporti.com, Cloudflare Workers)
+docs/guide/   the guide, Markdown, en/ and tr/ (rendered to zero2hero.getporti.com by site/build.py)
+scripts/      env.sh (your rig), teleop, calibrate, record, status, review, train, rollout
+python/       flywheel.qc (inspection), flywheel.sim (MuJoCo), flywheel.hardware (CAD)
+hardware/     params.yaml, print/ (plates), calibration/
 ```
+
+Tests: `cd python && uv run pytest`.
 
 ## License
 

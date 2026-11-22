@@ -6,155 +6,70 @@
 
 <h1 align="center">so101-flywheel</h1>
 
-<p align="center"><b>SO-101 kolu için kendini geliştiren bir veri çarkı, hat sonu kalite kontrol görevi üzerinde.</b><br>
-Kaydet, doğrula, düzelt, yeniden eğit. Simülasyon MuJoCo'da, baskılar Bambu X2D'de, eğitim <a href="https://github.com/huggingface/lerobot">LeRobot</a> ile.</p>
+<p align="center"><b>SO-101 sıfırdan zirveye: hücreyi kur, gösterim kaydet, VLA eğit, çalıştır, geliştir.</b><br>
+Hat sonu kalite kontrol görevi üzerinde düz <a href="https://github.com/huggingface/lerobot">LeRobot</a> komutları ve adım adım, Türkçe ve İngilizce bir rehber.</p>
 
 <p align="center">
   <a href="https://github.com/TheRobotStudio/SO-ARM100"><img src="https://img.shields.io/badge/robot-SO--101-ff7a1a?labelColor=1c1c1c" alt="SO-101"></a>
   <a href="https://github.com/huggingface/lerobot"><img src="https://img.shields.io/badge/LeRobot-0.6.1-ff7a1a?labelColor=1c1c1c" alt="LeRobot 0.6.1"></a>
+  <a href="https://huggingface.co/docs/lerobot/smolvla"><img src="https://img.shields.io/badge/policy-SmolVLA-ff7a1a?labelColor=1c1c1c" alt="SmolVLA"></a>
   <a href="https://github.com/google-deepmind/mujoco"><img src="https://img.shields.io/badge/MuJoCo-3.12-ededed?labelColor=1c1c1c" alt="MuJoCo 3.12"></a>
   <a href="https://www.python.org/"><img src="https://img.shields.io/badge/python-3.12-ededed?labelColor=1c1c1c" alt="Python 3.12"></a>
-  <a href="https://flywheel.getporti.com/?lang=tr"><img src="https://img.shields.io/badge/ilerleme-canl%C4%B1-ff7a1a?labelColor=1c1c1c" alt="Canlı ilerleme sitesi"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/lisans-MIT-ededed?labelColor=1c1c1c" alt="MIT lisansı"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/lisans-MIT-ededed?labelColor=1c1c1c" alt="MIT"></a>
 </p>
 
 <p align="center">
-  <a href="docs/PRD.md">PRD</a> ·
-  <a href="docs/experiment-design.md">Deney tasarımı</a> ·
-  <a href="docs/sim.md">Simülasyon</a> ·
+  <a href="https://zero2hero.getporti.com/tr/"><b>Rehber</b></a> ·
+  <a href="docs/guide/tr/record.md">Kayıt</a> ·
+  <a href="docs/guide/tr/data-quality.md">Veri kalitesi</a> ·
+  <a href="docs/guide/tr/train.md">Eğitim</a> ·
   <a href="hardware/README.md">Baskı dosyaları</a> ·
-  <a href="docs/report/so101-flywheel-architecture.md">Mimari</a> ·
-  <a href="https://flywheel.getporti.com/?lang=tr">İlerleme</a>
+  <a href="docs/sim.md">Simülasyon</a>
 </p>
-
-<p align="center"><sub>Dokümanlar İngilizce.</sub></p>
-
-## Ne
-
-Kol bir görevi her denemede kaydeder, bir VLM verifier başarıyı değerlendirir, başarısız denemeler insan düzeltmesiyle
-yeni veriye dönüşür ve policy retrain → eval → deploy döngüsünden geçer. İlk referans görev otomotiv yan sanayi hat
-sonu kalite kontrolü: üst kamera jant, dişli, balata ve braketlerle dolu tepsiyi bir kez muayene eder, sonra kola
-"N numaralı cepteki parçayı X kasasına koy" denir; iş emrine uyan sağlam parçalar OK kasasına, kusurlular ve yanlış
-varyantlar ret kasasına gider.
-
-| | |
-| --- | --- |
-| 🧪 **Simülasyon** | hücrenin MuJoCo sahnesi, scripted uzman, dengeli kayıt ve held-out eval planları |
-| 🖨️ **Donanım** | tek `params.yaml` hem simi hem parametrik CAD'i besler; 18 numaralı baskı tablası |
-| 🦾 **Gerçek kol** | leader → follower teleop, sesli yönlendiren plan güdümlü kaydedici, çökme kurtarma |
-| 📈 **Eğitim** | kaydedilen dataset üzerinde ACT, Hugging Face Hub'a private yüklenir |
-
-## Durum
-
-Faz 0. Repoda referans görevin MuJoCo sahnesi, onu doğrulayan scripted bölüm, aynı ölçülerden üretilen baskı
-dosyaları, teleop ve kaydedici var. Verifier, review UI ve eğitim döngüsü henüz yok.
 
 ## Başla
 
 ```bash
-cd python
-uv sync
-uv run flywheel-sim view
+cd python && uv sync --extra robot && cd ..
+scripts/teleop.sh --cams                    # leader follower'ı sürer, iki kamera Rerun'da
+(cd python && uv run flywheel-inspect)      # üst kamera tepsiyi okur: her cebe bir kasa
+scripts/record.sh 1 ok                      # "put the part from pocket 1 in the OK bin" için 10 episode
+scripts/status.sh                           # ne kaydedildi, sıradaki blok hangisi
+scripts/train.sh                            # SmolVLA'yı kiralık GPU'da fine-tune et
+scripts/rollout.sh 1 ok                     # policy kolu hareket ettirir
 ```
 
-### Gerçek kol: teleop
+Portlar ve kamera indeksleri [`scripts/env.sh`](scripts/env.sh) içinde. Her script çalıştırdığı `lerobot-*` komutunu ekrana yazar.
 
-Robot bağımlılıkları `robot` extra'sında (sim kurulumuna girmez):
+## Neden
 
-```bash
-cd python
-uv sync --extra robot
-uv run flywheel-robot teleop                     # Ctrl+C ile çık
-uv run flywheel-robot teleop --top 1 --wrist 0   # kameralarla, Rerun açılır
-```
+Tepside altı adet 3D baskı parça var: jant, dişli, balata ve braket; bazılarında delik eksik ya da köşe kırık.
+Üst kamera bir kez bakar ve her cep için OK ya da REJECT der; kola sonra parça parça şu söylenir:
+"put the part from pocket 3 in the REJECT bin". Karar vermek ile hareket etmek ayrıdır, böylece her biri tek başına
+test edilip düzeltilebilir. Policy yalnızca bir cümleye uyar ve veride hedefi belirleyen tek şey o cümledir.
 
-Kalibrasyon `hardware/calibration/{follower,leader}.json` içinde. Yeniden kalibre etmek için
-`uv run flywheel-robot calibrate follower|leader|both`; ilk soruya `c` + ENTER. Eski dosya
-`hardware/calibration/old/` altına yedeklenir. Portlar komutta sabit; seninkiler farklıysa `--follower-port` /
-`--leader-port` ile ver. Başlamadan önce follower'ın 12 V adaptörünü tak ve leader'ı follower'ın pozuna yakın tut:
-bağlanınca follower doğrudan leader'ın pozuna gider.
+## İçinde ne var
 
-### Gerçek kol: kayıt
+| | |
+| --- | --- |
+| 📖 **Rehber** | Boş masadan puanlanmış bir policy'ye sekiz adım, [Türkçe](docs/guide/tr/index.md) ve [İngilizce](docs/guide/en/index.md) |
+| 🦾 **Scriptler** | `lerobot-teleoperate`, `-record`, `-train`, `-rollout` üzerine ince sarmalayıcılar; özel kaydedici yok |
+| 🔎 **Muayene** | `flywheel-inspect`: AprilTag → altı cep kesiti → ölçülen delik, kol, diş, köşe → her cebe bir kasa |
+| 🖨️ **Donanım** | Tek `params.yaml` hem parametrik CAD'i hem simülasyonu üretir; Bambu X2D için numaralı baskı tablaları |
+| 🧪 **Simülasyon** | Hücrenin MuJoCo kopyası ve scripted uzman, sim-to-real denemeleri için |
 
-Kayıt planı (`plans/record-W-seed0`) üç seviyedir; numaralar terminalde, plan dosyasında ve sitede aynıdır:
-
-| Seviye | Ne | Sayı |
-| --- | --- | --- |
-| Bölüm | Tek parça: cebinden al, söylenen kasaya bırak | 1–120 |
-| Tepsi | Tepsiye dizilmiş 6 parça, üst kameradan bir karesi; 6 bölümde tepsi boşalır | 1–20 |
-| Seans | Tek `record --session N` çalıştırması: 5 tepsi, 30 bölüm, 30 farklı parça | 1–4 |
-
-Kaydedici sıradaki tepsiyi, cebi ve kasayı ekranda gösterip sesle söyler; operatör → ya da ENTER ile ilerler (tepsi
-dizildi → başlat → bıraktım); ← bölümü yeniden çeker, iki kez Esc çıkar. `lerobot-record`'daki gibi oklar ve Esc globaldir,
-Rerun penceresi öndeyken de çalışır; ENTER, `r` ve `q` sadece kaydın terminalinde sayılır. Tepsi dizilince üst
-kameranın karesi dataset'in yanında `flywheel/trays/` altına saklanır; muayene bunu okur. Bir bölümün tek görev metni
-vardır, "put the part from pocket N in the OK bin"; ACT aynı şeyi `observation.environment_state` kanalından alır
-(cep one-hot + [ok, reject]). Kol `lerobot-teleoperate` gibi 60 Hz'de sürülür, her ikinci adım
-30 fps dataset'e yazılır. Seans bitince `check` çalışır (eklem aralıkları, follower'ın leader'ı izlemesi, komut
-kanalının planla eşleşmesi, videolar), ancak ondan sonra dataset private olarak Hugging Face Hub'a yüklenir
-(`--no-push` ile atlanır). Sesli yönlendirmeler İngilizcedir.
-
-```bash
-cd python
-uv run flywheel-robot sessions                    # seansların durumu, sıradakinin parça listesi
-uv run flywheel-robot record --session 1          # üst kamera 1, bilek 0; Rerun paneli açılır (--no-display ile kapat)
-uv run flywheel-robot record --session 1 --fake   # donanımsız deneme
-uv run flywheel-robot check                       # dataset'i elle kontrol et (--repo-id fport/so101-qc-test)
-```
-
-Dataset `outputs/datasets/so101-qc` altına yazılır ve her tepsi sonunda `so101-qc.snapshot`'a yedeklenir. Kayıt
-temiz kapanmazsa (çökme, elektrik) bir sonraki çalıştırma son tepsi yedeğine döner ve kaldığı yerden sürer.
-Hangi bölümün hangi plan satırı olduğu `so101-qc/flywheel/episodes.jsonl`'da.
-
-### Claude ile muayene testi
-
-```bash
-cd python
-export ANTHROPIC_API_KEY=...
-uv run flywheel-robot inspect --tray --parts J-W-03 B-W-07 - L-T-01 D-W-02 J-T-04   # üst kamera, 6 cebin hepsi
-uv run flywheel-robot inspect --image ../outputs/inspect/tray/*/pocket*_*.png         # kaydedilen kırpmaları yeniden puanla
-uv run flywheel-robot inspect --tray --image ../outputs/datasets/so101-qc/flywheel/trays/record-W-seed0-tray01.png
-uv run flywheel-robot inspect --sim 24                      # sim cep kırpmalarında Claude, gerçek etiketle puanlanır
-uv run flywheel-robot inspect --live                        # teleop; → tepsiyi muayene eder, her cebe bir kasa, sen dağıtırsın
-uv run flywheel-robot inspect --sim 8 --model claude-haiku-5-5 --model claude-sonnet-5-5
-uv run flywheel-robot inspect --sim 8 --effort low                # daha az düşünür, daha kısa bekler
-```
-
-Claude gördüğünü söyler (tip, renk, eksik delik, kırık); kasayı iş emri kuralı verir, her sınıflandırıcıda olduğu
-gibi. Her isteğin süresi yazılır; kareler ve cevaplar `outputs/inspect/` altına gider.
-
-Muayene tepsi başına bir kez, ilk parçadan önce, kol yoldan çekilmişken yapılır. `--tray` üst kameradan 1280×960 tek
-kare alır (kaydedicinin 640×480 kareleri de çalışır), dört tag'i bulur ve altı cebi sabit 4 px/mm ölçekle keser. Claude'un
-cevabının yanında, siyah tepsideki açık renkli parçanın silüetinden ölçülebilenleri ölçer: delik (tepsi içinden
-görünür), renk, jant kolları, dişlideki eksik diş boşluğu ve kırık balata ya da braketin kesik köşesi. Kasa kararında
-ölçüm olan yerde ölçüm, kalanında (parça tipi) Claude kullanılır. `--parts` verilirse (cep sırasıyla, boş cep için `-`) kırpmalar parça
-ID'siyle adlandırılır ve her sütun kataloğa göre puanlanır.
-
-### Eğitim (ACT v0)
-
-```bash
-cd python
-uv run lerobot-train \
-  --dataset.repo_id=fport/so101-qc --dataset.video_backend=pyav \
-  --policy.type=act --policy.device=mps \
-  --policy.repo_id=fport/so101-qc-act-v0 --policy.private=true \
-  --output_dir=outputs/train/act-v0 --job_name=act-v0 \
-  --wandb.enable=false
-```
-
-`pyav`: Homebrew'un FFmpeg 9'u torchcodec ile yüklenemiyor. GPU'lu makinede `--policy.device=cuda`.
-
-## Yapı
+## Daha fazlası
 
 ```
-docs/        PRD, baskı planı, deney tasarımı, sim notları, mimari raporu
-plans/       dengeli kayıt ve eval planları
-hardware/    params.yaml (ortak ölçü kaynağı), print/ (numaralı baskı tablaları), calibration/
-python/      flywheel.sim (MuJoCo), flywheel.hardware (parametrik CAD), flywheel.robot (teleop, kayıt)
-site/        ilerleme sitesi (flywheel.getporti.com, Cloudflare Workers)
+docs/guide/   rehber, Markdown, en/ ve tr/ (site/build.py ile zero2hero.getporti.com'a dönüşür)
+scripts/      env.sh (senin düzeneğin), teleop, calibrate, record, status, review, train, rollout
+python/       flywheel.qc (muayene), flywheel.sim (MuJoCo), flywheel.hardware (CAD)
+hardware/     params.yaml, print/ (tablalar), calibration/
 ```
+
+Testler: `cd python && uv run pytest`.
 
 ## Lisans
 
-MIT, bkz. [LICENSE](LICENSE). `python/flywheel/sim/assets/so101/` altındaki SO-101 modeli TheRobotStudio'nundur ve
-Apache-2.0 lisanslıdır ([NOTICE](python/flywheel/sim/assets/so101/NOTICE.md)).
+MIT, bkz. [LICENSE](LICENSE). `python/flywheel/sim/assets/so101/` altındaki SO-101 modeli TheRobotStudio'ya aittir
+ve Apache-2.0 lisanslıdır ([NOTICE](python/flywheel/sim/assets/so101/NOTICE.md)).

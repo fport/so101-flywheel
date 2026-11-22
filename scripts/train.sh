@@ -7,11 +7,10 @@
 set -euo pipefail
 source "$(dirname "$0")/env.sh"
 
-job=()
-[[ "${TARGET:-a100-large}" != "local" ]] && job=("--job.target=${TARGET:-a100-large}")
-
-run lerobot-train --policy.path=lerobot/smolvla_base \
+cmd=(lerobot-train --policy.path=lerobot/smolvla_base \
   "--dataset.repo_id=$HF_USER/$DATASET" "--policy.repo_id=$HF_USER/$DATASET-smolvla" --policy.private=true \
   "--rename_map=$RENAME_MAP" \
   "--batch_size=${BATCH_SIZE:-64}" "--steps=${STEPS:-20000}" \
-  --policy.device=cuda --wandb.enable=false "${job[@]}"
+  --policy.device=cuda --wandb.enable=false)
+[[ "${TARGET:-a100-large}" != "local" ]] && cmd+=("--job.target=${TARGET:-a100-large}")
+run "${cmd[@]}"
