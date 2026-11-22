@@ -45,7 +45,7 @@ Sonra: [sırada ne denenir](next.md) (Cosmos 3, sim-to-real aktarımı, groundin
 ## Bugün, sırayla
 
 ```bash
-scripts/teleop.sh --cams      # 1. both cameras see what they should
+scripts/teleop.sh             # 1. leader drives follower; scripts/cams.sh shows both cameras
 uv run flywheel-inspect       # 2. the top camera reads the tray
 scripts/record.sh 1 ok        # 3. first block of 10 episodes
 scripts/status.sh             # 4. what is left; repeat until 120

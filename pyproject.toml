@@ -20,6 +20,7 @@ flywheel-sim = "flywheel.sim.cli:main"
 flywheel-cad = "flywheel.hardware.cli:main"
 flywheel-inspect = "flywheel.qc.cli:main"
 flywheel-status = "flywheel.status:main"
+flywheel-cams = "flywheel.cams:main"
 
 [project.optional-dependencies]
 robot = [

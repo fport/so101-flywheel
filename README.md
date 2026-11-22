@@ -32,7 +32,8 @@ Plain <a href="https://github.com/huggingface/lerobot">LeRobot</a> commands on a
 
 ```bash
 uv sync --extra robot
-scripts/teleop.sh --cams                    # leader drives follower, both cameras in Rerun
+scripts/teleop.sh                           # leader drives follower
+scripts/cams.sh                             # both cameras in the browser, to aim them
 uv run flywheel-inspect                     # top camera reads the tray: a bin per pocket
 scripts/record.sh 1 ok                      # 10 episodes of "put the part from pocket 1 in the OK bin"
 scripts/status.sh                           # what is recorded, which block is next

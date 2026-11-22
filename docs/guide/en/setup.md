@@ -35,8 +35,8 @@ changes what the numbers in your dataset mean: do it before, not in between.
 ## Teleoperate
 
 ```bash
-scripts/teleop.sh           # arms only
-scripts/teleop.sh --cams    # plus both cameras in Rerun
+scripts/teleop.sh           # leader drives follower
+scripts/cams.sh             # in a second terminal: both cameras at http://localhost:8642
 ```
 
 Hold the leader near the follower's pose before you start: the follower jumps to the leader on connect.
@@ -49,5 +49,6 @@ Hold the leader near the follower's pose before you start: the follower jumps to
   images, the policy cannot either. Move the cameras until you can.
 - Practise until one pick-and-drop takes about 10 seconds without fumbling.
 
-**Rerun and macOS.** Showing live cameras costs CPU and has stalled the control loop here. Use `--cams` to aim the
-cameras, then record without a viewer (the recording script does this).
+**Why not Rerun?** `scripts/teleop.sh --cams` opens LeRobot's Rerun viewer, but on a Mac it has stalled the control loop
+("Sender has been blocked… waiting for space in channel"). The browser preview is one small process and cannot block
+the arm. Stop it before recording: the recording needs the cameras for itself.

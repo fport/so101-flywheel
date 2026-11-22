@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Drive the follower with the leader. Ctrl+C to quit.
 #   scripts/teleop.sh          arms only
-#   scripts/teleop.sh --cams   also opens Rerun with both cameras (use it to aim the cameras, not while recording)
+#   scripts/teleop.sh --cams   also opens Rerun with both cameras. Rerun can stall the control loop on a Mac;
+#                              scripts/cams.sh in a second terminal shows the cameras in the browser without it
 set -euo pipefail
 source "$(dirname "$0")/env.sh"
 

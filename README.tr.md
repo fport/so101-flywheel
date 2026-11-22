@@ -32,7 +32,8 @@ Hat sonu kalite kontrol görevi üzerinde düz <a href="https://github.com/huggi
 
 ```bash
 uv sync --extra robot
-scripts/teleop.sh --cams                    # leader follower'ı sürer, iki kamera Rerun'da
+scripts/teleop.sh                           # leader follower'ı sürer
+scripts/cams.sh                             # iki kamera tarayıcıda, hizalamak için
 uv run flywheel-inspect                     # üst kamera tepsiyi okur: her cebe bir kasa
 scripts/record.sh 1 ok                      # "put the part from pocket 1 in the OK bin" için 10 episode
 scripts/status.sh                           # ne kaydedildi, sıradaki blok hangisi

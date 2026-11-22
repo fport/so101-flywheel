@@ -35,8 +35,8 @@ kalibre edersen dataset'indeki sayıların anlamı değişir: kayıttan önce ya
 ## Teleop
 
 ```bash
-scripts/teleop.sh           # arms only
-scripts/teleop.sh --cams    # plus both cameras in Rerun
+scripts/teleop.sh           # leader drives follower
+scripts/cams.sh             # in a second terminal: both cameras at http://localhost:8642
 ```
 
 Başlamadan önce leader'ı follower'ın pozuna yakın tut: follower bağlanır bağlanmaz leader'ın pozuna sıçrar.
@@ -49,5 +49,6 @@ Başlamadan önce leader'ı follower'ın pozuna yakın tut: follower bağlanır 
   yapamaz. Yapabilene kadar kameraların yerini değiştir.
 - Tek bir al-bırak, takılmadan yaklaşık 10 saniye sürene kadar pratik yap.
 
-**Rerun ve macOS.** Canlı kamera göstermek CPU yiyor ve burada kontrol döngüsünü kilitledi. Kameraları hizalamak
-için `--cams` kullan, sonra görüntüleyici olmadan kaydet (kayıt script'i zaten böyle yapıyor).
+**Neden Rerun değil?** `scripts/teleop.sh --cams` LeRobot'un Rerun görüntüleyicisini açar ama Mac'te kontrol döngüsünü
+kilitledi ("Sender has been blocked… waiting for space in channel"). Tarayıcı önizlemesi tek küçük bir süreç ve kolu
+bloklayamaz. Kayıttan önce kapat: kayıt kameraları kendisi kullanır.
