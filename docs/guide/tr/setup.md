@@ -17,7 +17,8 @@ uv run lerobot-find-port               # unplug one arm when asked; note both po
 uv run lerobot-find-cameras opencv     # saves one frame per camera, note the two indices
 ```
 
-Dört değeri [`scripts/env.sh`](../../../scripts/env.sh) dosyasına yaz. Her script onları oradan okur ve çalıştırmadan
+Dört değeri ve Hugging Face kullanıcı adını `scripts/env.local.sh` dosyasına yaz (sana ait, commit edilmez; şablonu
+[`scripts/env.sh`](../../../scripts/env.sh) dosyasının başında). Her script onları oradan okur ve çalıştırmadan
 önce tam `lerobot-*` komutunu ekrana basar, yani neyin çalıştığını her zaman görürsün.
 
 ## Kalibrasyon (bir kez)

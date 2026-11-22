@@ -19,8 +19,6 @@ import sys
 import time
 from datetime import datetime
 
-import numpy as np
-
 from ..sim.params import REPO_ROOT, load_params
 from ..sim.parts import decide
 from ..sim.plan import task
@@ -116,10 +114,11 @@ def inspect_tray(frame, parts, args, out):
     for the rest (the part type, and anything the measurement could not read). parts: 6 IDs in pocket order, '?' when
     unknown, '-' for an empty pocket; with IDs the crops are named after them and the catalog gives the truth.
     Raises RuntimeError when the tags are not found."""
-    import cv2
     from concurrent.futures import ThreadPoolExecutor
 
-    from .tray import find_tags, overlay, pocket_crops, measure, tray_homography, truth_for
+    import cv2
+
+    from .tray import find_tags, measure, overlay, pocket_crops, tray_homography, truth_for
 
     out.mkdir(parents=True, exist_ok=True)
     cv2.imwrite(str(out / "frame.png"), frame[..., ::-1])

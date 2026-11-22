@@ -11,7 +11,6 @@ for the verifier and the policy. All dimensions come from [`hardware/params.yaml
 ## Running
 
 ```bash
-cd python
 uv sync
 uv run flywheel-sim build      # params.yaml -> scene + 76-part catalogue
 uv run flywheel-sim view       # interactive viewer

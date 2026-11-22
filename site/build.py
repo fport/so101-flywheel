@@ -1,6 +1,6 @@
 """Renders docs/guide/{en,tr}/*.md to site/public/ (English at /, Turkish at /tr/).
 
-    cd python && uv run python ../site/build.py
+    uv run python site/build.py
     cd site && npx wrangler deploy
 
 The Markdown files are the only source: GitHub shows them as docs, this turns the same files into the site.
@@ -44,7 +44,6 @@ def render(text):
 def page(lang, name, text, titles):
     ui, i = UI[lang], PAGES.index(name)
     other = "tr" if lang == "en" else "en"
-    here = "" if name == "index" else name
     url = lambda l, n: ("/" if l == "en" else "/tr/") + ("" if n == "index" else n)  # noqa: E731
     nav = "".join(
         f'<a href="{url(lang, n)}"{" class=on" if n == name else ""}>{html.escape(ui["home"] if n == "index" else titles[n])}</a>'

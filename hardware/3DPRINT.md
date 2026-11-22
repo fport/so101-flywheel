@@ -1,6 +1,6 @@
 # 3D printing: lessons learned and checklist
 
-The parts of this cell are generated from code (`python/flywheel/hardware/`, dimensions in `hardware/params.yaml`). The points below come
+The parts of this cell are generated from code (`src/flywheel/hardware/`, dimensions in `hardware/params.yaml`). The points below come
 from mistakes that actually happened in the first prints; go through this list when designing a new part or before sending a file
 to the printer.
 
@@ -40,7 +40,6 @@ must not slide, since the arm learns their positions.
 ## Check before sending
 
 ```bash
-cd python
 uv run flywheel-cad build          # generates the files, checks collisions / plate / fits
 uv run pytest -q                   # geometry tests (bridge under feet, tongue-pocket lock, shared nozzle area...)
 uv run flywheel-cad slicecheck ../hardware/print/06_*.3mf   # Bambu's own slicer: warnings, time, layers

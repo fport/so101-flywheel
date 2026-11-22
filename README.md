@@ -30,16 +30,16 @@ Plain <a href="https://github.com/huggingface/lerobot">LeRobot</a> commands on a
 ## Start
 
 ```bash
-cd python && uv sync --extra robot && cd ..
+uv sync --extra robot
 scripts/teleop.sh --cams                    # leader drives follower, both cameras in Rerun
-(cd python && uv run flywheel-inspect)      # top camera reads the tray: a bin per pocket
+uv run flywheel-inspect                     # top camera reads the tray: a bin per pocket
 scripts/record.sh 1 ok                      # 10 episodes of "put the part from pocket 1 in the OK bin"
 scripts/status.sh                           # what is recorded, which block is next
 scripts/train.sh                            # fine-tune SmolVLA on a rented GPU
 scripts/rollout.sh 1 ok                     # the policy moves the arm
 ```
 
-Ports and camera indices live in [`scripts/env.sh`](scripts/env.sh). Each script prints the `lerobot-*` command it runs.
+Your ports, camera indices and Hugging Face user go in `scripts/env.local.sh` (template at the top of [`scripts/env.sh`](scripts/env.sh)). Each script prints the `lerobot-*` command it runs.
 
 ## Why
 
@@ -63,14 +63,15 @@ target.
 
 ```
 docs/guide/   the guide, Markdown, en/ and tr/ (rendered to zero2hero.getporti.com by site/build.py)
-scripts/      env.sh (your rig), teleop, calibrate, record, status, review, train, rollout
-python/       flywheel.qc (inspection), flywheel.sim (MuJoCo), flywheel.hardware (CAD)
+scripts/      env.sh (rig settings), teleop, calibrate, record, status, review, train, rollout
+src/flywheel/ qc (inspection), sim (MuJoCo), hardware (CAD), status
+tests/        pytest
 hardware/     params.yaml, print/ (plates), calibration/
 ```
 
-Tests: `cd python && uv run pytest`.
+Tests: `uv run pytest`.
 
 ## License
 
-MIT, see [LICENSE](LICENSE). The SO-101 model under `python/flywheel/sim/assets/so101/` belongs to TheRobotStudio
-and is licensed Apache-2.0 ([NOTICE](python/flywheel/sim/assets/so101/NOTICE.md)).
+MIT, see [LICENSE](LICENSE). The SO-101 model under `src/flywheel/sim/assets/so101/` belongs to TheRobotStudio
+and is licensed Apache-2.0 ([NOTICE](src/flywheel/sim/assets/so101/NOTICE.md)).

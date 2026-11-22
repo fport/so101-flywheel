@@ -1,7 +1,9 @@
 [project]
 name = "so101-flywheel"
 version = "0.1.0"
-description = "SO-101 self-improving data flywheel: robot, training, verifier and simulation"
+description = "SO-101 zero to hero: tray inspection, MuJoCo sim and parametric CAD around plain LeRobot recording and training"
+readme = "README.md"
+license = "MIT"
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "mujoco==3.12.0",
@@ -17,6 +19,7 @@ dependencies = [
 flywheel-sim = "flywheel.sim.cli:main"
 flywheel-cad = "flywheel.hardware.cli:main"
 flywheel-inspect = "flywheel.qc.cli:main"
+flywheel-status = "flywheel.status:main"
 
 [project.optional-dependencies]
 robot = [
@@ -29,10 +32,22 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["flywheel"]
+packages = ["src/flywheel"]
 
 [dependency-groups]
 dev = [
     "pytest>=9.1.1",
+    "ruff>=0.8",
     "markdown>=3.6",  # site/build.py
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 130
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501", "E731", "E741", "B905", "B007"]

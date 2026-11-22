@@ -46,7 +46,7 @@ So a falling loss means "imitates the recorded motions better", not "sorts parts
 - The loss falls quickly in the first thousand steps, then slowly. If it is flat from the start, the dataset or the
   camera map is wrong.
 - When the job starts it prints **Model repo:** `fport/so101-qc-smolvla_<time>`. The policy is uploaded there (private)
-  when training ends. Put that name in `scripts/env.sh` as `POLICY`: [step 8](rollout.md) reads it.
+  when training ends. Put that name in `scripts/env.local.sh` as `POLICY=...`: [step 8](rollout.md) reads it.
 
 ## Do a short dry run first
 

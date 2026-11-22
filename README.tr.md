@@ -30,16 +30,16 @@ Hat sonu kalite kontrol görevi üzerinde düz <a href="https://github.com/huggi
 ## Başla
 
 ```bash
-cd python && uv sync --extra robot && cd ..
+uv sync --extra robot
 scripts/teleop.sh --cams                    # leader follower'ı sürer, iki kamera Rerun'da
-(cd python && uv run flywheel-inspect)      # üst kamera tepsiyi okur: her cebe bir kasa
+uv run flywheel-inspect                     # üst kamera tepsiyi okur: her cebe bir kasa
 scripts/record.sh 1 ok                      # "put the part from pocket 1 in the OK bin" için 10 episode
 scripts/status.sh                           # ne kaydedildi, sıradaki blok hangisi
 scripts/train.sh                            # SmolVLA'yı kiralık GPU'da fine-tune et
 scripts/rollout.sh 1 ok                     # policy kolu hareket ettirir
 ```
 
-Portlar ve kamera indeksleri [`scripts/env.sh`](scripts/env.sh) içinde. Her script çalıştırdığı `lerobot-*` komutunu ekrana yazar.
+Portların, kamera indekslerin ve Hugging Face kullanıcın `scripts/env.local.sh` dosyasına yazılır (şablon [`scripts/env.sh`](scripts/env.sh) başında). Her script çalıştırdığı `lerobot-*` komutunu ekrana yazar.
 
 ## Neden
 
@@ -62,14 +62,15 @@ test edilip düzeltilebilir. Policy yalnızca bir cümleye uyar ve veride hedefi
 
 ```
 docs/guide/   rehber, Markdown, en/ ve tr/ (site/build.py ile zero2hero.getporti.com'a dönüşür)
-scripts/      env.sh (senin düzeneğin), teleop, calibrate, record, status, review, train, rollout
-python/       flywheel.qc (muayene), flywheel.sim (MuJoCo), flywheel.hardware (CAD)
+scripts/      env.sh (düzenek ayarları), teleop, calibrate, record, status, review, train, rollout
+src/flywheel/ qc (muayene), sim (MuJoCo), hardware (CAD), status
+tests/        pytest
 hardware/     params.yaml, print/ (tablalar), calibration/
 ```
 
-Testler: `cd python && uv run pytest`.
+Testler: `uv run pytest`.
 
 ## Lisans
 
-MIT, bkz. [LICENSE](LICENSE). `python/flywheel/sim/assets/so101/` altındaki SO-101 modeli TheRobotStudio'ya aittir
-ve Apache-2.0 lisanslıdır ([NOTICE](python/flywheel/sim/assets/so101/NOTICE.md)).
+MIT, bkz. [LICENSE](LICENSE). `src/flywheel/sim/assets/so101/` altındaki SO-101 modeli TheRobotStudio'ya aittir
+ve Apache-2.0 lisanslıdır ([NOTICE](src/flywheel/sim/assets/so101/NOTICE.md)).

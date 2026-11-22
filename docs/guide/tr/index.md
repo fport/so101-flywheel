@@ -33,7 +33,7 @@ Sonra: [sırada ne denenir](next.md) (Cosmos 3, sim-to-real aktarımı, groundin
 
 ```bash
 scripts/teleop.sh --cams      # 1. both cameras see what they should
-uv run flywheel-inspect       # 2. the top camera reads the tray (run inside python/)
+uv run flywheel-inspect       # 2. the top camera reads the tray
 scripts/record.sh 1 ok        # 3. first block of 10 episodes
 scripts/status.sh             # 4. what is left; repeat until 120
 scripts/train.sh              # 5. SmolVLA on a rented GPU

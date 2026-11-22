@@ -5,7 +5,11 @@ __pycache__/
 .DS_Store
 outputs/
 # regenerated from params.yaml by `flywheel-sim build`
-python/flywheel/sim/assets/generated/
+src/flywheel/sim/assets/generated/
+
+# per-device: your arm's calibration and your rig's ports are yours, not the repo's
+hardware/calibration/
+scripts/env.local.sh
 
 # tool output
 MUJOCO_LOG.TXT

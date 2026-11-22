@@ -4,10 +4,9 @@
 uygular. İkisini ayrı tutunca yanlış bir karar ile beceriksiz bir kavrama, ayrı ayrı düzeltilebilen iki ayrı sorun olur.
 
 ```bash
-cd python
 uv run flywheel-inspect                       # top camera, now
 uv run flywheel-inspect --parts L-T-02 B-W-07 J-W-08 J-W-06 D-W-02 D-W-06   # score it: IDs in pocket order
-uv run flywheel-inspect --image ../outputs/inspect/<time>/frame.png          # a saved frame
+uv run flywheel-inspect --image outputs/inspect/<time>/frame.png          # a saved frame
 ```
 
 1. cep kolun solunda, kola en yakın olan; 4. cep onun arkasında. Parça ID'si her parçanın altına kazınmış.

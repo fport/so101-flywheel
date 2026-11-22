@@ -11,8 +11,18 @@ import mujoco
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
-from .params import (ASSETS, CATALOG_JSON, GENERATED, SCENE_XML, SO101_XML, load_params, mast_top, mm, pocket_centers,
-                     top_camera_pose)
+from .params import (
+    ASSETS,
+    CATALOG_JSON,
+    GENERATED,
+    SCENE_XML,
+    SO101_XML,
+    load_params,
+    mast_top,
+    mm,
+    pocket_centers,
+    top_camera_pose,
+)
 from .parts import build_catalog, save_catalog
 
 G = mujoco.mjtGeom

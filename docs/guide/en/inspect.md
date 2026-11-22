@@ -4,10 +4,9 @@
 only executes. Keeping the two apart means a wrong decision and a clumsy grasp are separate, fixable problems.
 
 ```bash
-cd python
 uv run flywheel-inspect                       # top camera, now
 uv run flywheel-inspect --parts L-T-02 B-W-07 J-W-08 J-W-06 D-W-02 D-W-06   # score it: IDs in pocket order
-uv run flywheel-inspect --image ../outputs/inspect/<time>/frame.png          # a saved frame
+uv run flywheel-inspect --image outputs/inspect/<time>/frame.png          # a saved frame
 ```
 
 Pocket 1 is nearest the arm on its left; 4 is behind it. The part ID is engraved under each part.

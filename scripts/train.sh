@@ -5,7 +5,7 @@
 #   STEPS=200 scripts/train.sh       dry run: proves the dataset loads and the camera names map
 #   TARGET=local scripts/train.sh    this machine (needs a CUDA GPU)
 # A job uploads the policy to $HF_USER/$DATASET-smolvla_<time> and prints that name as "Model repo:". Put it in
-# scripts/env.sh as POLICY. A local run uploads to $HF_USER/$DATASET-smolvla.
+# scripts/env.local.sh as POLICY. A local run uploads to $HF_USER/$DATASET-smolvla.
 set -euo pipefail
 source "$(dirname "$0")/env.sh"
 

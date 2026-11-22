@@ -49,7 +49,7 @@ Bunun neden önemli olduğu ve kuralların geri kalanı: [veri kalitesi](data-qu
 
 | Belirti | Çözüm |
 | --- | --- |
-| Kamerada `TimeoutError` | Yanlış index (yakındaki bir iPhone sırayı kaydırır): `uv run lerobot-find-cameras opencv`, `scripts/env.sh`'ı düzelt |
+| Kamerada `TimeoutError` | Yanlış index (yakındaki bir iPhone sırayı kaydırır): `uv run lerobot-find-cameras opencv`, `scripts/env.local.sh`'ı düzelt |
 | Servodan "no status packet" | Follower'ın 12 V beslemesi ya da gevşek bir servo kablosu |
 | Ok tuşları bir şey yapmıyor | macOS ayarlarında terminale Erişilebilirlik izni ver ya da terminali odakta tut |
 | Dataset kaldığı yerden devam etmiyor | Son çalıştırma yazma sırasında öldü. Klasörü sil (`rm -rf outputs/datasets/so101-qc`) ve son push edilen kopyayı yeniden indir: `hf download fport/so101-qc --repo-type dataset --local-dir outputs/datasets/so101-qc` |

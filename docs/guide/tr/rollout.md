@@ -8,7 +8,7 @@
 scripts/rollout.sh 3 ok       # the policy has 30 s to do: "put the part from pocket 3 in the OK bin"
 ```
 
-`scripts/env.sh` içindeki policy'yi yükler (`POLICY`, eğitimin yazdığı "Model repo").
+`scripts/env.local.sh` içindeki policy'yi yükler (`POLICY`, eğitimin yazdığı "Model repo").
 
 Bir elini follower'ın güç kaynağının yakınında tut. İlk çalıştırma genelde kesik kesik ya da yanlış olur; bu da bilgi.
 Mac'te model Apple GPU'sunda (`DEVICE=mps`) çalışır ve yavaştır, o yüzden script *real-time chunking* (`--inference.type=rtc`) kullanır:
@@ -38,7 +38,7 @@ ayırır: 18/24 ile 20/24 aynı sonuçtur. Üzerinde iş yapacağın şey hata t
 ## Tüm döngü
 
 ```bash
-cd python && uv run flywheel-inspect     # prints one sentence per pocket
+uv run flywheel-inspect     # prints one sentence per pocket
 scripts/rollout.sh 5 ok                  # run them one by one
 ```
 

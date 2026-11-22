@@ -11,7 +11,6 @@ is a single print job: parts of the same filament laid out on the plate. The num
 All PLA. No screws, inserts or off-the-shelf profiles; everything is printed and fits together. Works with the stock gripper.
 
 ```bash
-cd python
 uv run flywheel-cad build    # regenerates print/, cell.svg and preview.png from params.yaml
 ```
 

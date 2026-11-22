@@ -8,7 +8,6 @@ import tempfile
 from pathlib import Path
 
 import mujoco
-import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
 from ..sim.env import QCSortSim

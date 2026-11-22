@@ -1,4 +1,4 @@
-# Single source of dimensions: CAD parts (hardware/) and the MuJoCo scene (python/flywheel/sim) derive from here.
+# Single source of dimensions: CAD parts (hardware/) and the MuJoCo scene (src/flywheel/sim) derive from here.
 # If the setup changes, only this file is updated; `flywheel-sim build` regenerates the scene.
 #
 # Units: length mm, angle degrees. Coordinate system: origin = point where the shoulder_pan axis meets the

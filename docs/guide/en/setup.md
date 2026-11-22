@@ -17,7 +17,8 @@ uv run lerobot-find-port               # unplug one arm when asked; note both po
 uv run lerobot-find-cameras opencv     # saves one frame per camera, note the two indices
 ```
 
-Put the four values in [`scripts/env.sh`](../../../scripts/env.sh). Every script reads them from there and prints the
+Put the four values and your Hugging Face user name in `scripts/env.local.sh` (your own file, not committed; the
+template is at the top of [`scripts/env.sh`](../../../scripts/env.sh)). Every script reads them from there and prints the
 full `lerobot-*` command before running it, so you always see what runs.
 
 ## Calibrate (once)

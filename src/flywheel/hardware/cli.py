@@ -189,7 +189,6 @@ def render_preview(items, p, path):
 
 def cmd_build(args):
     p = load_params()
-    bed = p["printer"]["bed"]
     items = build_all(p)
     problems = []
     for item in items:

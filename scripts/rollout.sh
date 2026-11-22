@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Let the trained policy move the arm for one pick. Keep a hand near the power switch.
 #   scripts/rollout.sh 3 ok
-#   POLICY=fport/other-policy scripts/rollout.sh 3 reject   (default: POLICY in scripts/env.sh)
+#   POLICY=fport/other-policy scripts/rollout.sh 3 reject   (default: POLICY in scripts/env.local.sh)
 #   DEVICE=cuda scripts/rollout.sh 3 ok        (default mps: Apple GPU)
 set -euo pipefail
 source "$(dirname "$0")/env.sh"
@@ -11,7 +11,7 @@ if [[ ! "$pocket" =~ ^[1-6]$ || ! "$bin" =~ ^(ok|reject)$ ]]; then
   echo "usage: scripts/rollout.sh <pocket 1-6> <ok|reject>" >&2; exit 2
 fi
 if [[ -z "$POLICY" ]]; then
-  echo "set POLICY in scripts/env.sh to the model repo that scripts/train.sh printed" >&2; exit 2
+  echo "set POLICY in scripts/env.local.sh to the model repo that scripts/train.sh printed" >&2; exit 2
 fi
 task="put the part from pocket $pocket in the $(echo "$bin" | tr '[:lower:]' '[:upper:]') bin"
 

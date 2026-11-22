@@ -11,7 +11,7 @@ import numpy as np
 from PIL import Image, ImageDraw
 
 from ..sim.env import QCSortSim
-from ..sim.params import REPO_ROOT, load_params, mm
+from ..sim.params import load_params
 from ..sim.parts import write_stl
 from ..sim.scene import look_at_quat
 from .fixtures import MAST_BOSS, build_all
@@ -173,9 +173,9 @@ ORANGE, GREY, BLACK = (226, 112, 26), (141, 145, 153), (43, 44, 48)
 
 def build_plan(p, path):
     """Scaled top plan: which part goes on which tile, in which orientation. Arm at the bottom, mast at the top."""
+    from ..sim.params import pocket_centers
     from .fixtures import KEY, _arm_seat, _mast_socket
     from .robot import Robot
-    from ..sim.params import pocket_centers
 
     g, u = p["grid"], p["grid"]["pitch"]
     W, H, s = 2250, 1250, 2.45
@@ -308,7 +308,7 @@ def build_plan(p, path):
         ("", "The tile number must match its place on the plan (tag 0-3); for the small tiles see the list for 10."),
         ("Mast", "05: three segments stacked, the first in the socket on B2. 02 head on top, camera in the cradle."),
     ]
-    sx0, sy0, wrap = 1420, 140, 40
+    sx0, sy0 = 1420, 140
     d.text((sx0, sy0), "Setup order", fill=INK, font=_font(30))
     y = sy0 + 56
     n = 0

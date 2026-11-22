@@ -8,7 +8,7 @@ from flywheel.sim.ik import IK, top_down
 from flywheel.sim.params import SCENE_XML, load_params, mm, pocket_centers
 from flywheel.sim.parts import decide
 from flywheel.sim.plan import build_plan
-from flywheel.sim.scene import JOINTS, build_scene
+from flywheel.sim.scene import JOINTS
 from flywheel.sim.scripted import ScriptedSorter
 
 

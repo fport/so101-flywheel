@@ -48,7 +48,7 @@ Why this matters, and the rest of the rules: [data quality](data-quality.md).
 
 | Symptom | Fix |
 | --- | --- |
-| `TimeoutError` on a camera | Wrong index (an iPhone nearby shifts them): `uv run lerobot-find-cameras opencv`, fix `scripts/env.sh` |
+| `TimeoutError` on a camera | Wrong index (an iPhone nearby shifts them): `uv run lerobot-find-cameras opencv`, fix `scripts/env.local.sh` |
 | "no status packet" from a servo | Follower's 12 V supply, or a loose servo cable |
 | Arrow keys do nothing | Give the terminal Accessibility permission in macOS settings, or keep the terminal focused |
 | Dataset refuses to resume | The last run died mid-write. Delete the folder (`rm -rf outputs/datasets/so101-qc`) and re-download the last pushed copy: `hf download fport/so101-qc --repo-type dataset --local-dir outputs/datasets/so101-qc` |

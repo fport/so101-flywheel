@@ -47,7 +47,7 @@ gerçek kol söyler.
 
 - Loss ilk bin adımda hızlı, sonra yavaş düşüyor. Baştan beri düz gidiyorsa dataset ya da kamera eşlemesi yanlış.
 - Job başlarken **Model repo:** `fport/so101-qc-smolvla_<zaman>` yazar. Eğitim bitince policy oraya (private) yüklenir.
-  Bu adı `scripts/env.sh` içine `POLICY` olarak yaz: [8. adım](rollout.md) oradan okur.
+  Bu adı `scripts/env.local.sh` içine `POLICY=...` olarak yaz: [8. adım](rollout.md) oradan okur.
 
 ## Önce kısa bir deneme yap
 

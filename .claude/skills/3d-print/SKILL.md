@@ -4,8 +4,8 @@ description: Use in this project when designing or changing a 3D-printed part, o
 ---
 
 1. Read `hardware/3DPRINT.md` and apply its design rules. The rules come from mistakes that actually happened in this project.
-2. Change the geometry under `python/flywheel/hardware/`; take dimensions from `hardware/params.yaml`.
-3. Before sending, run the following in `python/` and report the results to the user with numbers:
+2. Change the geometry under `src/flywheel/hardware/`; take dimensions from `hardware/params.yaml`.
+3. Before sending, run the following in the repo root and report the results to the user with numbers:
    - `uv run flywheel-cad build`
    - `uv run pytest -q`
    - `uv run flywheel-cad slicecheck ../hardware/print/<job>.3mf`
