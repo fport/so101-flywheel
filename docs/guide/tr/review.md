@@ -6,7 +6,7 @@
 scripts/status.sh              # episodes per sentence
 scripts/review.sh 12           # replay episode 12: both cameras and all joints, in Rerun
 scripts/review.sh delete 12 40 # remove bad episodes; the previous version is kept as so101-qc_old
-scripts/review.sh push         # upload after deleting (recording already pushes after every block)
+scripts/review.sh push         # upload after deleting: training reads the Hub copy, not your disk
 ```
 
 Online, hiçbir şey kurmadan:

@@ -5,7 +5,8 @@
 #   scripts/record.sh 3 reject 5    5 more episodes for pocket 3 -> REJECT
 #
 # Every block is appended to the same dataset (outputs/datasets/$DATASET) and pushed to the Hub, private, when the
-# block ends. Keys while recording:  → episode done, save   ← redo this episode   Esc stop after this episode.
+# block ends. Keys:  → end this phase (episode or reset)   ← redo the episode   Esc stop now (keeps the current episode:
+# press it during a reset, not mid-pick).
 set -euo pipefail
 source "$(dirname "$0")/env.sh"
 

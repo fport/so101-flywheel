@@ -34,7 +34,7 @@ size.
 
 1. Each camera frame becomes about 64 tokens, the sentence becomes tokens, the joint angles become one more token.
 2. The frozen vision-language model reads them once.
-3. A small *action expert* (about 100 M parameters, the only part you train) turns noise into the next 50 actions in
+3. A small *action expert* (about 100 M parameters; it and a few small input/output layers are all you train) turns noise into the next 50 actions in
    10 denoising steps. This is *flow matching*.
 4. The loss is how far the predicted 50 actions are from the 50 you actually made. Nothing else: no reward, no notion
    of success.
@@ -45,7 +45,8 @@ So a falling loss means "imitates the recorded motions better", not "sorts parts
 
 - The loss falls quickly in the first thousand steps, then slowly. If it is flat from the start, the dataset or the
   camera map is wrong.
-- When training ends the policy is uploaded to `fport/so101-qc-smolvla` (private).
+- When the job starts it prints **Model repo:** `fport/so101-qc-smolvla_<time>`. The policy is uploaded there (private)
+  when training ends. Put that name in `scripts/env.sh` as `POLICY`: [step 8](rollout.md) reads it.
 
 ## Do a short dry run first
 

@@ -13,7 +13,8 @@ case "${1:-}" in
     run lerobot-edit-dataset "--repo_id=$HF_USER/$DATASET" "--root=$DATASET_ROOT" "--new_root=$DATASET_ROOT" \
       --operation.type=delete_episodes "--operation.episode_indices=[$ids]" ;;
   push)
-    run hf upload "$HF_USER/$DATASET" "$DATASET_ROOT" . --repo-type dataset --private ;;
+    # LeRobot's own push also moves the v3.0 tag that training downloads; a plain `hf upload` would not
+    run python -c "from lerobot.datasets import LeRobotDataset as D; D('$HF_USER/$DATASET', root='$DATASET_ROOT').push_to_hub(private=True)" ;;
   ''|*[!0-9]*)
     echo "usage: scripts/review.sh <episode> | delete <episode>... | push" >&2; exit 2 ;;
   *)

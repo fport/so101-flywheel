@@ -10,6 +10,10 @@ FPS="${FPS:-30}"
 HF_USER="${HF_USER:-fport}"
 DATASET="${DATASET:-so101-qc}"          # -> huggingface.co/datasets/$HF_USER/$DATASET (private)
 
+# The trained policy on the Hub. A Hugging Face job names it <job name>_<time> and prints it as "Model repo:" when it
+# starts: paste that here (or pass POLICY=... to scripts/rollout.sh).
+POLICY="${POLICY:-}"
+
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CALIBRATION_DIR="$REPO_ROOT/hardware/calibration"
 DATASET_ROOT="$REPO_ROOT/outputs/datasets/$DATASET"

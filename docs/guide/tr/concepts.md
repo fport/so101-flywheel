@@ -13,7 +13,7 @@
 | **VLM** | Vision-language model: görüntü kodlayıcı + projektör + dil modeli. Görüntü okur, metin yazar |
 | **VLA** | Action head'i olan bir VLM: görüntüleri ve bir cümleyi okur, robot action'ları yazar. SmolVLA, π0, GR00T |
 | **Flow matching** | SmolVLA'nın action head'i böyle çalışır: gürültüden başla, birkaç adımda bir action chunk'a dönüştür |
-| **Fine-tuning** | Önceden eğitilmiş ağırlıklardan başlayıp kendi küçük dataset'inle eğitmek. Burada sadece action expert eğitiliyor |
+| **Fine-tuning** | Önceden eğitilmiş ağırlıklardan başlayıp kendi küçük dataset'inle eğitmek. Burada VLM donuk kalır, action expert eğitilir |
 | **Grounding** | Kelimeleri görüntüdeki yerlere bağlamak: "dişli" için kutular ya da noktalar |
 | **Rollout** | Policy'yi gerçek robotta çalıştırmak |
 | **DAgger** | Policy'yi çalıştır, başarısız olunca düzelt, düzeltmeleri veriye ekle, yeniden eğit |

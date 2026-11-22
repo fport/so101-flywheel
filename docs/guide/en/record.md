@@ -22,17 +22,17 @@ Every block is appended to the same dataset in `outputs/datasets/so101-qc` and p
 1. Put a part in the block's pocket. Arm at the start pose (gripper open, hovering between the base and the tray).
 2. Run the command. A voice says **"Recording episode N"**: recording has started.
 3. Pick the part, drop it in the block's bin, return to the start pose.
-4. Press **→**. The episode is saved; the voice says **"Reset the environment"**.
+4. Press **→**. The episode ends; the voice says **"Reset the environment"**.
 5. Nothing is recorded now. Put the next part in the pocket, hand back on the leader, arm at the start pose.
-6. Press **→** to start the next episode (or wait 15 s, it starts by itself).
+6. Press **→** to start the next episode (or wait 15 s, it starts by itself). The previous one is written to disk now.
 
 | Key | Does |
 | --- | --- |
 | → | End this phase now (episode done / reset done) |
 | ← | Throw this episode away and record it again |
-| Esc | Stop after this episode, save and upload |
+| Esc | Stop now, save and upload. It keeps whatever was recorded so far, so press it during a reset, not mid-pick |
 
-Fumbled the grasp, bumped the tray, forgot to return? Press **←**. Never keep an episode "because it mostly worked".
+Fumbled the grasp, bumped the tray, forgot to return? Press **←**, also if you only notice during the reset. Never keep an episode "because it mostly worked".
 
 ## Inside a block, change everything except the sentence
 
@@ -51,4 +51,4 @@ Why this matters, and the rest of the rules: [data quality](data-quality.md).
 | `TimeoutError` on a camera | Wrong index (an iPhone nearby shifts them): `uv run lerobot-find-cameras opencv`, fix `scripts/env.sh` |
 | "no status packet" from a servo | Follower's 12 V supply, or a loose servo cable |
 | Arrow keys do nothing | Give the terminal Accessibility permission in macOS settings, or keep the terminal focused |
-| Dataset refuses to resume | The last run died mid-write. Re-download the last pushed copy: `hf download fport/so101-qc --repo-type dataset --local-dir outputs/datasets/so101-qc` |
+| Dataset refuses to resume | The last run died mid-write. Delete the folder (`rm -rf outputs/datasets/so101-qc`) and re-download the last pushed copy: `hf download fport/so101-qc --repo-type dataset --local-dir outputs/datasets/so101-qc` |

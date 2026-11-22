@@ -35,7 +35,7 @@ küçük.
 
 1. Her kamera karesi yaklaşık 64 token'a dönüşür, cümle token'lara dönüşür, eklem açıları da bir token daha olur.
 2. Dondurulmuş vision-language modeli bunları bir kez okur.
-3. Küçük bir *action expert* (yaklaşık 100 M parametre, eğittiğin tek kısım) gürültüyü 10 denoising adımında sonraki
+3. Küçük bir *action expert* (yaklaşık 100 M parametre; yalnızca o ve birkaç küçük giriş/çıkış katmanı eğitilir) gürültüyü 10 denoising adımında sonraki
    50 action'a çevirir. Bu *flow matching*.
 4. Loss, tahmin edilen 50 action'ın senin gerçekten yaptığın 50 action'dan ne kadar uzak olduğu. Başka hiçbir şey
    değil: ödül yok, başarı diye bir kavram yok.
@@ -46,7 +46,8 @@ gerçek kol söyler.
 ## Kontrol
 
 - Loss ilk bin adımda hızlı, sonra yavaş düşüyor. Baştan beri düz gidiyorsa dataset ya da kamera eşlemesi yanlış.
-- Eğitim bitince policy `fport/so101-qc-smolvla`'ya (private) yüklenir.
+- Job başlarken **Model repo:** `fport/so101-qc-smolvla_<zaman>` yazar. Eğitim bitince policy oraya (private) yüklenir.
+  Bu adı `scripts/env.sh` içine `POLICY` olarak yaz: [8. adım](rollout.md) oradan okur.
 
 ## Önce kısa bir deneme yap
 

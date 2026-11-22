@@ -8,6 +8,8 @@
 scripts/rollout.sh 3 ok       # the policy has 30 s to do: "put the part from pocket 3 in the OK bin"
 ```
 
+`scripts/env.sh` içindeki policy'yi yükler (`POLICY`, eğitimin yazdığı "Model repo").
+
 Bir elini follower'ın güç kaynağının yakınında tut. İlk çalıştırma genelde kesik kesik ya da yanlış olur; bu da bilgi.
 Mac'te model Apple GPU'sunda (`DEVICE=mps`) çalışır ve yavaştır, o yüzden script *real-time chunking* (`--inference.type=rtc`) kullanır:
 sıradaki chunk hesaplanırken kol son tahmin edilen chunk'ı uygulamaya devam eder.

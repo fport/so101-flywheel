@@ -8,6 +8,8 @@
 scripts/rollout.sh 3 ok       # the policy has 30 s to do: "put the part from pocket 3 in the OK bin"
 ```
 
+It loads the policy named in `scripts/env.sh` (`POLICY`, the "Model repo" that training printed).
+
 Keep one hand near the follower's power supply. The first run is often jerky or wrong; that is information.
 On a Mac the model runs on the Apple GPU (`DEVICE=mps`) and is slow, so the script uses *real-time chunking* (`--inference.type=rtc`):
 the arm keeps executing the last predicted chunk while the next one is computed.

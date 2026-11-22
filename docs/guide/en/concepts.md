@@ -13,7 +13,7 @@
 | **VLM** | Vision-language model: image encoder + projector + language model. Reads images, writes text |
 | **VLA** | A VLM with an action head: reads images and a sentence, writes robot actions. SmolVLA, π0, GR00T |
 | **Flow matching** | How SmolVLA's action head works: start from noise, refine into an action chunk in a few steps |
-| **Fine-tuning** | Start from pretrained weights and train on your small dataset. Here only the action expert is trained |
+| **Fine-tuning** | Start from pretrained weights and train on your small dataset. Here the VLM stays frozen and the action expert is trained |
 | **Grounding** | Linking words to places in an image: boxes or points for "the gear" |
 | **Rollout** | Running the policy on the real robot |
 | **DAgger** | Let the policy run, correct it when it fails, add the corrections to the data, retrain |

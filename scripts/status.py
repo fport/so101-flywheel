@@ -7,6 +7,8 @@ from lerobot.datasets import LeRobotDatasetMetadata
 
 repo_id, root, target = sys.argv[1], sys.argv[2], int(sys.argv[3])
 meta = LeRobotDatasetMetadata(repo_id, root=root)
+if meta.episodes is None:
+    sys.exit("0 episodes so far. Start with: scripts/record.sh 1 ok")
 done = collections.Counter(t for tasks in meta.episodes["tasks"] for t in tasks)
 total = 0
 for bin_ in ("OK", "REJECT"):
