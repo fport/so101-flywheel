@@ -11,7 +11,7 @@ import numpy as np
 from .env import FPS, QCSortSim
 from .params import CATALOG_JSON, REPO_ROOT, SCENE_XML
 from .parts import TYPE_NAMES, VARIANTS, load_catalog
-from .plan import build_plan, task, to_markdown
+from .plan import build_plan, task
 from .scene import DEFAULT_PARTS, JOINTS, build_scene
 from .scripted import ScriptedSorter
 
@@ -127,19 +127,6 @@ def _plan(args):
     return catalog, build_plan(catalog, order=args.order, seed=args.seed, heldout=args.heldout)
 
 
-def cmd_plan(args):
-    """Writes the balanced recording (or held-out eval) plan the operator will follow."""
-    catalog, trays = _plan(args)
-    name = f"{'eval-heldout' if args.heldout else 'record'}-{args.order}-seed{args.seed}"
-    title = ("Held-out eval plan" if args.heldout else "Recording plan") + f" ({name})"
-    out = Path(args.out)
-    out.mkdir(parents=True, exist_ok=True)
-    (out / f"{name}.md").write_text(to_markdown(trays, catalog, args.order, title))
-    (out / f"{name}.json").write_text(json.dumps({"order": args.order, "seed": args.seed, "trays": trays}, indent=1))
-    n = sum(len(t["picks"]) for t in trays)
-    print(f"{out / (name + '.md')}: {len(trays)} trays, {n} episodes ({n // 2} correct command + {n // 2} opposite command)")
-
-
 def cmd_batch(args):
     """Runs the balanced plan with the scripted policy in sim; reports normal and opposite-command trials separately."""
     catalog, trays = _plan(args)
@@ -198,16 +185,13 @@ def main(argv=None):
     sp.add_argument("--seed", type=int, default=0)
     sp.add_argument("--no-video", action="store_true")
     sp.add_argument("--out", default=default_out)
-    for name, fn, help_ in (("plan", cmd_plan, "write the balanced recording / eval plan (each part goes to both bins)"),
-                            ("batch", cmd_batch, "run the plan with the scripted policy in sim, print a success table")):
-        sp = sub.add_parser(name, help=help_)
-        sp.set_defaults(fn=fn)
-        sp.add_argument("--heldout", action="store_true", help="held-out eval set instead of the training set")
-        sp.add_argument("--order", choices=list(VARIANTS), default="W", help="variant in the work order")
-        sp.add_argument("--seed", type=int, default=0)
-        sp.add_argument("--out", default=str(REPO_ROOT / "plans") if name == "plan" else default_out)
-        if name == "batch":
-            sp.add_argument("--video", action="store_true")
+    sp = sub.add_parser("batch", help="run the balanced plan (each part goes to both bins) with the scripted policy, print a success table")
+    sp.set_defaults(fn=cmd_batch)
+    sp.add_argument("--heldout", action="store_true", help="held-out eval set instead of the training set")
+    sp.add_argument("--order", choices=list(VARIANTS), default="W", help="variant in the work order")
+    sp.add_argument("--seed", type=int, default=0)
+    sp.add_argument("--out", default=default_out)
+    sp.add_argument("--video", action="store_true")
 
     args = parser.parse_args(argv)
     return args.fn(args) or 0

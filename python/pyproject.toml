@@ -16,7 +16,7 @@ dependencies = [
 [project.scripts]
 flywheel-sim = "flywheel.sim.cli:main"
 flywheel-cad = "flywheel.hardware.cli:main"
-flywheel-robot = "flywheel.robot.cli:main"
+flywheel-inspect = "flywheel.qc.cli:main"
 
 [project.optional-dependencies]
 robot = [
@@ -34,4 +34,5 @@ packages = ["flywheel"]
 [dependency-groups]
 dev = [
     "pytest>=9.1.1",
+    "markdown>=3.6",  # site/build.py
 ]

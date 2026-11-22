@@ -16,8 +16,7 @@ uv sync
 uv run flywheel-sim build      # params.yaml -> scene + 76-part catalogue
 uv run flywheel-sim view       # interactive viewer
 uv run flywheel-sim episode --part J-T-06     # single episode: mp4 + json + npz
-uv run flywheel-sim plan       # balanced recording plan: every part goes to both bins
-uv run flywheel-sim batch      # runs the plan in sim, success table (Wilson CI)
+uv run flywheel-sim batch      # balanced plan (every part goes to both bins) in sim, success table (Wilson CI)
 uv run flywheel-cad build      # numbered print plates: hardware/print
 uv run pytest
 ```
@@ -50,7 +49,7 @@ Part IDs carry no label: `J-W-03` is wheel rim, white, number 3 (`J` rim, `D` ge
 Inspection is not part of an episode. Before the first pick, with the arm at home, `QCSortSim.tray_frame()` renders one
 top-camera frame of the whole tray; `flywheel.robot.tray` finds the four tags, cuts each pocket out rectified at 4 px/mm
 and measures holes, rim spokes, gear teeth, broken corners and colour from the silhouette. The real arm does the same
-with the C310 (`flywheel-robot inspect --tray`). Each episode is then "put the part from pocket N in the X bin".
+with the C310 (`flywheel-inspect`). Each episode is then "put the part from pocket N in the X bin".
 
 ![Inspection crops of sound and defective parts](media/sim-inspection.png)
 
@@ -111,4 +110,4 @@ Every fixture in the scene fits the Gridfinity tiles exactly; the same `params.y
 - Camera fields of view were not measured. For the top camera the narrow end of the C310 (32° vertical) was used; if the real angle is wider
   the mast gets lower. The wrist camera was assumed to be 70° vertical.
 - The feeder, emptying ramp, e-stop and cable clips are not in the scene.
-- Recording is `npz` + `mp4` for now; export to the LeRobot dataset format is Phase 1 work.
+- Sim episodes are saved as `npz` + `mp4`, not as a LeRobot dataset.
