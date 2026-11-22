@@ -10,9 +10,9 @@ from pathlib import Path
 import mujoco
 from PIL import Image, ImageDraw, ImageFont
 
+from ..params import REPO_ROOT, load_params
+from ..parts import write_stl
 from ..sim.env import QCSortSim
-from ..sim.params import REPO_ROOT, load_params
-from ..sim.parts import write_stl
 from ..sim.scripted import ScriptedSorter
 from .fixtures import build_all
 

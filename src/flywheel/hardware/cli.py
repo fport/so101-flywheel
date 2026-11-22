@@ -12,8 +12,8 @@ from pathlib import Path
 import numpy as np
 from manifold3d import Error
 
-from ..sim.params import REPO_ROOT, load_params
-from ..sim.parts import generate, write_stl
+from ..params import REPO_ROOT, load_params
+from ..parts import generate, write_stl
 from .catalog_svg import build_catalog_svg
 from .diagram import build_svg
 from .fixtures import build_all

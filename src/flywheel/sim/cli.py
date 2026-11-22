@@ -8,10 +8,11 @@ from pathlib import Path
 
 import numpy as np
 
+from ..params import CATALOG_JSON, REPO_ROOT, SCENE_XML
+from ..parts import TYPE_NAMES, VARIANTS, load_catalog
+from ..task import task
 from .env import FPS, QCSortSim
-from .params import CATALOG_JSON, REPO_ROOT, SCENE_XML
-from .parts import TYPE_NAMES, VARIANTS, load_catalog
-from .plan import build_plan, task
+from .plan import build_plan
 from .scene import DEFAULT_PARTS, JOINTS, build_scene
 from .scripted import ScriptedSorter
 

@@ -13,7 +13,7 @@ import re
 import cv2
 import numpy as np
 
-from ..sim.params import CATALOG_JSON, load_params, pocket_centers
+from ..params import CATALOG_JSON, load_params, pocket_centers
 
 PX_PER_MM = 4.0  # rectified crop scale; the 1280x960 frame has ~2.2 px/mm at the tray, so crops are enlarged ~2x
 WINDOW_MM = 56  # crop side; a 38 mm pocket with room for a part that is off its pocket centre

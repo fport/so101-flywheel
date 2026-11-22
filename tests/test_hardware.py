@@ -8,7 +8,7 @@ from manifold3d import Error
 from flywheel.hardware.cli import REDESIGNED, REPRINTS, check_fit, print_jobs
 from flywheel.hardware.fixtures import build_all
 from flywheel.hardware.geom import write_3mf
-from flywheel.sim.params import load_params, mast_top, top_camera_pose
+from flywheel.params import load_params, mast_top, top_camera_pose
 
 
 @pytest.fixture(scope="module")
@@ -134,7 +134,7 @@ def test_footed_parts_print_without_long_bridges(built):
 
 def test_redesigned_broken_corners_cut_the_outline(built):
     # the top camera only sees the outline of pads and brackets: a broken corner must take a clear bite out of it
-    from flywheel.sim.parts import generate
+    from flywheel.parts import generate
 
     p, _, jobs = built
     sound = {}

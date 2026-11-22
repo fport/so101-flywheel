@@ -10,9 +10,9 @@ import mujoco
 import numpy as np
 from PIL import Image, ImageDraw
 
+from ..params import load_params
+from ..parts import write_stl
 from ..sim.env import QCSortSim
-from ..sim.params import load_params
-from ..sim.parts import write_stl
 from ..sim.scene import look_at_quat
 from .fixtures import MAST_BOSS, build_all
 from .showcase import HIDDEN, _font
@@ -173,7 +173,7 @@ ORANGE, GREY, BLACK = (226, 112, 26), (141, 145, 153), (43, 44, 48)
 
 def build_plan(p, path):
     """Scaled top plan: which part goes on which tile, in which orientation. Arm at the bottom, mast at the top."""
-    from ..sim.params import pocket_centers
+    from ..params import pocket_centers
     from .fixtures import KEY, _arm_seat, _mast_socket
     from .robot import Robot
 

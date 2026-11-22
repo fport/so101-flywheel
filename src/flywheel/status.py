@@ -3,7 +3,7 @@
 import collections
 import sys
 
-from .sim.plan import POCKETS, task
+from .task import POCKETS, task
 
 
 def main():

@@ -2,9 +2,9 @@
 
 import numpy as np
 
+from ..params import MAST_BOSS, mast_top, pocket_centers, top_camera_pose
 from ..sim.env import QCSortSim
 from ..sim.ik import IK
-from ..sim.params import MAST_BOSS, mast_top, pocket_centers, top_camera_pose
 
 INK, MUTED, LINE = "#1f2328", "#667085", "#c9ced6"
 PLATE, TRAY, BACK = "#3b3d42", "#1f1f21", "#17171a"

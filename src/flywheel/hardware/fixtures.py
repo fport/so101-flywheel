@@ -9,8 +9,8 @@ from dataclasses import dataclass, field
 import numpy as np
 from manifold3d import CrossSection, Manifold, OpType
 
-from ..sim.params import MAST_BOSS, head_geometry, mast_top
-from ..sim.parts import generate
+from ..params import MAST_BOSS, head_geometry, mast_top
+from ..parts import generate
 from .geom import (
     FOOT_R,
     PITCH,

@@ -19,9 +19,9 @@ import sys
 import time
 from datetime import datetime
 
-from ..sim.params import REPO_ROOT, load_params
-from ..sim.parts import decide
-from ..sim.plan import task
+from ..params import REPO_ROOT, load_params
+from ..parts import decide
+from ..task import task
 
 B, DIM, GREEN, ORANGE, RST = "\033[1m", "\033[2m", "\033[38;5;78m", "\033[38;5;208m", "\033[0m"
 OUT_DIR = REPO_ROOT / "outputs" / "inspect"

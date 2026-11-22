@@ -4,7 +4,7 @@ from collections import Counter
 
 import numpy as np
 
-from ..sim.parts import TYPE_NAMES
+from ..parts import TYPE_NAMES
 from .geom import union
 
 INK, MUTED, CARD = "#1f2328", "#667085", "#ffffff"

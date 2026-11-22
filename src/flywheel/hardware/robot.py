@@ -3,7 +3,7 @@
 import mujoco
 import numpy as np
 
-from ..sim.params import SO101_XML
+from ..params import SO101_XML
 from ..sim.scene import BASE_BOTTOM_Z, PAN_AXIS_XY
 
 

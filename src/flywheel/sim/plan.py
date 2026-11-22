@@ -1,4 +1,4 @@
-"""Balanced plan for the scripted sim run (`flywheel-sim batch`) and the task sentence every episode uses.
+"""Balanced plan for the scripted sim run (`flywheel-sim batch`).
 
 To break shortcut memorization each part is picked twice: once into the correct bin per the work order, once
 deliberately into the opposite bin (command-following probe, `probe`). So the demos can't tie "this look -> this
@@ -7,12 +7,7 @@ bin"; the policy can learn the bin only from the command. Pockets, neighbours an
 
 import numpy as np
 
-POCKETS = 6
-
-
-def task(pocket, command):
-    """Task text of an episode. The top camera has already inspected the tray; the policy is told where and to which bin."""
-    return f"put the part from pocket {pocket} in the {command.upper()} bin"
+from ..task import POCKETS
 
 
 def build_plan(catalog, order="W", seed=0, heldout=False):

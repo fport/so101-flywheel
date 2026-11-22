@@ -9,9 +9,9 @@ the scene. On the real arm this role is played by teleop demos and the trained p
 
 import numpy as np
 
+from ..params import mm
 from .env import FPS, HOME
 from .ik import IK, grasp_frame
-from .params import mm
 
 TIP_BELOW_PINCH = 0.0094  # from the pinch site to the jaw tip
 MAX_JOINT_SPEED = 1.6  # rad/s

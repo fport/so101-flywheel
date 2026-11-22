@@ -11,7 +11,7 @@ import mujoco
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
-from .params import (
+from ..params import (
     ASSETS,
     CATALOG_JSON,
     GENERATED,
@@ -23,7 +23,7 @@ from .params import (
     pocket_centers,
     top_camera_pose,
 )
-from .parts import build_catalog, save_catalog
+from ..parts import build_catalog, save_catalog
 
 G = mujoco.mjtGeom
 JOINTS = ["shoulder_pan", "shoulder_lift", "elbow_flex", "wrist_flex", "wrist_roll", "gripper"]

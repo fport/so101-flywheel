@@ -7,8 +7,8 @@ the VLM verifier will predict on the real arm and can be used to measure the ver
 import mujoco
 import numpy as np
 
+from ..params import load_params, mm, pocket_centers
 from .ik import grasp_frame
-from .params import load_params, mm, pocket_centers
 from .scene import DEFAULT_PARTS, JOINTS, build_scene
 
 FPS = 30

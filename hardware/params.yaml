@@ -1,4 +1,4 @@
-# Single source of dimensions: CAD parts (hardware/) and the MuJoCo scene (src/flywheel/sim) derive from here.
+# Single source of dimensions: the CAD parts (hardware/), the MuJoCo scene and the inspection all read it through src/flywheel/params.py.
 # If the setup changes, only this file is updated; `flywheel-sim build` regenerates the scene.
 #
 # Units: length mm, angle degrees. Coordinate system: origin = point where the shoulder_pan axis meets the
@@ -73,7 +73,7 @@ cameras:
   resolution: [640, 480]
   top:
     # Logitech C310, in the articulated cradle at the top of the mast. Position and view direction are computed from the
-    # mast + head dimensions and mast.head.tilt (flywheel.sim.params.top_camera_pose). FOV not measured: Logitech gives 60
+    # mast + head dimensions and mast.head.tilt (flywheel.params.top_camera_pose). FOV not measured: Logitech gives 60
     # degrees diagonal, which is 32-38 degrees vertical in 4:3 mode; the narrow end was taken.
     webcam: {model: Logitech C310, body: [71.15, 31.3, 25.95]}   # length, width, thickness (clip folded); outer dimensions given by Logitech
     fovy: 32

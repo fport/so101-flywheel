@@ -1,13 +1,14 @@
-"""hardware/params.yaml reader. The file holds mm/degrees, the sim wants metres/radians."""
+"""hardware/params.yaml reader, shared by the sim, the CAD and the inspection. The file holds mm/degrees, the sim
+wants metres/radians."""
 
 from pathlib import Path
 
 import numpy as np
 import yaml
 
-REPO_ROOT = Path(__file__).resolve().parents[3]
+REPO_ROOT = Path(__file__).resolve().parents[2]
 PARAMS_YAML = REPO_ROOT / "hardware" / "params.yaml"
-ASSETS = Path(__file__).resolve().parent / "assets"
+ASSETS = Path(__file__).resolve().parent / "sim" / "assets"
 GENERATED = ASSETS / "generated"
 SO101_XML = ASSETS / "so101" / "so101_new_calib.xml"
 SCENE_XML = GENERATED / "scene.xml"
