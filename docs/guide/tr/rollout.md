@@ -25,6 +25,8 @@ Birkaç şanslı denemeye bakıp karar verme. Bakmadan önce testi sabitle:
 | Başarı | Parça komut verilen kasada ve kol geri dönmüş, 30 sn içinde, senin yardımın olmadan |
 | Not al | cep, kasa, başarı ve hata tipi: yanlış cep · kaçan kavrama · düşürme · yanlış kasa · takılma |
 
+Neden 24 deneme ve bunlar neyi gösterebilir: [bir policy'yi ölçmek](learn-eval.md).
+
 Başarıları 24 üzerinden, ayrıca cep başına ve kasa başına raporla. 24 deneme sadece "çalışıyor" ile "çalışmıyor"u
 ayırır: 18/24 ile 20/24 aynı sonuçtur. Üzerinde iş yapacağın şey hata tipleri:
 

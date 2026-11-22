@@ -40,6 +40,8 @@ küçük.
 4. Loss, tahmin edilen 50 action'ın senin gerçekten yaptığın 50 action'dan ne kadar uzak olduğu. Başka hiçbir şey
    değil: ödül yok, başarı diye bir kavram yok.
 
+Formülleriyle birlikte resmin tamamı: [bir vision-language modelin içi](learn-vlm.md) ve [SmolVLA'nın içi](learn-vla.md).
+
 Yani düşen loss "kaydedilen hareketleri daha iyi taklit ediyor" demek, "parçaları ayırıyor" değil. Onu sana sadece
 gerçek kol söyler.
 

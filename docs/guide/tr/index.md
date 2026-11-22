@@ -19,6 +19,19 @@ kararı veriyor. Sonra kola her seferinde tek parça için şu söyleniyor: *"pu
 | 7 | [Eğitim](train.md) | `scripts/train.sh` (SmolVLA, kiralık GPU) | VLA, action chunk, flow matching |
 | 8 | [Çalıştır ve iyileştir](rollout.md) | `scripts/rollout.sh 3 ok`, puanla, düzelt | Değerlendirme, DAgger, veri çarkı (flywheel) |
 
+## Ne yaptığını anla
+
+Her adım bunlar olmadan da çalışır. Bunları, işin *neden* çalıştığını ve çalışmadığında neyi değiştireceğini bilmek
+için oku.
+
+| Oku | Hangi adımdan önce | Neyi cevaplıyor |
+| --- | --- | --- |
+| [Imitation learning nasıl çalışır](learn-imitation.md) | 4 | Küçük hatalar neden çığ gibi büyür, gösterimler neden tutarlı olmalı, chunk nedir |
+| [Dataset'in içi](learn-dataset.md) | 6 | Tam olarak ne saklanıyor, tek bir eğitim örneği nasıl kuruluyor, zamanlama neden önemli |
+| [Bir vision-language modelin içi](learn-vlm.md) | 7 | Bir görüntü nasıl 64 token oluyor, ne dondurulmuş, modeller *nerede* olduğunu nasıl söylüyor |
+| [SmolVLA'nın içi](learn-vla.md) | 7 | İki transformer, altı satırda flow matching, real-time chunking |
+| [Bir policy'yi ölçmek](learn-eval.md) | 8 | 24'te 18 sana gerçekte ne söylüyor, neyi not etmelisin |
+
 Sonra: [sırada ne denenir](next.md) (Cosmos 3, sim-to-real aktarımı, grounding modelleri, RL) ve
 [tek sayfada kavramlar](concepts.md).
 

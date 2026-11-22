@@ -43,7 +43,8 @@ Kavramayı mı beceremedin, tepsiye mi çarptın, dönmeyi mi unuttun? **←** t
 - **Diğer cepler:** 1–4. episode'larda tepsi dolu, 5–7'de iki üç komşu, 8–10'da parça tek başına. Çalışma sırasında
   kol iş yaptıkça tepsi boşalıyor ve policy bunların hepsini görmüş olmalı.
 
-Bunun neden önemli olduğu ve kuralların geri kalanı: [veri kalitesi](data-quality.md).
+Bunun neden önemli olduğu ve kuralların geri kalanı: [veri kalitesi](data-quality.md). Arkasındaki teori:
+[imitation learning nasıl çalışır](learn-imitation.md).
 
 ## Bir şeyler ters giderse
 

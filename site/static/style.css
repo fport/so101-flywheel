@@ -27,6 +27,7 @@ header { position: sticky; top: 0; z-index: 5; display: flex; align-items: cente
 .wrap { display: grid; grid-template-columns: 250px minmax(0, 1fr); max-width: 1120px; margin: 0 auto; }
 nav { position: sticky; top: 56px; align-self: start; max-height: calc(100vh - 56px); overflow: auto; padding: 30px 12px 30px 24px; }
 nav summary { display: none; }
+nav h6 { margin: 18px 0 6px 12px; font: 500 11px var(--mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-3); }
 nav a { display: block; padding: 7px 12px; border-left: 2px solid var(--line); color: var(--ink-2); font-size: 14.5px; }
 nav a:hover { color: var(--ink); text-decoration: none; }
 nav a.on { border-color: var(--accent); color: var(--ink); font-weight: 500; }

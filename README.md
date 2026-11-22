@@ -14,6 +14,7 @@ Plain <a href="https://github.com/huggingface/lerobot">LeRobot</a> commands on a
   <a href="https://github.com/huggingface/lerobot"><img src="https://img.shields.io/badge/LeRobot-0.6.1-ff7a1a?labelColor=1c1c1c" alt="LeRobot 0.6.1"></a>
   <a href="https://huggingface.co/docs/lerobot/smolvla"><img src="https://img.shields.io/badge/policy-SmolVLA-ff7a1a?labelColor=1c1c1c" alt="SmolVLA"></a>
   <a href="https://github.com/google-deepmind/mujoco"><img src="https://img.shields.io/badge/MuJoCo-3.12-ededed?labelColor=1c1c1c" alt="MuJoCo 3.12"></a>
+  <a href="https://github.com/fport/so101-flywheel/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/fport/so101-flywheel/ci.yml?label=tests&labelColor=1c1c1c&color=ededed" alt="tests"></a>
   <a href="https://www.python.org/"><img src="https://img.shields.io/badge/python-3.12-ededed?labelColor=1c1c1c" alt="Python 3.12"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-ededed?labelColor=1c1c1c" alt="MIT"></a>
 </p>

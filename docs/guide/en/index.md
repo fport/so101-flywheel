@@ -18,6 +18,18 @@ The arm is then told, one part at a time: *"put the part from pocket 3 in the RE
 | 7 | [Train](train.md) | `scripts/train.sh` (SmolVLA, rented GPU) | VLA, action chunks, flow matching |
 | 8 | [Run and improve](rollout.md) | `scripts/rollout.sh 3 ok`, score, correct | Evaluation, DAgger, the data flywheel |
 
+## Understand what you are doing
+
+Each step works without these. Read them to know *why* it works, and what to change when it does not.
+
+| Read | Before step | It answers |
+| --- | --- | --- |
+| [How imitation learning works](learn-imitation.md) | 4 | Why small errors snowball, why demos must be consistent, what a chunk is |
+| [Inside the dataset](learn-dataset.md) | 6 | What exactly is stored, how one training sample is built, why timing matters |
+| [Inside a vision-language model](learn-vlm.md) | 7 | How an image becomes 64 tokens, what is frozen, how models say *where* |
+| [Inside SmolVLA](learn-vla.md) | 7 | The two transformers, flow matching in six lines, real-time chunking |
+| [Measuring a policy](learn-eval.md) | 8 | What 18 out of 24 really tells you, and what to log |
+
 Then: [what to try next](next.md) (Cosmos 3, sim-to-real transfer, grounding models, RL) and
 [the concepts in one page](concepts.md).
 

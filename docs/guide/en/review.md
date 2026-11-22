@@ -35,6 +35,8 @@ outputs/datasets/so101-qc/
   videos/               one mp4 stream per camera
 ```
 
+More detail: [inside the dataset](learn-dataset.md).
+
 One frame = `observation.images.top`, `observation.images.wrist`, `observation.state` (where the follower is),
 `action` (where the leader told it to go), and the task sentence. Training is: given the first three and the sentence,
 predict the next 50 actions.

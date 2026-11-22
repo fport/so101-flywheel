@@ -42,7 +42,8 @@ Fumbled the grasp, bumped the tray, forgot to return? Press **←**, also if you
 - **The other pockets:** episodes 1–4 full tray, 5–7 two or three neighbours, 8–10 the part alone. At run time the tray
   empties as the arm works, and the policy must have seen all of that.
 
-Why this matters, and the rest of the rules: [data quality](data-quality.md).
+Why this matters, and the rest of the rules: [data quality](data-quality.md). The theory behind them:
+[how imitation learning works](learn-imitation.md).
 
 ## If something goes wrong
 

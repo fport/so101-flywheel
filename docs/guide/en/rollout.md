@@ -25,6 +25,8 @@ Do not judge by a few lucky runs. Fix the test before you look:
 | Success | Part is in the commanded bin and the arm is back, within 30 s, without your help |
 | Write down | pocket, bin, success, and the failure type: wrong pocket · missed grasp · dropped · wrong bin · stuck |
 
+Why 24 trials and what they can show: [measuring a policy](learn-eval.md).
+
 Report successes out of 24, and per pocket and per bin. 24 trials only separate "works" from "does not": 18/24 and
 20/24 are the same result. The failure types are what you act on:
 

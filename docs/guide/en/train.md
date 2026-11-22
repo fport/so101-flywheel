@@ -39,6 +39,8 @@ size.
 4. The loss is how far the predicted 50 actions are from the 50 you actually made. Nothing else: no reward, no notion
    of success.
 
+The full picture, with the formulas: [inside a VLM](learn-vlm.md) and [inside SmolVLA](learn-vla.md).
+
 So a falling loss means "imitates the recorded motions better", not "sorts parts". Only the real arm tells you that.
 
 ## Check

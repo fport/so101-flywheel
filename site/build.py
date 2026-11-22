@@ -17,11 +17,15 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[1]
 GUIDE, PUBLIC, STATIC = ROOT / "docs" / "guide", ROOT / "site" / "public", ROOT / "site" / "static"
 GITHUB = "https://github.com/fport/so101-flywheel"
-PAGES = ["index", "cell", "setup", "inspect", "record", "data-quality", "review", "train", "rollout", "next", "concepts"]
+PAGES = ["index", "cell", "setup", "inspect", "record", "data-quality", "review", "train", "rollout",
+         "learn-imitation", "learn-dataset", "learn-vlm", "learn-vla", "learn-eval", "next", "concepts"]
+GROUPS = {"cell": "do", "learn-imitation": "understand", "next": "more"}  # a nav heading before these pages
 UI = {
     "en": {"home": "The path", "prev": "Previous", "next": "Next", "menu": "Steps", "copy": "Copy", "copied": "Copied",
+           "do": "Do", "understand": "Understand", "more": "More",
            "desc": "SO-101 zero to hero: build a cell, record demonstrations, train SmolVLA, run it on the arm."},
     "tr": {"home": "Yol haritası", "prev": "Önceki", "next": "Sonraki", "menu": "Adımlar", "copy": "Kopyala", "copied": "Kopyalandı",
+           "do": "Yap", "understand": "Anla", "more": "Devamı",
            "desc": "SO-101 sıfırdan zirveye: hücreyi kur, gösterim kaydet, SmolVLA eğit, kolda çalıştır."},
 }
 
@@ -46,7 +50,8 @@ def page(lang, name, text, titles):
     other = "tr" if lang == "en" else "en"
     url = lambda l, n: ("/" if l == "en" else "/tr/") + ("" if n == "index" else n)  # noqa: E731
     nav = "".join(
-        f'<a href="{url(lang, n)}"{" class=on" if n == name else ""}>{html.escape(ui["home"] if n == "index" else titles[n])}</a>'
+        (f"<h6>{ui[GROUPS[n]]}</h6>" if n in GROUPS else "")
+        + f'<a href="{url(lang, n)}"{" class=on" if n == name else ""}>{html.escape(ui["home"] if n == "index" else titles[n])}</a>'
         for n in PAGES)
     pager = ""
     if i > 0:

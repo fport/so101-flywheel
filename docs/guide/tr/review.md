@@ -35,6 +35,8 @@ outputs/datasets/so101-qc/
   videos/               one mp4 stream per camera
 ```
 
+Daha fazla ayrıntı: [dataset'in içi](learn-dataset.md).
+
 Bir kare = `observation.images.top`, `observation.images.wrist`, `observation.state` (follower'ın nerede olduğu),
 `action` (leader'ın ona nereye gitmesini söylediği) ve görev cümlesi. Eğitim şu: ilk üçü ve cümle verildiğinde
 sonraki 50 action'ı tahmin et.
