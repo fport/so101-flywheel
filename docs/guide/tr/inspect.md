@@ -33,4 +33,4 @@ dört farklı tepside çalıştır; güvenmeden önce geçmen gereken çıta her
 ## Sırada
 
 Ölçüm adımı bu dört parça için elle yazılmış. Bir *grounding* modeli ise nesneleri bir metin prompt'undan bulur:
-bkz. ["Sırada ne denenir" sayfasındaki LocateAnything](next.md#grounding-locateanything).
+bkz. [grounding](learn-grounding.md).

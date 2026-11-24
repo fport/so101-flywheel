@@ -39,6 +39,8 @@ That cache is what makes a VLA fast enough.
 
 ## Flow matching: how noise becomes a motion
 
+This section is the short version. [Flow matching from scratch](learn-flow.md) derives it and runs it on a toy problem.
+
 The expert does not output actions directly. It learns a *velocity field*: a rule that says, for any half-noisy
 action chunk, which direction leads to a clean one.
 
@@ -108,7 +110,7 @@ enough.
 | **SmolVLA** | 450 M | yes | Flow matching, ~100 M expert | One consumer GPU |
 | π0 / π0.5 | 3–4 B | yes | Flow matching, ~300 M expert | 24–40 GB |
 | GR00T N1.7 | 3 B | yes | Flow-matching diffusion transformer under a slower VLM | Large GPU, Jetson to run |
-| Cosmos 3 Edge | 4.6 B | yes | Actions denoised by the world model itself | 21 GB with LoRA, LeRobot 0.7 |
+| [Cosmos 3 Edge](learn-world-models.md) | 4.6 B | yes | Actions denoised together with the future video | 21 GB with LoRA, LeRobot 0.7 |
 
 On real SO-100 tasks with 50 demonstrations each, the SmolVLA paper reports 78 % average success, against 62 % for π0
 and 48 % for ACT, and 52 % for SmolVLA without its pretraining. Our task has 12 sentences that differ in one

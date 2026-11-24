@@ -30,10 +30,19 @@ için oku.
 | [Dataset'in içi](learn-dataset.md) | 6 | Tam olarak ne saklanıyor, tek bir eğitim örneği nasıl kuruluyor, zamanlama neden önemli |
 | [Bir vision-language modelin içi](learn-vlm.md) | 7 | Bir görüntü nasıl 64 token oluyor, ne dondurulmuş, modeller *nerede* olduğunu nasıl söylüyor |
 | [SmolVLA'nın içi](learn-vla.md) | 7 | İki transformer, altı satırda flow matching, real-time chunking |
+| [Sıfırdan flow matching](learn-flow.md) | 7 | Gürültü nasıl harekete dönüşür, çalıştırabileceğin 50 satırlık bir örnekle |
 | [Bir policy'yi ölçmek](learn-eval.md) | 8 | 24'te 18 sana gerçekte ne söylüyor, neyi not etmelisin |
 
-Sonra: [sırada ne denenir](next.md) (Cosmos 3, sim-to-real aktarımı, grounding modelleri, RL) ve
-[tek sayfada kavramlar](concepts.md).
+Daha ileri gitmek için, baseline'ın bir puanı olduktan sonra:
+
+| Oku | Neyi cevaplıyor |
+| --- | --- |
+| [Policy olarak world model](learn-world-models.md) | Cosmos 3 Edge nedir, bizim dataset'imiz ondan nasıl geçer |
+| [Sim-to-real](learn-sim2real.md) | Yeniden boyanmış bir simülatör neyin yerini tutabilir, neyin tutamaz |
+| [Grounding](learn-grounding.md) | LocateAnything bir ifadeyi nasıl cep numarasına çevirir |
+| [Deney planı](next.md) | Bunlardan hangisini önce denemeli, sonuçları nasıl karşılaştırmalısın |
+
+Ve [tek sayfada kavramlar](concepts.md).
 
 ## Neye ihtiyacın var
 

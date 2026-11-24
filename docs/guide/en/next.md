@@ -1,52 +1,126 @@
-# What to try next
+# After the baseline: the experiment plan
 
-Each of these is one experiment with a clear question. Do them after the SmolVLA baseline has a score: without a
-baseline you cannot tell whether anything helped.
+You have a dataset, a SmolVLA checkpoint and a score. This page is what to do next, in the order that teaches the
+most for the least money. Each experiment changes **one thing** and is judged on the **same fixed test**
+([measuring a policy](learn-eval.md)).
 
-## A bigger policy: Cosmos 3 Edge
+## The cell is four layers
 
-[nvidia/Cosmos3-Edge](https://huggingface.co/nvidia/Cosmos3-Edge) is a 4 B-parameter *world model*: it generates
-video, text and actions with one network, so it is not a drop-in VLA like SmolVLA. LeRobot (0.7 and later) can
-fine-tune it as a policy:
+Every model in this guide belongs to one of them. Knowing which keeps the experiments separate.
 
-```bash
-lerobot-train --policy.type=cosmos3_edge --policy.pretrained_path=lerobot/Cosmos3-Edge \
-  --policy.load_action_modules=false --dataset.repo_id=fport/so101-qc ...
+```
+1. SEE        top camera frame ─► where is each part, what is wrong with it
+                 today: AprilTags + measurement          try: LocateAnything
+2. DECIDE     work order + what was seen ─► OK or REJECT per pocket
+                 today: decide() in flywheel.qc          (rules; nothing to learn)
+3. SAY        one sentence per pocket: "put the part from pocket 3 in the REJECT bin"
+4. DO         sentence + two cameras + joints ─► 30 actions per second
+                 today: SmolVLA                          try: Cosmos 3 Edge
+   ─────────────────────────────────────────────────────────────────────────────
+   DATA       what layer 4 learns from
+                 today: teleoperated episodes            try: DAgger corrections, Sim-Transfer, RL
 ```
 
-- **Question:** does a 10× larger model follow the 12 sentences better on the same 120 episodes?
-- **Cost:** LoRA fine-tuning needs about 21 GB of GPU memory (an A100, not an A10G); full fine-tuning 47 GB. Linux only.
-- **Caveat:** the model card does not list the SO-101; NVIDIA's blog does. Read the
-  [LeRobot Cosmos 3 page](https://huggingface.co/docs/lerobot/cosmos3) for the camera description it expects.
+Why not one model for everything? Because of resolution. The policy sees each camera as 64 tokens; a 7 mm hole is
+far below that. Inspection reads a straightened crop at 4 pixels per millimetre. Keeping "what is wrong" out of the
+policy is what lets a small VLA do the job: it only has to find a pocket and a bin.
 
-## Sim to real: Cosmos 3 Nano Sim-Transfer
+## The ladder
 
-[nvidia/Cosmos3-Nano-Sim-Transfer](https://huggingface.co/nvidia/Cosmos3-Nano-Sim-Transfer) turns simulator output
-(depth, segmentation or edges) plus a text prompt into photoreal video. This repo has a MuJoCo copy of the cell and a
-scripted expert that solves it (`uv run flywheel-sim batch`).
+| | Experiment | Changes | Cost | Needs |
+| --- | --- | --- | --- | --- |
+| 0 | SmolVLA baseline | | ~4 h of an A100 | Done first |
+| 1 | Inference settings | Chunk execution only | Free | The baseline checkpoint |
+| 2 | Learning curve | Amount of data | 2 more trainings | The dataset |
+| 3 | DAgger round | 20 to 30 correction episodes | One afternoon + 1 training | The arm |
+| 4 | Grounding | Layer 1 | A GPU for an hour, no arm | Saved frames |
+| 5 | Cosmos 3 Edge | Layer 4 | A 48 GB+ GPU, and a GPU machine for rollout | LeRobot 0.7 |
+| 6 | Sim-Transfer data | The data | An H100-class GPU, a week of building | The simulator |
+| 7 | Reinforcement learning | How layer 4 improves | Days on the arm | A reward signal |
 
-- **Question:** can sim episodes, repainted to look real, replace some of the teleoperated ones?
-- **Cost:** 15–16 B parameters, tested by NVIDIA on H100-class GPUs only. Expect more than 24 GB.
-- **Path:** render depth + segmentation from the sim → Sim-Transfer → a LeRobot dataset with the sim's actions →
-  train on real + generated → same 24-trial test.
+Do them top to bottom. The first three cost almost nothing and tell you whether the expensive ones are worth it.
 
-## Grounding: LocateAnything {#grounding-locateanything}
+### 1. Inference settings (free)
 
-[nvidia/LocateAnything-3B](https://huggingface.co/nvidia/LocateAnything-3B) returns boxes or points (0–1000
-coordinates) for a text prompt such as "gear with a missing tooth".
-[Demo](https://huggingface.co/spaces/nvidia/LocateAnything).
+Same checkpoint, same test, three runs:
 
-- **Question:** can a prompt replace the hand-written measurements in `flywheel-inspect`, and the AprilTags?
-- **Test:** the frames in `outputs/inspect/*/frame.png` with known part IDs are a ready-made benchmark.
-- **Caveats:** non-commercial licence; the public demo may store what you upload.
+| Run | Setting | Looks for |
+| --- | --- | --- |
+| a | `--inference.type=sync` | Pauses at chunk boundaries |
+| b | `--inference.type=rtc` (what `scripts/rollout.sh` uses) | Smooth motion, late reactions |
+| c | `rtc`, fewer actions executed per chunk | Faster reaction to a slipped part, more compute |
 
-## Reinforcement learning
+This is the cheapest lesson in how a chunked policy behaves. Background: [inside SmolVLA](learn-vla.md).
+
+### 2. Learning curve
+
+Train the same model on half the data, then compare with the full one:
+
+```bash
+# the first 5 episodes of each 10-episode block: 5 per sentence instead of 10
+HALF=$(python3 -c "print(str([b*10+i for b in range(12) for i in range(5)]).replace(' ',''))")
+scripts/train.sh --dataset.episodes="$HALF" --job_name=so101-qc-smolvla-half
+```
+
+The list assumes 12 blocks of exactly 10 episodes in recording order. If you deleted episodes, build it from
+`scripts/status.sh` instead.
+
+| Result | Meaning | Next |
+| --- | --- | --- |
+| 60 episodes scores about the same as 120 | Data amount is not the limit | Fix what fails: DAgger, or a different model |
+| 120 clearly better than 60 | Still on the rising part of the curve | Record more before anything else |
+
+This one result decides whether experiments 3 and 6 (more data) or 5 (a bigger model) come first.
+
+### 3. One DAgger round
+
+Run the policy, take over when it fails, save only the corrections, retrain on old + new, retest. Twenty good
+corrections aimed at the most common failure type usually move the score more than sixty new clean episodes. How:
+[run and improve](rollout.md); why: [how imitation learning works](learn-imitation.md).
+
+### 4. Grounding in the inspection
+
+Replace or double-check the hand-written measurements with a grounding model, on saved frames, with no robot.
+Start here if you care more about perception than about control. Full page: [grounding](learn-grounding.md).
+
+### 5. A world model as the policy
+
+Fine-tune Cosmos 3 Edge with LoRA on the same episodes and run the same test. The question is narrow: does a 10×
+larger model that also predicts video follow the pocket number better? Full page:
+[world models as policies](learn-world-models.md).
+
+### 6. Simulated episodes, repainted
+
+Generate episodes in the MuJoCo cell, repaint them with Cosmos 3 Sim-Transfer, mix with real data. Worth doing only
+if experiment 2 said more data helps. Full page: [sim to real](learn-sim2real.md).
+
+### 7. Reinforcement learning
 
 Imitation stops at the quality of your demonstrations. RL lets the arm improve past them from its own attempts and a
-success signal. LeRobot ships HIL-SERL (human-in-the-loop RL on the real arm). The inspection camera could give the
-reward: "is the part in the commanded bin?". Start this only when imitation plateaus.
+success signal. LeRobot ships HIL-SERL (human-in-the-loop RL on the real arm). The top camera can give the reward:
+"is the part in the commanded bin?". Start this only when imitation has plateaued and you can leave the arm running.
+
+## Comparing two policies with 24 trials
+
+Twenty-four trials can tell *broken* from *working*. They cannot tell 70 % from 80 %. So:
+
+- **Pair the trials.** Both policies get the same 24 trials: same part, pocket, bin, tray fill. Count the trials
+  where exactly one of them succeeded. If A wins 7 of those and B wins 1, that is a real difference. If it is 4
+  against 3, it is not.
+- **Compare failure types, not only totals.** "Wrong pocket dropped from 6 to 1" is a finding even when the total
+  barely moves.
+- **Change one thing.** A new model *and* new data *and* new settings is three experiments with one answer.
+
+## What each one costs to get wrong
+
+| | If it fails you lose | You still learn |
+| --- | --- | --- |
+| 1, 2, 3 | An afternoon | How chunking, data amount and corrections behave on your own arm |
+| 4 | An hour of GPU | Where a general model stops seeing your defects |
+| 5 | A day and tens of dollars | How a world model is fine-tuned and served |
+| 6 | A week | A simulator that writes LeRobot datasets, which RL needs anyway |
 
 ## A newer LeRobot
 
-This repo pins LeRobot 0.6.1 (the arm is calibrated and tested on it). 0.7 adds Cosmos 3 policies and remote
-inference. The dataset format (v3.0) is the same, so you can record on 0.6.1 and train on 0.7.
+This repo pins LeRobot 0.6.1: the arm is calibrated and tested on it. Cosmos 3 needs 0.7 or later. The dataset
+format (v3.0) is the same, so keep recording on 0.6.1 and train the Cosmos experiment in a separate environment.

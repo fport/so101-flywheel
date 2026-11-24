@@ -77,8 +77,8 @@ The inspection step needs positions. Models answer that in different formats:
 | General VLMs | Coordinates written as text or JSON: validate them with a schema before use |
 
 `flywheel-inspect` avoids the question with AprilTags: the pocket positions are known in millimetres, so the VLM only
-has to say *what* is in a crop. Replacing the tags with a grounding model is experiment 3 in
-[what to try next](next.md).
+has to say *what* is in a crop. Replacing the tags with a grounding model is covered in
+[grounding](learn-grounding.md).
 
 **Sources:** *Vision Language Models* (Noyan, Farré, Marafioti): tokens and pixel shuffle p. 131–134, architectures
 p. 229–249, localisation p. 87–94, LoRA p. 191–199 · LeRobot 0.6.1 source, `policies/smolvla/smolvlm_with_expert.py`

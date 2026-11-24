@@ -40,6 +40,8 @@ yeniden kullanıyor. Bir VLA'yı yeterince hızlı yapan şey bu önbellek.
 
 ## Flow matching: gürültü nasıl harekete dönüşür
 
+Bu bölüm kısa versiyon. [Sıfırdan flow matching](learn-flow.md) onu türetiyor ve oyuncak bir problemde çalıştırıyor.
+
 Expert action'ları doğrudan vermiyor. Bir *velocity field* (hız alanı) öğreniyor: yarı gürültülü herhangi bir action
 chunk için hangi yönün temiz bir chunk'a götürdüğünü söyleyen bir kural.
 
@@ -109,7 +111,7 @@ yüzden.
 | **SmolVLA** | 450 M | evet | Flow matching, ~100 M expert | Tek bir tüketici GPU'su |
 | π0 / π0.5 | 3–4 B | evet | Flow matching, ~300 M expert | 24–40 GB |
 | GR00T N1.7 | 3 B | evet | Daha yavaş bir VLM'in altında flow matching'li diffusion transformer | Büyük GPU, çalıştırmak için Jetson |
-| Cosmos 3 Edge | 4,6 B | evet | Action'ları world model'in kendisi denoise ediyor | LoRA ile 21 GB, LeRobot 0.7 |
+| [Cosmos 3 Edge](learn-world-models.md) | 4,6 B | evet | Action'lar gelecekteki videoyla birlikte denoise ediliyor | LoRA ile 21 GB, LeRobot 0.7 |
 
 Her biri 50 gösterimli gerçek SO-100 görevlerinde SmolVLA makalesi ortalama %78 başarı bildiriyor; π0 için %62, ACT
 için %48, önceden eğitimi olmayan SmolVLA için %52. Bizim görevimizde tek kelimeyle ayrışan 12 cümle var, bu da üç ayrı

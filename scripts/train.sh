@@ -4,6 +4,7 @@
 #   scripts/train.sh                 HF Jobs, a100-large: the recipe below takes about 4 h there
 #   STEPS=200 scripts/train.sh       dry run: proves the dataset loads and the camera names map
 #   TARGET=local scripts/train.sh    this machine (needs a CUDA GPU)
+#   scripts/train.sh --dataset.episodes="[0,1,2]"    extra arguments go to lerobot-train as they are
 # A job uploads the policy to $HF_USER/$DATASET-smolvla_<time> and prints that name as "Model repo:". Put it in
 # scripts/env.local.sh as POLICY. A local run uploads to $HF_USER/$DATASET-smolvla.
 set -euo pipefail
@@ -16,4 +17,5 @@ cmd=(lerobot-train --policy.path=lerobot/smolvla_base \
   "--batch_size=${BATCH_SIZE:-64}" "--steps=${STEPS:-20000}" \
   --policy.device=cuda --wandb.enable=false)
 [[ "${TARGET:-a100-large}" != "local" ]] && cmd+=("--job.target=${TARGET:-a100-large}")
+cmd+=("$@")
 run "${cmd[@]}"

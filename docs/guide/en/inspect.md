@@ -33,4 +33,4 @@ three or four different trays; `bin 6/6` each time is the bar before you trust i
 ## Try next
 
 The measuring step is hand-written for these four parts. A *grounding* model finds things from a text prompt instead:
-see [LocateAnything in "next"](next.md#grounding-locateanything).
+see [grounding](learn-grounding.md).

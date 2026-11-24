@@ -78,8 +78,8 @@ Muayene adımı konum istiyor. Modeller buna farklı formatlarda cevap veriyor:
 | Genel VLM'ler | Metin ya da JSON olarak yazılmış koordinatlar: kullanmadan önce bir şemayla doğrula |
 
 `flywheel-inspect` bu soruyu AprilTag'lerle atlatıyor: cep konumları milimetre cinsinden biliniyor, yani VLM'in sadece
-bir kırpıntıda *ne* olduğunu söylemesi yetiyor. Tag'lerin yerine bir grounding modeli koymak,
-[sırada ne denenir](next.md) sayfasındaki 3. deney.
+bir kırpıntıda *ne* olduğunu söylemesi yetiyor. Tag'lerin yerine bir grounding modeli koymak
+[grounding](learn-grounding.md) sayfasında anlatılıyor.
 
 **Kaynaklar:** *Vision Language Models* (Noyan, Farré, Marafioti): token'lar ve pixel shuffle s. 131–134, mimariler
 s. 229–249, konum bulma s. 87–94, LoRA s. 191–199 · LeRobot 0.6.1 kaynak kodu, `policies/smolvla/smolvlm_with_expert.py`

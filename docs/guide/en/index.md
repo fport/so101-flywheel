@@ -28,10 +28,19 @@ Each step works without these. Read them to know *why* it works, and what to cha
 | [Inside the dataset](learn-dataset.md) | 6 | What exactly is stored, how one training sample is built, why timing matters |
 | [Inside a vision-language model](learn-vlm.md) | 7 | How an image becomes 64 tokens, what is frozen, how models say *where* |
 | [Inside SmolVLA](learn-vla.md) | 7 | The two transformers, flow matching in six lines, real-time chunking |
+| [Flow matching from scratch](learn-flow.md) | 7 | How noise becomes a motion, with a 50-line example you can run |
 | [Measuring a policy](learn-eval.md) | 8 | What 18 out of 24 really tells you, and what to log |
 
-Then: [what to try next](next.md) (Cosmos 3, sim-to-real transfer, grounding models, RL) and
-[the concepts in one page](concepts.md).
+Going further, once the baseline has a score:
+
+| Read | It answers |
+| --- | --- |
+| [World models as policies](learn-world-models.md) | What Cosmos 3 Edge is, and how our dataset goes through it |
+| [Sim to real](learn-sim2real.md) | What a repainted simulator can and cannot replace |
+| [Grounding](learn-grounding.md) | How LocateAnything turns a phrase into a pocket number |
+| [The experiment plan](next.md) | Which of these to try first, and how to compare the results |
+
+And [the concepts in one page](concepts.md).
 
 ## What you need
 
