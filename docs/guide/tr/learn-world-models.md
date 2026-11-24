@@ -106,8 +106,10 @@ chunk'ı bitirir ve her sınırda durur. Ayarlanacak iki şey var: daha uzun bir
 sayıda solver adımı (LIBERO varsayılanı 30, DROID tarifi 4 kullanıyor). İkisini de ayarlaman gerekeceğini bekle.
 
 **2. Nerede çalıştığı.** bfloat16'da 15 GB GPU belleği ve sadece Linux, yani kolun yanındaki Mac'te değil. Policy bir
-GPU makinesinde çalışmak ve chunk'ları geri göndermek zorunda. LeRobot bu ayrımı `lerobot.async_inference` olarak
-sunuyor (bir policy sunucusu ve bir robot istemcisi). Ağ gecikmesi de 1. maddenin üstüne eklenir.
+GPU makinesinde çalışmak ve chunk'ları geri göndermek zorunda. Güncel LeRobot bu ayrımı *remote inference* olarak
+sunuyor: GPU makinesinde `lerobot-policy-server`, kolun yanında `lerobot-rollout --inference.type=remote`. Dokümanlara
+göre bunun üzerinden gerçek robotlarda sadece ACT, SmolVLA, X-VLA, EVO1 ve LaWAM çalıştırıldı; diğer policy'ler
+protokol tarafından destekleniyor ama donanımda doğrulanmadı. Ağ gecikmesi de 1. maddenin üstüne eklenir.
 
 **3. Veri ölçeği.** Yayımlanmış tarifler 379 ila 1 693 episode üzerinde, 2 048'lik efektif batch ile fine-tune ediyor.
 Bizde yaklaşık 120 episode var ve 8'lik bir batch kullanırdık. Bu ölçekte ne olduğunu kimse yayımlamadı. LIBERO

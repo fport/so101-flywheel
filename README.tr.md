@@ -21,6 +21,8 @@ Hat sonu kalite kontrol görevi üzerinde düz <a href="https://github.com/huggi
 
 <p align="center">
   <a href="https://zero2hero.getporti.com/tr/"><b>Rehber</b></a> ·
+  <a href="docs/guide/tr/roadmap.md">Rota</a> ·
+  <a href="https://flywheel.getporti.com">3D hücre</a> ·
   <a href="docs/guide/tr/record.md">Kayıt</a> ·
   <a href="docs/guide/tr/data-quality.md">Veri kalitesi</a> ·
   <a href="docs/guide/tr/train.md">Eğitim</a> ·

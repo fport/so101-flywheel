@@ -41,6 +41,9 @@ kasayı bulması gerekiyor.
 
 Bunları yukarıdan aşağıya yap. İlk üçü neredeyse bedava ve pahalı olanların değip değmeyeceğini söylüyor.
 
+Bu merdiven [rota](roadmap.md) üzerindeki 4 ila 9. fazlar. 3. ve 5. deneyler arasında bir seçenek daha var: aynı
+testi, SO-101'i zaten tanıyan başka bir güncel policy ile yapmak. Hangileri ve neden: [2026'da alan](learn-landscape.md).
+
 ### 1. Inference ayarları (ücretsiz)
 
 Aynı checkpoint, aynı test, üç çalıştırma:

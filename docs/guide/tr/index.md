@@ -4,12 +4,16 @@ Boş bir masadan, konuşur gibi verilen bir komutla parçaları ayıran bir robo
 eğittiğin bir policy yönetiyor. Sekiz adım. Her biri birkaç sade `lerobot-*` komutu; arkasındaki sayfa komutun ne
 yaptığını ve neye dikkat etmen gerektiğini anlatıyor.
 
+Bu sekiz adım daha uzun bir projenin ilk dört fazı. [Rota](roadmap.md) on fazın hepsini, her birinin ne ürettiğini ve
+bittiğini nasıl anlayacağını gösteriyor.
+
 **Görev.** Bir tepside 3D baskı altı parça var. Yukarıdaki bir kamera bir kez bakıyor ve her cep için OK ya da REJECT
 kararı veriyor. Sonra kola her seferinde tek parça için şu söyleniyor: *"put the part from pocket 3 in the REJECT bin"*
 (3. cepteki parçayı REJECT kasasına koy).
 
 | | Adım | Sen ne yapıyorsun | Ne öğreniyorsun |
 | --- | --- | --- | --- |
+| 0 | [Önce simüle et](simulate.md) | `flywheel-sim batch`, donanım yok | Görev ve hücrenin neden böyle göründüğü |
 | 1 | [Hücreyi kur](cell.md) | Bas, birleştir, iki kamerayı tak | Sahne neden kıpırdamamalı |
 | 2 | [Kolu hazırla](setup.md) | Kur, kalibre et, teleop yap | Leader/follower, eklem uzayı |
 | 3 | [Tepsiyi muayene et](inspect.md) | `flywheel-inspect` | Klasik görüntü işleme ve VLM, grounding |
@@ -37,9 +41,11 @@ Daha ileri gitmek için, baseline'ın bir puanı olduktan sonra:
 
 | Oku | Neyi cevaplıyor |
 | --- | --- |
+| [2026'da alan](learn-landscape.md) | Beş policy ailesi ve hangilerinin bu kolu zaten gördüğü |
 | [Policy olarak world model](learn-world-models.md) | Cosmos 3 Edge nedir, bizim dataset'imiz ondan nasıl geçer |
 | [Sim-to-real](learn-sim2real.md) | Yeniden boyanmış bir simülatör neyin yerini tutabilir, neyin tutamaz |
 | [Grounding](learn-grounding.md) | LocateAnything bir ifadeyi nasıl cep numarasına çevirir |
+| [Gerçek kolda reinforcement learning](learn-rl.md) | HIL-SERL ve reward model'ler nasıl çalışır, bu hücreden ne isterler |
 | [Deney planı](next.md) | Bunlardan hangisini önce denemeli, sonuçları nasıl karşılaştırmalısın |
 
 Ve [tek sayfada kavramlar](concepts.md).

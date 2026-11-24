@@ -21,6 +21,8 @@ Plain <a href="https://github.com/huggingface/lerobot">LeRobot</a> commands on a
 
 <p align="center">
   <a href="https://zero2hero.getporti.com"><b>Guide</b></a> ·
+  <a href="docs/guide/en/roadmap.md">Roadmap</a> ·
+  <a href="https://flywheel.getporti.com">3D cell</a> ·
   <a href="docs/guide/en/record.md">Recording</a> ·
   <a href="docs/guide/en/data-quality.md">Data quality</a> ·
   <a href="docs/guide/en/train.md">Training</a> ·

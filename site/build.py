@@ -17,10 +17,10 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[1]
 GUIDE, PUBLIC, STATIC = ROOT / "docs" / "guide", ROOT / "site" / "public", ROOT / "site" / "static"
 GITHUB = "https://github.com/fport/so101-flywheel"
-PAGES = ["index", "cell", "setup", "inspect", "record", "data-quality", "review", "train", "rollout",
+PAGES = ["index", "roadmap", "simulate", "cell", "setup", "inspect", "record", "data-quality", "review", "train", "rollout",
          "learn-imitation", "learn-dataset", "learn-vlm", "learn-vla", "learn-flow", "learn-eval",
-         "learn-world-models", "learn-sim2real", "learn-grounding", "next", "concepts"]
-GROUPS = {"cell": "do", "learn-imitation": "understand", "learn-world-models": "further", "concepts": "more"}  # a nav heading before these pages
+         "learn-landscape", "learn-world-models", "learn-sim2real", "learn-grounding", "learn-rl", "next", "concepts"]
+GROUPS = {"simulate": "do", "learn-imitation": "understand", "learn-landscape": "further", "concepts": "more"}  # a nav heading before these pages
 UI = {
     "en": {"home": "The path", "prev": "Previous", "next": "Next", "menu": "Steps", "copy": "Copy", "copied": "Copied",
            "do": "Do", "understand": "Understand", "further": "Go further", "more": "More",

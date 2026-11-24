@@ -2,7 +2,7 @@
 
 The MuJoCo scene for the reference task: end-of-line quality control at an automotive supplier. The top camera inspects the
 tray of parts (wheel rim, gear, brake pad, bracket) once; the arm then picks each part from its pocket and drops it into the OK bin
-if it matches the work order, or into the reject bin if it does not. Why the part set and attempts are set up this way: [experiment-design.md](experiment-design.md).
+if it matches the work order, or into the reject bin if it does not.
 It is for trying out the layout, camera angles and part set before the real setup is printed, and then for generating synthetic data
 for the verifier and the policy. All dimensions come from [`hardware/params.yaml`](../hardware/params.yaml).
 
@@ -46,7 +46,7 @@ Part IDs carry no label: `J-W-03` is wheel rim, white, number 3 (`J` rim, `D` ge
 ## Inspection image
 
 Inspection is not part of an episode. Before the first pick, with the arm at home, `QCSortSim.tray_frame()` renders one
-top-camera frame of the whole tray; `flywheel.robot.tray` finds the four tags, cuts each pocket out rectified at 4 px/mm
+top-camera frame of the whole tray; `flywheel.qc.tray` finds the four tags, cuts each pocket out rectified at 4 px/mm
 and measures holes, rim spokes, gear teeth, broken corners and colour from the silhouette. The real arm does the same
 with the C310 (`flywheel-inspect`). Each episode is then "put the part from pocket N in the X bin".
 
@@ -58,7 +58,7 @@ brake pad, orange brake pad without ear holes, white brake pad with broken corne
 
 ## Ground truth
 
-At the end of an episode, `QCSortSim.outcome()` produces the same labels as the failure taxonomy in the PRD: `grasp_fail`, `drop`,
+At the end of an episode, `QCSortSim.outcome()` produces these failure labels: `grasp_fail`, `drop`,
 `wrong_bin`, `misclassification`, `out_of_bin`, `timeout`. Because this label is exact in sim, the VLM verifier's
 accuracy (agreement, false positive) can be measured before moving to the real arm.
 

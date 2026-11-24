@@ -105,8 +105,10 @@ exists and stop at every boundary. Two levers: a longer chunk (48 actions = 1.6 
 steps (the LIBERO default is 30, the DROID recipe uses 4). Expect to tune both.
 
 **2. Where it runs.** 15 GB of GPU memory in bfloat16 and Linux only, so not on the Mac next to the arm. The policy
-has to run on a GPU machine and send chunks back. LeRobot ships this split as `lerobot.async_inference` (a policy
-server and a robot client). Network delay then adds to point 1.
+has to run on a GPU machine and send chunks back. Current LeRobot ships this split as *remote inference*:
+`lerobot-policy-server` on the GPU machine, `lerobot-rollout --inference.type=remote` next to the arm. The docs say
+only ACT, SmolVLA, X-VLA, EVO1 and LaWAM have run on real robots through it; other policies are supported by the
+protocol but not validated on hardware. Network delay then adds to point 1.
 
 **3. Data scale.** The public recipes fine-tune on 379 to 1 693 episodes with an effective batch of 2 048. We have
 about 120 episodes and would use a batch of 8. Nobody has published what happens at that scale. The LIBERO result

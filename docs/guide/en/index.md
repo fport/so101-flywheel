@@ -4,11 +4,15 @@ From an empty desk to a robot arm that sorts parts on a spoken-style command, us
 recorded. Eight steps. Each one is a few plain `lerobot-*` commands; the page behind it explains what the command
 does and what to watch for.
 
+These eight steps are the first four phases of a longer project. [The route](roadmap.md) shows all ten, with what
+each one produces and how you know it is done.
+
 **The task.** A tray holds six 3D-printed parts. A camera above looks once and decides, per pocket, OK or REJECT.
 The arm is then told, one part at a time: *"put the part from pocket 3 in the REJECT bin"*.
 
 | | Step | You do | You learn |
 | --- | --- | --- | --- |
+| 0 | [Simulate first](simulate.md) | `flywheel-sim batch`, no hardware | The task, and why the cell looks the way it does |
 | 1 | [Build the cell](cell.md) | Print, assemble, mount two cameras | Why the scene must not move |
 | 2 | [Set up the arm](setup.md) | Install, calibrate, teleoperate | Leader/follower, joint space |
 | 3 | [Inspect the tray](inspect.md) | `flywheel-inspect` | Classic vision vs a VLM, grounding |
@@ -35,9 +39,11 @@ Going further, once the baseline has a score:
 
 | Read | It answers |
 | --- | --- |
+| [The field in 2026](learn-landscape.md) | The five families of policies, and which ones have already seen this arm |
 | [World models as policies](learn-world-models.md) | What Cosmos 3 Edge is, and how our dataset goes through it |
 | [Sim to real](learn-sim2real.md) | What a repainted simulator can and cannot replace |
 | [Grounding](learn-grounding.md) | How LocateAnything turns a phrase into a pocket number |
+| [Reinforcement learning on a real arm](learn-rl.md) | How HIL-SERL and reward models work, and what they need from this cell |
 | [The experiment plan](next.md) | Which of these to try first, and how to compare the results |
 
 And [the concepts in one page](concepts.md).

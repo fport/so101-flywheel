@@ -40,6 +40,9 @@ policy is what lets a small VLA do the job: it only has to find a pocket and a b
 
 Do them top to bottom. The first three cost almost nothing and tell you whether the expensive ones are worth it.
 
+This ladder is phases 4 to 9 of [the route](roadmap.md). Between experiments 3 and 5 there is one more option: the
+same test on another current policy that already knows the SO-101. Which ones, and why: [the field in 2026](learn-landscape.md).
+
 ### 1. Inference settings (free)
 
 Same checkpoint, same test, three runs:
